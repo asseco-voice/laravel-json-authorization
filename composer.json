@@ -1,0 +1,31 @@
+{
+    "name": "asseco-voice/laravel-json-authorization",
+    "description": "Laravel JSON authorization",
+    "keywords": [
+        "php",
+        "laravel"
+    ],
+    "license": "MIT",
+    "require": {
+        "php": "^7.4",
+        "asseco-voice/laravel-json-query-builder": "dev-master",
+        "illuminate/support": "^7.17",
+        "illuminate/database": "^7.17"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.5",
+        "mockery/mockery": "^1.3.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Voice\\JsonAuthorization\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Voice\\JsonAuthorization\\JsonAuthorizationServiceProvider"
+            ]
+        }
+    }
+}
