@@ -1,6 +1,6 @@
 <?php
 
-namespace Voice\SearchQueryBuilder\App\Scopes;
+namespace Voice\JsonAuthorization\App\Scopes;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
