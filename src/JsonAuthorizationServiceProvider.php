@@ -2,97 +2,127 @@
 
 namespace Voice\JsonAuthorization;
 
+use Exception;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
+use Voice\JsonQueryBuilder\Exceptions\SearchException;
 use Voice\JsonQueryBuilder\JsonQuery;
 
 class JsonAuthorizationServiceProvider extends ServiceProvider
 {
     /**
+     * Register the application services.
+     */
+    public function register()
+    {
+        $this->mergeConfigFrom(__DIR__ . '/config/asseco-authorization.php', 'asseco-authorization');
+        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
+        $this->loadRoutesFrom(__DIR__ . '/routes/api.php');
+
+        $this->app->singleton(RightParser::class, function ($app) {
+            return new RightParser();
+        });
+    }
+
+    /**
      * Bootstrap the application services.
      */
     public function boot()
     {
-        Event::listen(RightParser::$eventsToListen, function ($event, $model) {
-            Log::info($event);
+        $this->publishes([__DIR__ . '/config/asseco-authorization.php' => config_path('asseco-authorization.php'),]);
 
-            /**
-             * @var Model $eloquentModel
-             */
-            $eloquentModel = $model[0];
+        /**
+         * @var $rightParser RightParser
+         */
+        $rightParser = App::make(RightParser::class);
 
-            /**
-             * @var Model $class
-             */
-            $class = get_class($eloquentModel);
-            $keyName = $eloquentModel->getKeyName();
+        Event::listen($rightParser->eventsToListen, function ($event, $model) use ($rightParser) {
 
-            $eventName = $this->getEventName($event);
+            $eloquentModel = $this->getModel($model);
+            $modelClass = get_class($eloquentModel);
 
-            if (!$this->eventRegistered($eventName)) {
-                Log::info("Event $eventName is not registered. Assuming you have rights then...");
+            if (!$rightParser->isModelAuthorizable($modelClass)) {
+                // Given model is not authorizable, therefore you are allowed every action on it
                 return true;
             }
 
-            $input = RightParser::getAuthValues($class, RightParser::$eventRightMapping[$eventName]);
+            Log::info("[JSONAuth] Triggered Eloquent event: $event");
+
+            $eventName = $this->parseEventName($event);
+
+            $rightParser->checkEventMapping($eventName);
+
+            $input = $rightParser->getAuthValues($modelClass, $rightParser->eventRightMapping[$eventName]);
 
             if (count($input) < 1) {
-                Log::info('You have no rights for this action.');
+                Log::info("[JSONAuth] You have no rights for this action.");
                 return false;
             }
 
             if (array_key_exists(0, $input) && $input[0] === '*') {
-                Log::info('You have full rights for this action.');
+                Log::info("[JSONAuth] You have full rights for this action.");
                 return true;
             }
 
-            // Create the query
-            $builder = (new $class)->newModelQuery();
-            $jsonQuery = new JsonQuery($builder, $input);
-            $jsonQuery->search();
-            $builder->select($keyName);
+            $fetched = $this->executeQuery($modelClass, $input, $eloquentModel);
 
-            // Execute the query
-            $fetched = $builder->get()->pluck($keyName)->toArray();
-
-            // Compare primary keys only
+            // Compare primary keys only ... what if there are none?
             return in_array($eloquentModel->getKey(), $fetched);
         });
     }
 
     /**
-     * Register the application services.
-     */
-    public function register()
-    {
-        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
-        $this->loadRoutesFrom(__DIR__ . '/routes/api.php');
-    }
-
-    /**
      * @param $event
      * @return mixed|string
-     * @throws \Exception
+     * @throws Exception
      */
-    protected function getEventName($event)
+    protected function parseEventName($event): string
     {
         $parsed = explode(':', $event);
 
         if (count($parsed) != 2) {
-            throw new \Exception();
+            throw new Exception();
         }
 
         return $parsed[0];
     }
 
     /**
-     * @param string $eventName
-     * @return bool
+     * @param $model
+     * @return Model
+     * @throws Exception
      */
-    protected function eventRegistered(string $eventName): bool
+    protected function getModel(array $model): Model
     {
-        return array_key_exists($eventName, RightParser::$eventRightMapping);
+        if (count($model) < 1) {
+            throw new Exception();
+        }
+
+        return $model[0];
+    }
+
+    /**
+     * @param Model $modelClass
+     * @param array $input
+     * @param Model $eloquentModel
+     * @return mixed
+     * @throws SearchException
+     */
+    protected function executeQuery(string $modelClass, array $input, Model $eloquentModel)
+    {
+        // Create the query
+        $builder = (new $modelClass)->newModelQuery();
+        $jsonQuery = new JsonQuery($builder, $input);
+        $jsonQuery->search();
+
+        $keyName = $eloquentModel->getKeyName();
+        $builder->select($keyName);
+
+        // Execute the query
+        $fetched = $builder->get()->pluck($keyName)->toArray();
+        return $fetched;
     }
 }

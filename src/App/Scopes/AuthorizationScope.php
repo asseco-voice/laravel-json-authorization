@@ -24,13 +24,13 @@ class AuthorizationScope implements Scope
         $input = RightParser::getAuthValues(get_class($model));
 
         if (count($input) < 1) {
-            Log::info('You have no rights for this action.');
+            Log::info("[JSONAuth] You have no rights for this action.");
             $builder->whereRaw('1 = 0');
             return;
         }
 
         if (array_key_exists(0, $input) && $input[0] === '*') {
-            Log::info('You have full rights for this action.');
+            Log::info("[JSONAuth] You have full rights for this action.");
             return;
         }
 

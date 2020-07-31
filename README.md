@@ -3,6 +3,14 @@
 This package enables authorization via JSON objects imposed
 as a scope on each model which can be authorized.
 
+Package is developed mainly for the purpose of multiple Laravel microservices
+authorization having in mind to avoiding the additional trips to authorization service.
+
+This also makes non-auth services self-contained. Auth should provide roles (or any other
+form of authorization), while services should provide limits that are imposed on any of
+the roles. Should auth service ever need to be replaced, the only responsibility is to 
+re-map roles on a new auth service, and role limits will stay intact.  
+
 ## Why this approach?
 
 This package offers a great flexibility for imposing rights on Eloquent models.
@@ -24,9 +32,9 @@ Of course, there are also some limitations:
 I.e. ``ContactType`` has many `Contacts`. If you impose the right to only update contacts
 with contact type ID 1, the following will still pass as valid:
 ``Contacts::create([... 'contact_type_id' = 2 ...])``
-- package will try to authorize early based on the limitations provided (TODO), however on complex
+- package will try to authorize early based on the limitations provided, however on complex
 limits imposed package will make a select on a DB which in some cases may prove to be a heavy action. 
-This doesn't affect read rights, just create/update/delete ones.
+This mostly affects create/update/delete rights, not read ones.
 
 ## Installation
 
@@ -44,13 +52,17 @@ which will publish 2 tables:
 authorizations ----M:1--- authorization_models
 ```
 
-``authorization_models`` - a list of full Eloquent (namespaced) models for models which are to be protected
-``authorizations`` - a list of roles and resource limits imposed on them
+``authorization_models`` - a list of full Eloquent (namespaced) models for models which are to be protected.
+Package will automatically push to DB models which are authorizable (using ``AuthorizesWithJson`` trait), 
+so no need to do that manually.
+``authorizations`` - a list of roles and resource limits imposed on them.
 
-With regard to the performance, those are all cached. 
+With regard to the performance, everything is cached to the great extent, and invalidated and re-cached
+upon rights change. 
 
-If model is protected, and no limit is present, we are assuming you have no rights to operate on the model.
-You are obligated to explicitly say who has the right for what. 
+If a model is authorizable, and no limit is present within ``authorizations`` table for the currently logged in
+user, we are assuming that user has no rights to operate on the model. You are obligated to explicitly say who has 
+the right for what. 
 
 Possible rights are:
 - create
@@ -58,7 +70,8 @@ Possible rights are:
 - update
 - delete
 
-Each role will have a set of rights (in JSON format) for a single model. 
+Each role (or any other type of authorizable attribute, customizable through configuration) will have a 
+set of rights (in JSON format) for a single model. 
 
 By default, no model is authorizable, you need to explicitly add ``AuthorizesWithJson`` trait to it.
 
