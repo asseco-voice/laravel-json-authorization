@@ -18,9 +18,9 @@ class JsonAuthorizationServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->mergeConfigFrom(__DIR__ . '/config/asseco-authorization.php', 'asseco-authorization');
-        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
-        $this->loadRoutesFrom(__DIR__ . '/routes/api.php');
+        $this->mergeConfigFrom(__DIR__ . '/Config/asseco-authorization.php', 'asseco-authorization');
+        $this->loadMigrationsFrom(__DIR__ . '/Database/migrations');
+        $this->loadRoutesFrom(__DIR__ . '/Routes/api.php');
 
         $this->app->singleton(RightParser::class, function ($app) {
             return new RightParser();
@@ -32,7 +32,7 @@ class JsonAuthorizationServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->publishes([__DIR__ . '/config/asseco-authorization.php' => config_path('asseco-authorization.php'),]);
+        $this->publishes([__DIR__ . '/Config/asseco-authorization.php' => config_path('asseco-authorization.php'),]);
 
         /**
          * @var $rightParser RightParser

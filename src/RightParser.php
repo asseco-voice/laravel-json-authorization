@@ -39,7 +39,8 @@ class RightParser
     public function __construct()
     {
         if (!Auth::check()) {
-            throw new \Exception();
+            return;
+            throw new \Exception(); // <- ovo instant kod composer dumpa baci ex
         }
 
         $user = Auth::user();
@@ -57,11 +58,11 @@ class RightParser
             return Cache::get(self::CACHE_PREFIX . 'models');
         }
 
-        $paths = Config::get('asseco-voice.authorization.models_path');
+        $paths = Config::get('asseco-authorization.models_path');
 
         // TODO: šta sa ovim? ako skenira, valjda dohvati i to?
 
-        $namespace = Config::get('asseco-voice.authorization.model_namespace');
+        $namespace = Config::get('asseco-authorization.model_namespace');
         $models = [];
 
         foreach ($paths as $path) {
@@ -90,7 +91,7 @@ class RightParser
     protected function hasAuthorizesWithJsonTrait($class)
     {
         $traits = class_uses($class);
-        $authorizationTrait = Config::get('asseco-voice.authorization.trait_path');
+        $authorizationTrait = Config::get('asseco-authorization.trait_path');
 
         return in_array($authorizationTrait, $traits);
     }
