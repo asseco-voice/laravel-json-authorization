@@ -126,3 +126,9 @@ return only 5 records. Also, calling ``Contact::find(6)`` will not return the re
 which will in start limit the possible output to 1, 2, 3, 4 and 5 effectively saying that you can 
 update IDs 1, 3, 4, and 5. Others are forbidden through an imposed read right.
 - since delete option is omitted, you have no right for deleting any contact
+
+## Additional
+
+For dev purposes, you can disable authorization completely by adding this to your ``.env`` file:
+
+    OVERRIDE_AUTHORIZATION=true

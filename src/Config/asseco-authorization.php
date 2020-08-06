@@ -34,5 +34,5 @@ return [
     /**
      * For dev purposes. Setting to true will ignore authorization completely
      */
-    'override_authorization' => false,
+    'override_authorization' => env('OVERRIDE_AUTHORIZATION', false),
 ];
