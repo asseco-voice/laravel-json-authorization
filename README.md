@@ -75,6 +75,11 @@ set of rights (in JSON format) for a single model.
 
 By default, no model is authorizable, you need to explicitly add ``AuthorizesWithJson`` trait to it.
 
+You are also required to implement a method from a ``AuthorizesUsers`` interface on your `User` model.
+This method should return an array of roles (or other authorizable attribute). Array should contain 
+the same properties which you are writing within the DB. If this is a role name, then let array return
+role names for a given authenticated user, if those are role IDs, let an array return IDs. 
+
 ## In depth
 
 Package is built on top of [JSON query builder](https://github.com/asseco-voice/laravel-json-query-builder)
