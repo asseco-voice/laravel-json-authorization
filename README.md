@@ -21,8 +21,8 @@ This in turn results in two great benefits which the route approach doesn't have
 - calling a single endpoint doesn't mean that it operates on a single model, making it impossible
 for the route approach to do the underlying protection for something which you meant to stay
 protected.
-- calling a relation on a protected model doesn't protect the related model, so if you're lazy loading
-something you have no way of protecting what is being resolved.
+- calling a relation on a protected model doesn't protect the related model, so if you're eager/lazy loading
+something through Eloquent relations you have no way of protecting what is being resolved.
 
 Resource protection here imposes limits you provided independently of where your request comes from.
 We are doing that by taking advantage of Laravel scopes.
