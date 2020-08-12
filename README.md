@@ -89,9 +89,10 @@ which case you will add those as well.
 With regard to the performance, everything is cached to the great extent, and invalidated (TODO) and re-cached
 upon rights change. 
 
-Two seeders are available. If you want to use them, attach them directly to your ``DatabaseSeeder``.
+Two seeders are available. If you want to use them, attach them directly to your ``DatabaseSeeder``:
 
 ``AuthorizationManageTypesSeeder`` - will add `roles`, `groups` and `id` as type sets. 
+
 ``AuthorizationModelSeeder`` - is not a seeder per-se, as it will read 
 [authorizable models](#pick-authorizable-models) and add them to DB.
 
