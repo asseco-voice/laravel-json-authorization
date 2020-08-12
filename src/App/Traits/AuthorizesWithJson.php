@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Voice\JsonAuthorization\App\Traits;
 
 use Voice\JsonAuthorization\App\Scopes\AuthorizationScope;

@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Voice\JsonAuthorization\Authorization;
-
 
 use Illuminate\Support\Facades\Auth;
 use Voice\JsonAuthorization\App\Contracts\AuthorizesUsers;

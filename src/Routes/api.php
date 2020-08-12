@@ -20,5 +20,6 @@ Route::namespace('Voice\JsonAuthorization\App\Http\Controllers')
 
         Route::apiResource('authorization', 'AuthorizationController');
         Route::apiResource('authorization-models', 'AuthorizationModelController');
+        Route::apiResource('authorization-manage-types', 'AuthorizationManageTypeController');
 
     });
