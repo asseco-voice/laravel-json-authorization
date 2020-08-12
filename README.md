@@ -78,7 +78,9 @@ upon package usage but is not deleted automatically if you remove the trait. Sca
 done within the ``app`` folder and does not recurse within it, so in case you have a different folder 
 structure, or need to implement external models, modify  the config ``models_path`` variable to include 
 what you need.
+
 ``authorizations`` - a list of roles and resource limits imposed on them.
+
 ``authorization_manage_types`` - types represent different sets of things to authorize by. If you are
 authorizing only by roles, then it makes sense to have only ``roles`` there, however there may be cases
 where you'd like to merge roles from different sets of authorizable properties (roles, groups, IDs etc) in
