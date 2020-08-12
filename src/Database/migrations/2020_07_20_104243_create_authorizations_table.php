@@ -17,7 +17,9 @@ class CreateAuthorizationsTable extends Migration
             $table->id();
             $table->timestamps();
 
-            $table->string('role');
+            $table->foreignId('authorization_manage_type_id')->constrained()->onDelete('cascade');
+            $table->string('manage_type_value');
+
             $table->foreignId('authorization_model_id')->constrained()->onDelete('cascade');
 
             $table->json('rules');

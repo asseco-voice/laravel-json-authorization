@@ -14,15 +14,16 @@ class RulesResolver
     const CACHE_TTL = 60 * 60 * 24;
 
     /**
-     * @param $role
+     * @param string $manageTypeId
+     * @param string $role
      * @param string $modelClass
      * @param Model $resolvedModel
      * @param string $right
      * @return array
      */
-    public function resolveRules($role, string $modelClass, Model $resolvedModel, string $right): array
+    public function resolveRules(string $manageTypeId, string $role, string $modelClass, Model $resolvedModel, string $right): array
     {
-        $rules = $this->fetchRules($role, $modelClass, $resolvedModel->id);
+        $rules = $this->fetchRules($manageTypeId, $role, $modelClass, $resolvedModel->id);
 
         if (!array_key_exists($right, $rules)) {
             Log::info("[Authorization] No '$right' rights found for $modelClass.");
@@ -36,7 +37,7 @@ class RulesResolver
     }
 
 
-    public function fetchRules(string $role, string $modelClass, string $modelId): array
+    public function fetchRules(string $manageTypeId, string $role, string $modelClass, string $modelId): array
     {
         $cacheKey = self::CACHE_PREFIX . "role_{$role}_model_{$modelClass}";
 
@@ -46,8 +47,9 @@ class RulesResolver
         }
 
         $resolveFromDb = Authorization::where([
-            'role'                   => $role,
-            'authorization_model_id' => $modelId,
+            'authorization_manage_type_id' => $manageTypeId,
+            'manage_type_value'            => $role,
+            'authorization_model_id'       => $modelId,
         ])->first();
 
         if ($resolveFromDb) {
@@ -64,6 +66,23 @@ class RulesResolver
 
     public function mergeRules(array $mergedRules, array $rules): array
     {
-        return [];
+        $search = 'search';
+        $or = '||';
+
+        if (!array_key_exists($search, $rules)) {
+            return $mergedRules;
+        }
+
+        if (!array_key_exists($search, $mergedRules)) {
+            $mergedRules[$search] = [];
+        }
+
+        if (!array_key_exists($or, $mergedRules[$search])) {
+            $mergedRules[$search][$or] = [];
+        }
+
+        $mergedRules[$search][$or][] = $rules[$search];
+
+        return $mergedRules;
     }
 }

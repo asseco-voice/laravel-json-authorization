@@ -2,12 +2,18 @@
 
 namespace Voice\JsonAuthorization\Authorization;
 
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
+use Voice\JsonAuthorization\App\AuthorizationManageType;
 use Voice\JsonAuthorization\Exceptions\AuthorizationException;
 
 class RightParser
 {
+    const CACHE_PREFIX = 'right_parser_';
+    const CACHE_TTL = 60 * 60 * 24;
+
     const ABSOLUTE_RIGHTS = '*';
 
     const CREATE_RIGHT = 'create';
@@ -60,35 +66,37 @@ class RightParser
             return [];
         }
 
-        $authorizableSets = $this->authenticatedUser->user->getAuthorizableSets();
+        return $this->getMergedRules($modelClass, $right);
+    }
 
-        if ($this->hasAbsoluteRights($authorizableSets)) {
-            return [self::ABSOLUTE_RIGHTS];
+    public function getManageTypes()
+    {
+        if (Cache::has(self::CACHE_PREFIX . 'manage_types')) {
+            return Cache::get(self::CACHE_PREFIX . 'manage_types');
         }
 
-        $resolvedModel = $this->authorizableModels->resolveAuthorizationModel($modelClass);
+        $manageTypes = AuthorizationManageType::all();
 
-        $mergedRules = [];
-        foreach ($authorizableSets as $role) {
-            $rules = $this->rulesResolver->resolveRules($role, $modelClass, $resolvedModel, $right);
-
-            $mergedRules = $this->rulesResolver->mergeRules($mergedRules, $rules);
-        }
-
-        return $mergedRules;
+        Cache::put(self::CACHE_PREFIX . 'manage_types', $manageTypes, self::CACHE_TTL);
+        return $manageTypes;
     }
 
     /**
+     * @param string $manageType
      * @param array $authorizableSets
      * @return bool
      * @throws AuthorizationException
      */
-    protected function hasAbsoluteRights(array $authorizableSets): bool
+    protected function hasAbsoluteRights(string $manageType, array $authorizableSets): bool
     {
         $rolesWithAbsoluteRights = $this->getRolesWithAbsoluteRights();
 
+        if(!array_key_exists($manageType, $rolesWithAbsoluteRights)){
+            return false;
+        }
+
         foreach ($authorizableSets as $authorizableSet) {
-            if (in_array($authorizableSet, $rolesWithAbsoluteRights)) {
+            if (in_array($authorizableSet, $rolesWithAbsoluteRights[$manageType])) {
                 return true;
             }
         }
@@ -125,5 +133,74 @@ class RightParser
         if (!$eventMapped) {
             throw new AuthorizationException("Event '$eventName' is not mapped correctly.");
         }
+    }
+
+    /**
+     * @param string $modelClass
+     * @param string $right
+     * @return array
+     * @throws AuthorizationException
+     */
+    protected function getMergedRules(string $modelClass, string $right): array
+    {
+        /*
+         * 'role' => ['role1', 'role2' ...],
+         * 'group' => ['group1', 'group2' ...],
+         * 'id' => 123,
+         */
+        $authorizableSets = Arr::wrap($this->authenticatedUser->user->getAuthorizableSets());
+
+        /*
+         * [
+         *    [id => 1, name => 'role'],
+         *    [id => 2, name => 'group'],
+         *    [id => 3, name => 'id'],
+         * ]
+         */
+        $manageTypes = $this->getManageTypes();
+
+        /*
+         * App\Workspace
+         * ...
+         */
+        $resolvedModel = $this->authorizableModels->resolveAuthorizationModel($modelClass);
+
+        $mergedRules = [];
+
+        foreach ($manageTypes as $manageType) {
+            if (!array_key_exists($manageType->name, $authorizableSets)) {
+                Log::info("[Authorization] Type '{$manageType->name}' is missing within your User::getAuthorizableSets() method");
+                continue;
+            }
+
+            /*
+             * 'role' => ['role1', 'role2' ...],
+             */
+            $authorizableSet = Arr::wrap($authorizableSets[$manageType->name]);
+
+            if ($this->hasAbsoluteRights($manageType->name, $authorizableSet)) {
+                return [self::ABSOLUTE_RIGHTS];
+            }
+
+            /*
+             * Dolazi iz Keycloaka
+             * ['role1', 'role2' ...]
+             */
+            foreach ($authorizableSet as $role) {
+                Log::info("[Authorization] Processing: {$manageType->name} - $role");
+
+                $rules = $this->rulesResolver->resolveRules($manageType->id, $role, $modelClass, $resolvedModel, $right);
+
+                if(array_key_exists(0, $rules) && $rules[0] === self::ABSOLUTE_RIGHTS){
+                    return [self::ABSOLUTE_RIGHTS];
+                }
+
+                $mergedRules = $this->rulesResolver->mergeRules($mergedRules, $rules);
+            }
+        }
+
+        Log::info("[Authorization] Merged rules: " . print_r($mergedRules, true));
+
+        return $mergedRules;
     }
 }

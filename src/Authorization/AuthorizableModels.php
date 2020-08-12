@@ -51,7 +51,7 @@ class AuthorizableModels
                 $result = substr($result, 0, -4);
 
                 $model = $namespace . $result;
-                if (self::hasAuthorizesWithJsonTrait($model)) {
+                if ($this->hasAuthorizesWithJsonTrait($model)) {
                     $models[] = $model;
                 }
             }
@@ -76,7 +76,7 @@ class AuthorizableModels
 
     public function resolveAuthorizationModel($model): Model
     {
-        $cacheKey = self::CACHE_PREFIX . $model;
+        $cacheKey = self::CACHE_PREFIX . "_$model";
 
         if (Cache::has($cacheKey)) {
             Log::info("[Authorization] Resolving $model from cache.");

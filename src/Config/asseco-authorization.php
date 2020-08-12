@@ -18,17 +18,16 @@ return [
     'trait_path'       => 'Voice\JsonAuthorization\App\Traits\AuthorizesWithJson',
 
     /**
-     * List of roles/groups/etc which have absolute admin/root rights
+     * List of roles/groups/etc which have absolute admin/root rights.
+     * Key must resemble names from authorization_manage_types table
      */
     'absolute_rights' => [
-        'asseco-voice-admin'
-    ],
-
-    /**
-     * Who will have resolving precedence if OR resolution_type is used
-     */
-    'resolution_types' => [
-        // RoleResolution::class
+        'roles' => [
+            //'asseco-voice-admin'
+        ],
+        // 'groups' => [
+        //     'asseco-voice-admin'
+        // ],
     ],
 
     /**

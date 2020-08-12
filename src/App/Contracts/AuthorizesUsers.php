@@ -5,22 +5,24 @@ namespace Voice\JsonAuthorization\App\Contracts;
 interface AuthorizesUsers
 {
     /**
-     * List of things to authorize by. This can be
-     * an array of roles, or array of arrays where each
-     * inner array would be a set of authorizable claims.
+     * List of things to authorize by. Keys given here MUST
+     * resemble names from authorization_manage_types table.
      *
-     * This list MUST come from the DB or some other external
-     * source. It should not be hardcoded.
+     * Examples:
      *
-     * I.e. single array:
-     * [ 'role1', 'role2' ... ]
+     *   - a single role (will load permissions for a given role).
+     *   Example: 'role' => 'admin'
      *
-     * I.e. nested array:
-     * [
-     *    [ 'role1', 'role2' ...],
-     *    [ 'group1, 'group2' ...],
-     *    [ 'something_else1, 'something_else2' ...],
-     * ]
+     *   - array of roles (will load merge of permissions for given roles).
+     *   Example: 'role' => ['role1', 'role2']
+     *
+     *   - multi-dimensional array of authorizable properties (will load merge of permissions for given roles).
+     *   Example:
+     *   [
+     *      'role' => [...],
+     *      'group' => [...],
+     *      'id' => ...,
+     *   ]
      *
      * @return array
      */
