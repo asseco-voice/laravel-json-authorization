@@ -45,20 +45,127 @@ as a Laravel service provider, so no additional actions are required to register
 
 ## Usage
 
-In order to use the package you need to run ``php artisan migrate``
-which will publish 2 tables:
+Package initialization requires few steps to set up:
+
+1. [Pick authorizable models](#pick-authorizable-models)
+1. [Migrate tables](#migrate-tables)
+1. [Modify User](#modify-user)
+1. [Attach permissions](#attach-permissions)
+
+### Pick authorizable models
+
+Models you want protected MUST implement ``AuthorizesWithJson`` trait.
+
+### Migrate tables
+
+Running ``php artisan migrate`` will publish 3 tables:
 
 ```
-authorizations ----M:1--- authorization_models
+    authorizations ----M:1--- authorization_models
+          |
+          |
+          M
+          -
+          1
+          |
+          |
+authorization_manage_types
 ```
 
-``authorization_models`` - a list of full Eloquent (namespaced) models for models which are to be protected.
-Package will automatically push to DB models which are authorizable (using ``AuthorizesWithJson`` trait), 
-so no need to do that manually.
+``authorization_models`` - a list of full Eloquent (namespaced) models for 
+[authorizable models](#pick-authorizable-models). This table is filled out automatically 
+upon package usage but is not deleted automatically if you remove the trait. Scanning of these models is 
+done within the ``app`` folder and does not recurse within it, so in case you have a different folder 
+structure, or need to implement external models, modify  the config ``models_path`` variable to include 
+what you need.
 ``authorizations`` - a list of roles and resource limits imposed on them.
+``authorization_manage_types`` - types represent different sets of things to authorize by. If you are
+authorizing only by roles, then it makes sense to have only ``roles`` there, however there may be cases
+where you'd like to merge roles from different sets of authorizable properties (roles, groups, IDs etc) in
+which case you will add those as well. 
 
-With regard to the performance, everything is cached to the great extent, and invalidated and re-cached
+With regard to the performance, everything is cached to the great extent, and invalidated (TODO) and re-cached
 upon rights change. 
+
+Two seeders are available. If you want to use them, attach them directly to your ``DatabaseSeeder``.
+
+``AuthorizationManageTypesSeeder`` - will add `roles`, `groups` and `id` as type sets. 
+``AuthorizationModelSeeder`` - is not a seeder per-se, as it will read 
+[authorizable models](#pick-authorizable-models) and add them to DB.
+
+### Modify User
+
+User should implement ``AuthorizesUsers`` interface which requires you to implement a single method.
+
+The method should return array of authorizable sets. This needs to reflect ``authorization_manage_types`` 
+types as array keys. Values should pull an array of roles/groups/IDs for the current user.
+
+Example:
+
+``authorization_manage_types``
+```
+ID Name
+1  roles
+2  groups
+3  id
+```
+
+```
+public function getAuthorizableSets(): array
+{
+    return [
+        'roles'  => Auth::user()->roles,
+        'groups' => Auth::user()->groups,
+        'id'     => Auth::user()->id,
+    ];
+}
+```
+
+You don't need to implement all of those though. This is valid as well:
+
+```
+public function getAuthorizableSets(): array
+{
+    return [
+        'roles'  => Auth::user()->roles
+    ];
+}
+```
+
+Depending on where the set is coming from, you can give it any method which will return an array of 
+things to authorize by:
+
+```
+public function getAuthorizableSets(): array
+{
+    return [
+        'roles'  => $someClass->methodCall(Auth::user()->id, 'https://my-external-service')
+    ];
+}
+```
+
+Once resolved, function should return for example:
+
+```
+return [
+    'roles' => ['role1', 'role2'...],
+    'groups' => ['group1', 'group2'...],
+    ...
+]
+```
+
+It is worth mentioning that final product is merge of role rules. 
+
+Example:
+
+```
+role 1: "read" right for IDs 1, 2 and 3
+role 2: "read" right for IDs 4, 5 and 6
+
+Final "read" right for that user are IDs 1, 2, 3, 4, 5 and 6
+```
+
+### Attach permissions
 
 If a model is authorizable, and no limit is present within ``authorizations`` table for the currently logged in
 user, we are assuming that user has no rights to operate on the model. You are obligated to explicitly say who has 
@@ -70,20 +177,22 @@ Possible rights are:
 - update
 - delete
 
-Each role (or any other type of authorizable attribute, customizable through configuration) will have a 
-set of rights (in JSON format) for a single model. 
-
-By default, no model is authorizable, you need to explicitly add ``AuthorizesWithJson`` trait to it.
-
-You are also required to implement a method from a ``AuthorizesUsers`` interface on your `User` model.
-This method should return an array of roles (or other authorizable attribute). Array should contain 
-the same properties which you are writing within the DB. If this is a role name, then let array return
-role names for a given authenticated user, if those are role IDs, let an array return IDs. 
-
-## In depth
+Each role will have a set of rights (in JSON format) for a single model. 
 
 Package is built on top of [JSON query builder](https://github.com/asseco-voice/laravel-json-query-builder)
-where you can check query logic in depth. 
+where you can check query logic in depth, with the addition of an absolute right ``*``. To use it 
+you can do:
+
+```
+{
+    "read": "*"
+}
+```
+
+Giving you a read right to all rows for the given model.
+
+In case you need some sort of admin available which has absolute rights to everything, publish the configuration
+and add it to ``absolute_rights`` key, and you will not need to give the explicit rights for it.
 
 ## Example
 
