@@ -27,13 +27,9 @@ class AuthorizableModels
         }
 
         $paths = Config::get('asseco-authorization.models_path');
-
-        // TODO: složiti dinamički za modele koji nisu u istom scopeu (eksterni paketi)
-        $namespace = Config::get('asseco-authorization.model_namespace');
-
         $models = [];
 
-        foreach ($paths as $path) {
+        foreach ($paths as $path => $namespace) {
 
             $results = scandir($path);
 
