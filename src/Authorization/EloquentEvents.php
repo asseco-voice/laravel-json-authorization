@@ -60,7 +60,7 @@ class EloquentEvents
      * @throws AuthorizationException
      * @throws \Exception
      */
-    protected function parseEventName($event, RightParser $rightParser): string
+    protected function parseEventName(string $event, RightParser $rightParser): string
     {
         $parsed = explode(':', $event);
 

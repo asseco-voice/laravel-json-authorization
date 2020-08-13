@@ -20,7 +20,7 @@ class AuthorizableModels
         $this->models = $this->getAuthorizableModels();
     }
 
-    public function getAuthorizableModels()
+    public function getAuthorizableModels(): array
     {
         if (Cache::has(self::CACHE_PREFIX)) {
             return Cache::get(self::CACHE_PREFIX);
@@ -30,34 +30,40 @@ class AuthorizableModels
         $models = [];
 
         foreach ($paths as $path => $namespace) {
-
-            $results = scandir($path);
-
-            foreach ($results as $result) {
-                if ($result === '.' or $result === '..') {
-                    continue;
-                }
-
-                $filename = $path . '/' . $result;
-
-                if (is_dir($filename)) {
-                    continue;
-                }
-
-                $result = substr($result, 0, -4);
-
-                $model = $namespace . $result;
-                if ($this->hasAuthorizesWithJsonTrait($model)) {
-                    $models[] = $model;
-                }
-            }
+            $models = $this->traversePath($path, $namespace, $models);
         }
 
         Cache::put(self::CACHE_PREFIX, $models, self::CACHE_TTL);
         return $models;
     }
 
-    protected function hasAuthorizesWithJsonTrait($class)
+    protected function traversePath(string $path, string $namespace, array $models): array
+    {
+        $results = scandir($path);
+
+        foreach ($results as $result) {
+            if ($result === '.' or $result === '..') {
+                continue;
+            }
+
+            $filename = "{$path}/{$result}";
+
+            if (is_dir($filename)) {
+                continue;
+            }
+
+            $result = substr($result, 0, -4);
+
+            $model = $namespace . $result;
+            if ($this->hasAuthorizesWithJsonTrait($model)) {
+                $models[] = $model;
+            }
+        }
+
+        return $models;
+    }
+
+    protected function hasAuthorizesWithJsonTrait(string $class): bool
     {
         $traits = class_uses($class);
         $authorizationTrait = Config::get('asseco-authorization.trait_path');
@@ -65,7 +71,7 @@ class AuthorizableModels
         return in_array($authorizationTrait, $traits);
     }
 
-    public function isModelAuthorizable(string $model)
+    public function isModelAuthorizable(string $model): bool
     {
         return in_array($model, $this->models);
     }
@@ -93,5 +99,4 @@ class AuthorizableModels
         Cache::put($cacheKey, $newModel, self::CACHE_TTL);
         return $newModel;
     }
-
 }
