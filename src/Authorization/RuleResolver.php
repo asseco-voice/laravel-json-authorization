@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use Voice\JsonAuthorization\App\Authorization;
+use Voice\JsonAuthorization\App\AuthorizationRule;
 
-class RulesResolver
+class RuleResolver
 {
     const CACHE_PREFIX = 'authorization_';
     const CACHE_TTL = 60 * 60 * 24;
@@ -46,7 +46,7 @@ class RulesResolver
             return Cache::get($cacheKey);
         }
 
-        $resolveFromDb = Authorization::where([
+        $resolveFromDb = AuthorizationRule::where([
             'authorization_manage_type_id' => $manageTypeId,
             'manage_type_value'            => $role,
             'authorization_model_id'       => $modelId,

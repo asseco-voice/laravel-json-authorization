@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
-use Voice\JsonAuthorization\App\AuthorizationModel;
+use Voice\JsonAuthorization\App\AuthorizableModel;
 
 class AuthorizableModels
 {
@@ -85,7 +85,7 @@ class AuthorizableModels
             return Cache::get($cacheKey);
         }
 
-        $resolveFromDb = AuthorizationModel::where('name', $model)->first();
+        $resolveFromDb = AuthorizableModel::where('name', $model)->first();
 
         if ($resolveFromDb) {
             Log::info("[Authorization] Resolved $model from DB. Adding to cache and returning.");
@@ -94,7 +94,7 @@ class AuthorizableModels
         }
 
         Log::info("[Authorization] Model $model is authorizable, but doesn't exist in DB yet. Creating...");
-        $newModel = AuthorizationModel::create(['name' => $model]);
+        $newModel = AuthorizableModel::create(['name' => $model]);
 
         Cache::put($cacheKey, $newModel, self::CACHE_TTL);
         return $newModel;

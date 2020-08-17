@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Scope;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
-use Voice\JsonAuthorization\Authorization\RightParser;
+use Voice\JsonAuthorization\Authorization\RuleParser;
 use Voice\JsonQueryBuilder\JsonQuery;
 
 class AuthorizationScope implements Scope
@@ -31,9 +31,9 @@ class AuthorizationScope implements Scope
         }
 
         /**
-         * @var $rightParser RightParser
+         * @var $rightParser RuleParser
          */
-        $rightParser = App::make(RightParser::class);
+        $rightParser = App::make(RuleParser::class);
         $input = $rightParser->getAuthValues(get_class($model));
 
         if (count($input) < 1) {

@@ -6,8 +6,8 @@ as a scope on each model which can be authorized.
 Package is developed mainly for the purpose of multiple Laravel microservices
 authorization having in mind to avoiding the additional trips to authorization service.
 
-This also makes non-auth services self-contained. Auth should provide roles (or any other
-form of authorization), while services should provide limits that are imposed on any of
+This also makes non-auth services self-contained. Authentication service should provide roles (
+or any other form of authorization), while services should provide limits that are imposed on any of
 the roles. Should auth service ever need to be replaced, the only responsibility is to 
 re-map roles on a new auth service, and role limits will stay intact.  
 
@@ -15,7 +15,7 @@ re-map roles on a new auth service, and role limits will stay intact.
 
 This package offers a great flexibility for imposing rights on Eloquent models.
 What makes the package unique is the concept switch in a way that you do not want to protect your
-routes, but rather protecting the resource itself.
+routes, but rather **protecting the resource** itself.
 
 This in turn results in two great benefits which the route approach doesn't have out-of-the-box:
 - calling a single endpoint doesn't mean that it operates on a single model, making it impossible
@@ -43,6 +43,19 @@ as a Laravel service provider, so no additional actions are required to register
 
 ``composer require asseco-voice/laravel-json-authorization``
 
+## Terminology
+
+- calling something **authorizable** means it is capable of being authorized
+- **authorizable set** - collection of authorizable user properties 
+(i.e. a collection of **roles** classifies as an **authorizable set**)  
+- **authorizable set value** - single object within an **authorizable set** (i.e. a single role - `example_role_1`)
+- **authorizable set type** - logical **authorizable sets** separation
+(i.e. you can have a set of **roles**, set of **groups**... which would classify as an **authorizable set type**)
+- **authorizable model** - model upon which the authorization can be enforced
+- **right** - a single CRUD right for a single **authorizable model**, and a single **authorizable set value**
+(i.e. having a **create right** for some model)
+- **rule** - set of **rights** for a single **authorizable model**, and a single **authorizable set value**
+
 ## Usage
 
 Package initialization requires few steps to set up:
@@ -61,7 +74,7 @@ Models you want protected MUST implement ``AuthorizesWithJson`` trait.
 Running ``php artisan migrate`` will publish 3 tables:
 
 ```
-    authorizations ----M:1--- authorization_models
+    authorization_rules ----M:1--- authorizable_models
           |
           |
           M
@@ -69,43 +82,46 @@ Running ``php artisan migrate`` will publish 3 tables:
           1
           |
           |
-authorization_manage_types
+ authorizable_set_types
 ```
 
-``authorization_models`` - a list of full Eloquent (namespaced) models for 
+``authorizable_models`` - a list of full Eloquent (namespaced) models for 
 [authorizable models](#pick-authorizable-models). This table is filled out automatically 
 upon package usage but is not deleted automatically if you remove the trait. Scanning of these models is 
 done within the ``app`` folder and does not recurse within it, so in case you have a different folder 
-structure, or need to implement external models, modify  the config ``models_path`` variable to include 
+structure, or need to implement external models, [modify the config](#additional) ``models_path`` variable to include 
 what you need.
 
-``authorizations`` - a list of roles and resource limits imposed on them.
+``authorization_rules`` - a list of [authorizable set values](#terminology) and [rules](#terminology) 
+imposed on them.
 
-``authorization_manage_types`` - types represent different sets of things to authorize by. If you are
+``authorizable_set_types`` - types represent different sets of things to authorize by. If you are
 authorizing only by roles, then it makes sense to have only ``roles`` there, however there may be cases
-where you'd like to merge roles from different sets of authorizable properties (roles, groups, IDs etc) in
-which case you will add those as well. 
+where you'd like to merge [authorizable set values](#terminology) from different 
+[authorizable set types](#terminology) in which case you will add those as well. 
 
-With regard to the performance, everything is cached to the great extent, and invalidated (TODO) and re-cached
-upon rights change. 
+With regard to the performance, everything is cached to the great extent, invalidated (TODO) and re-cached
+upon change. 
 
 Two seeders are available. If you want to use them, attach them directly to your ``DatabaseSeeder``:
 
-``AuthorizationManageTypesSeeder`` - will add `roles`, `groups` and `id` as type sets. 
-
-``AuthorizationModelSeeder`` - is not a seeder per-se, as it will read 
-[authorizable models](#pick-authorizable-models) and add them to DB.
+- ``AuthorizableSetTypesSeeder`` - will add `roles`, `groups` and `id` as type sets. 
+- ``AuthorizableModelSeeder`` - is not a seeder per-se, as it will read 
+[authorizable models](#pick-authorizable-models) and add them to the DB.
 
 ### Modify User
 
 User should implement ``AuthorizesUsers`` interface which requires you to implement a single method.
 
-The method should return array of authorizable sets. This needs to reflect ``authorization_manage_types`` 
-types as array keys. Values should pull an array of roles/groups/IDs for the current user.
+The method should return an array of [authorizable sets and their values](#terminology) for 
+currently authenticated user.
+ 
+This needs to reflect names from ``authorizable_set_types`` table as array keys, 
+and [authorizable set values](#terminology) for each [authorizable set type](#terminology) set.
 
 Example:
 
-``authorization_manage_types``
+``authorizable_set_types``
 ```
 ID Name
 1  roles
@@ -124,7 +140,7 @@ public function getAuthorizableSets(): array
 }
 ```
 
-You don't need to implement all of those though. This is valid as well:
+You don't need to implement all of these though. This is valid as well:
 
 ```
 public function getAuthorizableSets(): array
@@ -170,9 +186,9 @@ Final "read" right for that user are IDs 1, 2, 3, 4, 5 and 6
 
 ### Attach permissions
 
-If a model is authorizable, and no limit is present within ``authorizations`` table for the currently logged in
-user, we are assuming that user has no rights to operate on the model. You are obligated to explicitly say who has 
-the right for what. 
+If a model is [authorizable](#terminology), and no limit is present within ``authorization_rules`` table for the 
+currently logged in user, we are assuming that user has no rights to operate on the model. 
+You are obligated to explicitly say who has the right for what. 
 
 Possible rights are:
 - create
@@ -180,11 +196,13 @@ Possible rights are:
 - update
 - delete
 
-Each role will have a set of rights (in JSON format) for a single model. 
+Each [authorizable set value](#terminology) will have a set of [rules](#terminology) (in JSON format) 
+for a single model. 
 
 Package is built on top of [JSON query builder](https://github.com/asseco-voice/laravel-json-query-builder)
-where you can check query logic in depth, with the addition of an absolute right ``*``. To use it 
-you can do:
+where you can check query logic in depth, with the addition of an absolute right ``*``. 
+
+To use the absolute right, you can do:
 
 ```
 {
@@ -194,14 +212,15 @@ you can do:
 
 Giving you a read right to all rows for the given model.
 
-In case you need some sort of admin available which has absolute rights to everything, publish the configuration
-and add it to ``absolute_rights`` key, and you will not need to give the explicit rights for it.
+In case you need some sort of admin available which has absolute rights to everything, 
+[publish the configuration](#additional) and add it to the ``absolute_rights`` key, 
+and you will not need to give the explicit CRUD rights for it.
 
 ## Example
 
 Let's assume we have the following model protected:
 
-``authorization_models``
+``authorizable_models``
 ```
 ID Name
 1  App\Contact
@@ -209,7 +228,7 @@ ID Name
 
 Let's impose the rights  for a role called ``agent``
 
-``authorizations``
+``authorization_rules``
 ```
 ID  Role    Authorization model ID
 1   agent   1                      
@@ -244,3 +263,7 @@ update IDs 1, 3, 4, and 5. Others are forbidden through an imposed read right.
 For dev purposes, you can disable authorization completely by adding this to your ``.env`` file:
 
     OVERRIDE_AUTHORIZATION=true
+
+Publish and override the configuration for the package:
+
+    php artisan vendor:publish --provider="Voice\JsonAuthorization\JsonAuthorizationServiceProvider"

@@ -3,7 +3,7 @@
 namespace Voice\JsonAuthorization\Authorization;
 
 use Illuminate\Support\Facades\Cache;
-use Voice\JsonAuthorization\App\AuthorizationManageType;
+use Voice\JsonAuthorization\App\AuthorizableSetType;
 
 class ManageTypes
 {
@@ -16,7 +16,7 @@ class ManageTypes
             return Cache::get(self::CACHE_PREFIX);
         }
 
-        $manageTypes = AuthorizationManageType::all();
+        $manageTypes = AuthorizableSetType::all();
 
         Cache::put(self::CACHE_PREFIX, $manageTypes, self::CACHE_TTL);
         return $manageTypes;

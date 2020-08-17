@@ -17,7 +17,8 @@ class AuthenticatedUser
     public function __construct()
     {
         if (!Auth::check()) {
-            // Don't throw an exception, it will wreak havoc. Also, it is completely valid not to be authenticated...
+            // Don't throw an exception, it will wreak havoc.
+            // Also, it is completely valid not to be authenticated...
             return;
         }
 

@@ -4,10 +4,10 @@ namespace Voice\JsonAuthorization\Database\Seeds;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Cache;
-use Voice\JsonAuthorization\App\AuthorizationModel;
+use Voice\JsonAuthorization\App\AuthorizableModel;
 use Voice\JsonAuthorization\Authorization\AuthorizableModels;
 
-class AuthorizationModelSeeder extends Seeder
+class AuthorizableModelSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -27,6 +27,6 @@ class AuthorizationModelSeeder extends Seeder
             $data[] = ['name' => $model];
         }
 
-        AuthorizationModel::insert($data);
+        AuthorizableModel::insert($data);
     }
 }

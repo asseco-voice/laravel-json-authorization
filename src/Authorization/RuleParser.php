@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 use Voice\JsonAuthorization\Exceptions\AuthorizationException;
 
-class RightParser
+class RuleParser
 {
     const ABSOLUTE_RIGHTS = '*';
 
@@ -28,15 +28,15 @@ class RightParser
 
     protected AuthenticatedUser  $authenticatedUser;
     protected AuthorizableModels $authorizableModels;
-    protected RulesResolver      $rulesResolver;
+    protected RuleResolver      $rulesResolver;
 
     /**
      * RightParser constructor.
      * @param AuthenticatedUser $authenticatedUser
      * @param AuthorizableModels $authorizableModels
-     * @param RulesResolver $rulesResolver
+     * @param RuleResolver $rulesResolver
      */
-    public function __construct(AuthenticatedUser $authenticatedUser, AuthorizableModels $authorizableModels, RulesResolver $rulesResolver)
+    public function __construct(AuthenticatedUser $authenticatedUser, AuthorizableModels $authorizableModels, RuleResolver $rulesResolver)
     {
         $this->authorizableModels = $authorizableModels;
         $this->rulesResolver = $rulesResolver;

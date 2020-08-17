@@ -3,9 +3,9 @@
 namespace Voice\JsonAuthorization\Database\Seeds;
 
 use Illuminate\Database\Seeder;
-use Voice\JsonAuthorization\App\AuthorizationManageType;
+use Voice\JsonAuthorization\App\AuthorizableSetType;
 
-class AuthorizationManageTypesSeeder extends Seeder
+class AuthorizableSetTypeSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -20,6 +20,6 @@ class AuthorizationManageTypesSeeder extends Seeder
             ['name' => 'id'],
         ];
 
-        AuthorizationManageType::insert($data);
+        AuthorizableSetType::insert($data);
     }
 }

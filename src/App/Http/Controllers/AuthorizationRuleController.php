@@ -4,11 +4,11 @@ namespace Voice\JsonAuthorization\App\Http\Controllers;
 
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Voice\JsonAuthorization\App\AuthorizationRule;
 use Illuminate\Http\Request;
-use Voice\JsonAuthorization\App\AuthorizationManageType;
 use App\Http\Controllers\Controller; // Stock Laravel controller class
 
-class AuthorizationManageTypeController extends Controller
+class AuthorizationRuleController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,7 +17,7 @@ class AuthorizationManageTypeController extends Controller
      */
     public function index()
     {
-        return response()->json(AuthorizationManageType::all());
+        return response()->json(AuthorizationRule::all());
     }
 
     /**
@@ -28,32 +28,32 @@ class AuthorizationManageTypeController extends Controller
      */
     public function store(Request $request)
     {
-        $authorizationManageType = AuthorizationManageType::create($request->all());
+        $authorization = AuthorizationRule::create($request->all());
 
-        return response()->json($authorizationManageType);
+        return response()->json($authorization);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param AuthorizationManageType $authorizationManageType
+     * @param AuthorizationRule $authorization
      * @return JsonResponse
      */
-    public function show(AuthorizationManageType $authorizationManageType)
+    public function show(AuthorizationRule $authorization)
     {
-        return response()->json($authorizationManageType);
+        return response()->json($authorization);
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param Request $request
-     * @param AuthorizationManageType $authorizationManageType
+     * @param AuthorizationRule $authorization
      * @return JsonResponse
      */
-    public function update(Request $request, AuthorizationManageType $authorizationManageType)
+    public function update(Request $request, AuthorizationRule $authorization)
     {
-        $isUpdated = $authorizationManageType->update($request->all());
+        $isUpdated = $authorization->update($request->all());
 
         return response()->json($isUpdated);
     }
@@ -61,13 +61,13 @@ class AuthorizationManageTypeController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param AuthorizationManageType $authorizationManageType
+     * @param AuthorizationRule $authorization
      * @return JsonResponse
      * @throws Exception
      */
-    public function destroy(AuthorizationManageType $authorizationManageType)
+    public function destroy(AuthorizationRule $authorization)
     {
-        $isDeleted = $authorizationManageType->delete();
+        $isDeleted = $authorization->delete();
 
         return response()->json($isDeleted);
     }

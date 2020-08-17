@@ -30,9 +30,9 @@ class EloquentEvents
             Log::info("[Authorization] Triggered Eloquent event: $event");
 
             /**
-             * @var $rightParser RightParser
+             * @var $rightParser RuleParser
              */
-            $rightParser = App::make(RightParser::class);
+            $rightParser = App::make(RuleParser::class);
             $eventName = $this->parseEventName($event, $rightParser);
             $input = $rightParser->getAuthValues($modelClass, $rightParser->eventRightMapping[$eventName]);
 
@@ -55,12 +55,12 @@ class EloquentEvents
 
     /**
      * @param $event
-     * @param RightParser $rightParser
+     * @param RuleParser $rightParser
      * @return mixed|string
      * @throws AuthorizationException
      * @throws \Exception
      */
-    protected function parseEventName(string $event, RightParser $rightParser): string
+    protected function parseEventName(string $event, RuleParser $rightParser): string
     {
         $parsed = explode(':', $event);
 

@@ -6,7 +6,7 @@ interface AuthorizesUsers
 {
     /**
      * List of things to authorize by. Keys given here MUST
-     * resemble names from authorization_manage_types table.
+     * resemble names from authorizable_set_types table.
      *
      * Examples:
      *

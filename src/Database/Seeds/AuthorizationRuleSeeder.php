@@ -4,7 +4,7 @@ namespace Voice\JsonAuthorization\Database\Seeds;
 
 use Illuminate\Database\Seeder;
 
-class AuthorizationSeeder extends Seeder
+class AuthorizationRuleSeeder extends Seeder
 {
     /**
      * Run the database seeds.

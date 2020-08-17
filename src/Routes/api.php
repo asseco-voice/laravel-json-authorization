@@ -18,8 +18,8 @@ Route::namespace('Voice\JsonAuthorization\App\Http\Controllers')
     ->middleware('api')
     ->group(function () {
 
-        Route::apiResource('authorization', 'AuthorizationController');
-        Route::apiResource('authorization-models', 'AuthorizationModelController');
-        Route::apiResource('authorization-manage-types', 'AuthorizationManageTypeController');
+        Route::apiResource('authorization-rules', 'AuthorizationRuleController');
+        Route::apiResource('authorizable-models', 'AuthorizableModelController');
+        Route::apiResource('authorizable-set-types', 'AuthorizableSetTypeController');
 
     });

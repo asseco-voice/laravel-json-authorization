@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAuthorizationManageTypesTable extends Migration
+class CreateAuthorizableSetTypesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateAuthorizationManageTypesTable extends Migration
      */
     public function up()
     {
-        Schema::create('authorization_manage_types', function (Blueprint $table) {
+        Schema::create('authorizable_set_types', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
 
@@ -28,6 +28,6 @@ class CreateAuthorizationManageTypesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('authorization_manage_types');
+        Schema::dropIfExists('authorizable_set_types');
     }
 }

@@ -7,8 +7,8 @@ use Illuminate\Support\ServiceProvider;
 use Voice\JsonAuthorization\Authorization\AuthenticatedUser;
 use Voice\JsonAuthorization\Authorization\AuthorizableModels;
 use Voice\JsonAuthorization\Authorization\EloquentEvents;
-use Voice\JsonAuthorization\Authorization\RightParser;
-use Voice\JsonAuthorization\Authorization\RulesResolver;
+use Voice\JsonAuthorization\Authorization\RuleParser;
+use Voice\JsonAuthorization\Authorization\RuleResolver;
 
 class JsonAuthorizationServiceProvider extends ServiceProvider
 {
@@ -47,8 +47,8 @@ class JsonAuthorizationServiceProvider extends ServiceProvider
             return new AuthenticatedUser();
         });
 
-        $this->app->singleton(RightParser::class, function ($app) {
-            return new RightParser(new AuthenticatedUser(), new AuthorizableModels(), new RulesResolver());
+        $this->app->singleton(RuleParser::class, function ($app) {
+            return new RuleParser(new AuthenticatedUser(), new AuthorizableModels(), new RuleResolver());
         });
 
         $this->app->singleton(EloquentEvents::class, function ($app) {
