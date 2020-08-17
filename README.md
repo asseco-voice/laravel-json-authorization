@@ -1,7 +1,6 @@
 # Laravel JSON authorization
 
-This package enables authorization via JSON objects imposed
-as a scope on each model which can be authorized.
+This package enables authorization via JSON objects imposed on each model which can be authorized.
 
 Package is developed mainly for the purpose of multiple Laravel microservices
 authorization having in mind to avoiding the additional trips to authorization service.
@@ -25,7 +24,7 @@ protected.
 something through Eloquent relations you have no way of protecting what is being resolved.
 
 Resource protection here imposes limits you provided independently of where your request comes from.
-We are doing that by taking advantage of Laravel scopes.
+We are doing that by taking advantage of Laravel scopes and Eloquent events.
 
 Of course, there are also some limitations:
 - relation will not be protected if you manually forward a ``relation_id`` to model
@@ -63,7 +62,7 @@ Package initialization requires few steps to set up:
 1. [Pick authorizable models](#pick-authorizable-models)
 1. [Migrate tables](#migrate-tables)
 1. [Modify User](#modify-user)
-1. [Attach permissions](#attach-permissions)
+1. [Attach rules](#attach-rules)
 
 ### Pick authorizable models
 
@@ -87,8 +86,8 @@ Running ``php artisan migrate`` will publish 3 tables:
 
 ``authorizable_models`` - a list of full Eloquent (namespaced) models for 
 [authorizable models](#pick-authorizable-models). This table is filled out automatically 
-upon package usage but is not deleted automatically if you remove the trait. Scanning of these models is 
-done within the ``app`` folder and does not recurse within it, so in case you have a different folder 
+upon package usage but is not deleted automatically if you remove the trait after it is already written
+in the DB. Only models within ``app`` folder are scanned. In case you have a different folder 
 structure, or need to implement external models, [modify the config](#additional) ``models_path`` variable to include 
 what you need.
 
@@ -140,7 +139,8 @@ public function getAuthorizableSets(): array
 }
 ```
 
-You don't need to implement all of these though. This is valid as well:
+You don't need to implement all of these though. This is valid as well (as long as `roles` are under 
+`authorizable_set_types` table):
 
 ```
 public function getAuthorizableSets(): array
@@ -184,7 +184,7 @@ role 2: "read" right for IDs 4, 5 and 6
 Final "read" right for that user are IDs 1, 2, 3, 4, 5 and 6
 ```
 
-### Attach permissions
+### Attach rules
 
 If a model is [authorizable](#terminology), and no limit is present within ``authorization_rules`` table for the 
 currently logged in user, we are assuming that user has no rights to operate on the model. 
