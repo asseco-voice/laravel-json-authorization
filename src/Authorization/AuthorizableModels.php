@@ -42,7 +42,7 @@ class AuthorizableModels
         $results = scandir($path);
 
         foreach ($results as $result) {
-            if ($result === '.' or $result === '..') {
+            if ($result === '.' || $result === '..' || stripos($result, '.php') === false) {
                 continue;
             }
 
