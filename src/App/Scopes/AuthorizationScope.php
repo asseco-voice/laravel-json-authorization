@@ -34,20 +34,20 @@ class AuthorizationScope implements Scope
          * @var $rightParser RuleParser
          */
         $rightParser = App::make(RuleParser::class);
-        $input = $rightParser->getAuthValues(get_class($model));
+        $authValues = $rightParser->getAuthValues(get_class($model));
 
-        if (count($input) < 1) {
+        if (count($authValues) < 1) {
             Log::info("[Authorization] You have no rights for this action.");
             $builder->whereRaw('1 = 0');
             return;
         }
 
-        if (array_key_exists(0, $input) && $input[0] === $rightParser::ABSOLUTE_RIGHTS) {
+        if (array_key_exists(0, $authValues) && $authValues[0] === $rightParser::ABSOLUTE_RIGHTS) {
             Log::info("[Authorization] You have full rights for this action.");
             return;
         }
 
-        $jsonQuery = new JsonQuery($builder, $input);
+        $jsonQuery = new JsonQuery($builder, $authValues);
         $jsonQuery->search();
     }
 }

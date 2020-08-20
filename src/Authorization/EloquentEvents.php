@@ -25,54 +25,30 @@ class EloquentEvents
         Event::listen($this->eventsToListen, function ($event, $model) {
 
             $eloquentModel = $this->getModel($model);
-            $modelClass = get_class($eloquentModel);
-
-            Log::info("[Authorization] Triggered Eloquent event: $event");
-
             /**
-             * @var $rightParser RuleParser
+             * @var $ruleParser RuleParser
              */
-            $rightParser = App::make(RuleParser::class);
-            $eventName = $this->parseEventName($event, $rightParser);
-            $input = $rightParser->getAuthValues($modelClass, $rightParser->eventRightMapping[$eventName]);
+            $ruleParser = App::make(RuleParser::class);
+            [$eventName, $modelClass] = $this->parseEventName($event, $ruleParser);
+            $authValues = $ruleParser->getAuthValues($modelClass, $ruleParser->eventRightMapping[$eventName]);
 
-            if (count($input) < 1) {
+            Log::info("[Authorization] Triggered '$event' event for '$modelClass' model.");
+
+            if (count($authValues) < 1) {
                 Log::info("[Authorization] You have no '$eventName' rights for '$modelClass' model.");
                 return false;
             }
 
-            if (array_key_exists(0, $input) && $input[0] === $rightParser::ABSOLUTE_RIGHTS) {
+            if (array_key_exists(0, $authValues) && $authValues[0] === $ruleParser::ABSOLUTE_RIGHTS) {
                 Log::info("[Authorization] You have full '$eventName' rights for '$modelClass' model.");
                 return true;
             }
 
-            $fetched = $this->executeQuery($modelClass, $input, $eloquentModel);
+            $fetched = $this->executeQuery($modelClass, $authValues, $eloquentModel);
 
             // Compare primary keys only ... what if there are none?
             return in_array($eloquentModel->getKey(), $fetched);
         });
-    }
-
-    /**
-     * @param $event
-     * @param RuleParser $rightParser
-     * @return mixed|string
-     * @throws AuthorizationException
-     * @throws \Exception
-     */
-    protected function parseEventName(string $event, RuleParser $rightParser): string
-    {
-        $parsed = explode(':', $event);
-
-        if (count($parsed) != 2) {
-            throw new AuthorizationException("Something went wrong parsing the '$event' event.");
-        }
-
-        $eventName = $parsed[0];
-
-        $rightParser->checkEventMapping($eventName);
-
-        return $eventName;
     }
 
     /**
@@ -87,6 +63,29 @@ class EloquentEvents
         }
 
         return $model[0];
+    }
+
+    /**
+     * @param $event
+     * @param RuleParser $ruleParser
+     * @return mixed|string
+     * @throws AuthorizationException
+     * @throws \Exception
+     */
+    protected function parseEventName(string $event, RuleParser $ruleParser): array
+    {
+        $parsed = explode(':', $event);
+
+        if (count($parsed) != 2) {
+            throw new AuthorizationException("Something went wrong parsing the '$event' event.");
+        }
+
+        $eventName = trim($parsed[0]);
+        $modelClass = trim($parsed[1]);
+
+        $ruleParser->checkEventMapping($eventName);
+
+        return [$eventName, $modelClass];
     }
 
     /**

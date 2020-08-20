@@ -2,7 +2,6 @@
 
 namespace Voice\JsonAuthorization\Authorization;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
@@ -10,7 +9,7 @@ use Voice\JsonAuthorization\App\AuthorizableModel;
 
 class AuthorizableModels
 {
-    const CACHE_PREFIX = 'authorization_models';
+    const CACHE_PREFIX = 'authorizable_models';
     const CACHE_TTL = 60 * 60 * 24;
 
     public array $models;
@@ -39,22 +38,16 @@ class AuthorizableModels
 
     protected function traversePath(string $path, string $namespace, array $models): array
     {
-        $results = scandir($path);
+        $files = scandir($path);
 
-        foreach ($results as $result) {
-            if ($result === '.' || $result === '..' || stripos($result, '.php') === false) {
+        foreach ($files as $file) {
+            if (stripos($file, '.php') === false) {
                 continue;
             }
 
-            $filename = "{$path}/{$result}";
+            $modelName = substr($file, 0, -4);
+            $model = $namespace . $modelName;
 
-            if (is_dir($filename)) {
-                continue;
-            }
-
-            $result = substr($result, 0, -4);
-
-            $model = $namespace . $result;
             if ($this->hasAuthorizesWithJsonTrait($model)) {
                 $models[] = $model;
             }
@@ -76,7 +69,7 @@ class AuthorizableModels
         return in_array($model, $this->models);
     }
 
-    public function resolveAuthorizationModel($model): Model
+    public function resolveAuthorizableModelId(string $model): int
     {
         $cacheKey = self::CACHE_PREFIX . "_$model";
 
@@ -85,7 +78,7 @@ class AuthorizableModels
             return Cache::get($cacheKey);
         }
 
-        $resolveFromDb = AuthorizableModel::where('name', $model)->first();
+        $resolveFromDb = AuthorizableModel::where('name', $model)->pluck('id')->first();
 
         if ($resolveFromDb) {
             Log::info("[Authorization] Resolved $model from DB. Adding to cache and returning.");
@@ -96,7 +89,7 @@ class AuthorizableModels
         Log::info("[Authorization] Model $model is authorizable, but doesn't exist in DB yet. Creating...");
         $newModel = AuthorizableModel::create(['name' => $model]);
 
-        Cache::put($cacheKey, $newModel, self::CACHE_TTL);
-        return $newModel;
+        Cache::put($cacheKey, $newModel->id, self::CACHE_TTL);
+        return $newModel->id;
     }
 }

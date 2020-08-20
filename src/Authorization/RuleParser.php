@@ -28,18 +28,18 @@ class RuleParser
 
     protected AuthenticatedUser  $authenticatedUser;
     protected AuthorizableModels $authorizableModels;
-    protected RuleResolver      $rulesResolver;
+    protected RuleResolver       $ruleResolver;
 
     /**
      * RightParser constructor.
      * @param AuthenticatedUser $authenticatedUser
      * @param AuthorizableModels $authorizableModels
-     * @param RuleResolver $rulesResolver
+     * @param RuleResolver $ruleResolver
      */
-    public function __construct(AuthenticatedUser $authenticatedUser, AuthorizableModels $authorizableModels, RuleResolver $rulesResolver)
+    public function __construct(AuthenticatedUser $authenticatedUser, AuthorizableModels $authorizableModels, RuleResolver $ruleResolver)
     {
         $this->authorizableModels = $authorizableModels;
-        $this->rulesResolver = $rulesResolver;
+        $this->ruleResolver = $ruleResolver;
         $this->authenticatedUser = $authenticatedUser;
     }
 
@@ -52,7 +52,7 @@ class RuleParser
     public function getAuthValues(string $modelClass, string $right = self::READ_RIGHT): array
     {
         if (!$this->authorizableModels->isModelAuthorizable($modelClass)) {
-            Log::info("[Authorization] Model '$modelClass' does not implement AuthorizesWithJson trait. Skipping authorization...");
+            Log::info("[Authorization] Model '$modelClass' does not implement AuthorizesWithJson trait (or you forgot to flush the cache). Skipping authorization...");
             return [self::ABSOLUTE_RIGHTS];
         }
 
@@ -73,34 +73,10 @@ class RuleParser
     protected function getMergedRules(string $modelClass, string $right): array
     {
         $authorizableSets = Arr::wrap($this->authenticatedUser->user->getAuthorizableSets());
-        $manageTypes = ManageTypes::getManageTypes();
-        $authorizableModel = $this->authorizableModels->resolveAuthorizationModel($modelClass);
-        $mergedRules = [];
+        $authorizableSetTypes = AuthorizableSetTypes::getAuthorizableSetTypes();
+        $authorizableModelId = $this->authorizableModels->resolveAuthorizableModelId($modelClass);
 
-        foreach ($manageTypes as $manageType) {
-            if (!array_key_exists($manageType->name, $authorizableSets)) {
-                Log::info("[Authorization] Type '{$manageType->name}' is missing within your User::getAuthorizableSets() method");
-                continue;
-            }
-
-            $authorizableSet = Arr::wrap($authorizableSets[$manageType->name]);
-
-            if ($this->hasAbsoluteRights($manageType->name, $authorizableSet)) {
-                return [self::ABSOLUTE_RIGHTS];
-            }
-
-            foreach ($authorizableSet as $role) {
-                Log::info("[Authorization] Processing: {$manageType->name} - $role");
-
-                $rules = $this->rulesResolver->resolveRules($manageType->id, $role, $modelClass, $authorizableModel, $right);
-
-                if (array_key_exists(0, $rules) && $rules[0] === self::ABSOLUTE_RIGHTS) {
-                    return [self::ABSOLUTE_RIGHTS];
-                }
-
-                $mergedRules = $this->rulesResolver->mergeRules($mergedRules, $rules);
-            }
-        }
+        $mergedRules = $this->mergeRules($authorizableSets, $authorizableSetTypes, $authorizableModelId, $modelClass, $right);
 
         Log::info("[Authorization] Merged rules: " . print_r($mergedRules, true));
 
@@ -108,21 +84,62 @@ class RuleParser
     }
 
     /**
-     * @param string $manageType
+     * @param $authorizableSetTypes
+     * @param array $authorizableSets
+     * @param string $modelClass
+     * @param int $authorizableModelId
+     * @param string $right
+     * @return array
+     * @throws AuthorizationException
+     */
+    protected function mergeRules(array $authorizableSets, array $authorizableSetTypes, int $authorizableModelId, string $modelClass, string $right): array
+    {
+        $mergedRules = [];
+
+        foreach ($authorizableSetTypes as $authorizableSetType => $authorizableSetTypeId) {
+            if (!array_key_exists($authorizableSetType, $authorizableSets)) {
+                Log::info("[Authorization] Type '{$authorizableSetType}' is missing within your User::getAuthorizableSets() method");
+                continue;
+            }
+
+            $authorizableSet = Arr::wrap($authorizableSets[$authorizableSetType]);
+
+            if ($this->hasAbsoluteRights($authorizableSetType, $authorizableSet)) {
+                return [self::ABSOLUTE_RIGHTS];
+            }
+
+            foreach ($authorizableSet as $authorizableValue) {
+                Log::info("[Authorization] Processing: {$authorizableSetType} - $authorizableValue");
+
+                $rules = $this->ruleResolver->resolveRules($authorizableSetType, $authorizableSetTypeId, $authorizableValue, $modelClass, $authorizableModelId, $right);
+
+                if (array_key_exists(0, $rules) && $rules[0] === self::ABSOLUTE_RIGHTS) {
+                    return [self::ABSOLUTE_RIGHTS];
+                }
+
+                $mergedRules = $this->ruleResolver->mergeRules($mergedRules, $rules);
+            }
+        }
+
+        return $mergedRules;
+    }
+
+    /**
+     * @param string $authorizableSetType
      * @param array $authorizableSets
      * @return bool
      * @throws AuthorizationException
      */
-    protected function hasAbsoluteRights(string $manageType, array $authorizableSets): bool
+    protected function hasAbsoluteRights(string $authorizableSetType, array $authorizableSets): bool
     {
-        $rolesWithAbsoluteRights = $this->getRolesWithAbsoluteRights();
+        $authorizableSetsWithAbsoluteRights = $this->getAuthorizableSetsWithAbsoluteRights();
 
-        if (!array_key_exists($manageType, $rolesWithAbsoluteRights)) {
+        if (!array_key_exists($authorizableSetType, $authorizableSetsWithAbsoluteRights)) {
             return false;
         }
 
         foreach ($authorizableSets as $authorizableSet) {
-            if (in_array($authorizableSet, $rolesWithAbsoluteRights[$manageType])) {
+            if (in_array($authorizableSet, $authorizableSetsWithAbsoluteRights[$authorizableSetType])) {
                 return true;
             }
         }
@@ -134,7 +151,7 @@ class RuleParser
      * @return array
      * @throws AuthorizationException
      */
-    protected function getRolesWithAbsoluteRights(): array
+    protected function getAuthorizableSetsWithAbsoluteRights(): array
     {
         $absoluteRights = Config::get('asseco-authorization.absolute_rights');
 

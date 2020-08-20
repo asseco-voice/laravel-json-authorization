@@ -63,6 +63,7 @@ Package initialization requires few steps to set up:
 1. [Migrate tables](#migrate-tables)
 1. [Modify User](#modify-user)
 1. [Attach rules](#attach-rules)
+1. [Flush cache](#flush-cache)
 
 ### Pick authorizable models
 
@@ -215,6 +216,15 @@ Giving you a read right to all rows for the given model.
 In case you need some sort of admin available which has absolute rights to everything, 
 [publish the configuration](#additional) and add it to the ``absolute_rights`` key, 
 and you will not need to give the explicit CRUD rights for it.
+
+### Flush cache
+
+Due to the heavy workload this package has to do, everything is cached with 1 day TTL. 
+Be sure to flush the cache after each manual code update (i.e. you add `AuthorizesWithJson` on a model).
+
+You can flush the cache [the Laravel way](https://laravel.com/docs/7.x/cache#removing-items-from-the-cache),
+or if you're using Redis as your cache driver you may use [one of our packages](https://github.com/asseco-voice/laravel-redis-cache-extension)
+to enable a wildcard Redis flush.
 
 ## Example
 

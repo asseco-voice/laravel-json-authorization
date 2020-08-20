@@ -2,7 +2,6 @@
 
 namespace Voice\JsonAuthorization\Authorization;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -10,20 +9,21 @@ use Voice\JsonAuthorization\App\AuthorizationRule;
 
 class RuleResolver
 {
-    const CACHE_PREFIX = 'authorization_';
+    const CACHE_PREFIX = 'authorization_rules_';
     const CACHE_TTL = 60 * 60 * 24;
 
     /**
-     * @param string $manageTypeId
-     * @param string $role
+     * @param string $authorizableSetType
+     * @param string $authorizableSetTypeId
+     * @param string $authorizableValue
      * @param string $modelClass
-     * @param Model $resolvedModel
+     * @param int $resolvedModelId
      * @param string $right
      * @return array
      */
-    public function resolveRules(string $manageTypeId, string $role, string $modelClass, Model $resolvedModel, string $right): array
+    public function resolveRules(string $authorizableSetType, string $authorizableSetTypeId, string $authorizableValue, string $modelClass, int $resolvedModelId, string $right): array
     {
-        $rules = $this->fetchRules($manageTypeId, $role, $modelClass, $resolvedModel->id);
+        $rules = $this->fetchRules($authorizableSetType, $authorizableSetTypeId, $authorizableValue, $modelClass, $resolvedModelId);
 
         if (!array_key_exists($right, $rules)) {
             Log::info("[Authorization] No '$right' rights found for $modelClass.");
@@ -37,23 +37,23 @@ class RuleResolver
     }
 
 
-    public function fetchRules(string $manageTypeId, string $role, string $modelClass, string $modelId): array
+    public function fetchRules(string $authorizableSetType, string $authorizableSetTypeId, string $authorizableValue, string $modelClass, string $modelId): array
     {
-        $cacheKey = self::CACHE_PREFIX . "role_{$role}_model_{$modelClass}";
+        $cacheKey = self::CACHE_PREFIX . "{$authorizableSetType}_{$authorizableValue}_model_{$modelClass}";
 
         if (Cache::has($cacheKey)) {
-            Log::info("[Authorization] Resolving $role rights for auth model $modelClass from cache.");
+            Log::info("[Authorization] Resolving $authorizableValue rights for auth model $modelClass from cache.");
             return Cache::get($cacheKey);
         }
 
         $resolveFromDb = AuthorizationRule::where([
-            'authorization_manage_type_id' => $manageTypeId,
-            'manage_type_value'            => $role,
-            'authorization_model_id'       => $modelId,
-        ])->first();
+            'authorizable_set_type_id' => $authorizableSetTypeId,
+            'authorizable_set_value'   => $authorizableValue,
+            'authorizable_model_id'    => $modelId,
+        ])->first('rules');
 
         if ($resolveFromDb) {
-            Log::info("[Authorization] Found $role rights for auth model $modelClass. Adding to cache and returning.");
+            Log::info("[Authorization] Found $authorizableValue rights for auth model $modelClass. Adding to cache and returning.");
             $decoded = json_decode($resolveFromDb->rules, true);
             Cache::put($cacheKey, $decoded, self::CACHE_TTL);
             return $decoded;
@@ -69,10 +69,34 @@ class RuleResolver
         $search = 'search';
         $or = '||';
 
-        if (!array_key_exists($search, $rules)) {
+        if ($this->rulesMalformed($search, $rules)) {
             return $mergedRules;
         }
 
+        $mergedRules = $this->initMergedRulesArrayKeys($search, $mergedRules, $or);
+        $mergedRules[$search][$or][] = $rules[$search];
+
+        return $mergedRules;
+    }
+
+    /**
+     * @param string $search
+     * @param array $rules
+     * @return bool
+     */
+    protected function rulesMalformed(string $search, array $rules): bool
+    {
+        return !array_key_exists($search, $rules);
+    }
+
+    /**
+     * @param string $search
+     * @param array $mergedRules
+     * @param string $or
+     * @return array
+     */
+    protected function initMergedRulesArrayKeys(string $search, array $mergedRules, string $or): array
+    {
         if (!array_key_exists($search, $mergedRules)) {
             $mergedRules[$search] = [];
         }
@@ -80,8 +104,6 @@ class RuleResolver
         if (!array_key_exists($or, $mergedRules[$search])) {
             $mergedRules[$search][$or] = [];
         }
-
-        $mergedRules[$search][$or][] = $rules[$search];
 
         return $mergedRules;
     }
