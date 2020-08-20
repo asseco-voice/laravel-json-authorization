@@ -23,28 +23,27 @@ class EloquentEvents
     public function attachEloquentListener(): void
     {
         Event::listen($this->eventsToListen, function ($event, $model) {
-
-            $eloquentModel = $this->getModel($model);
             /**
              * @var $ruleParser RuleParser
              */
             $ruleParser = App::make(RuleParser::class);
+            $eloquentModel = $this->getModel($model);
             [$eventName, $modelClass] = $this->parseEventName($event, $ruleParser);
-            $authValues = $ruleParser->getAuthValues($modelClass, $ruleParser->eventRightMapping[$eventName]);
+            $rules = $ruleParser->getRules($modelClass, $ruleParser->eventRightMapping[$eventName]);
 
             Log::info("[Authorization] Triggered '$event' event for '$modelClass' model.");
 
-            if (count($authValues) < 1) {
+            if (count($rules) < 1) {
                 Log::info("[Authorization] You have no '$eventName' rights for '$modelClass' model.");
                 return false;
             }
 
-            if (array_key_exists(0, $authValues) && $authValues[0] === $ruleParser::ABSOLUTE_RIGHTS) {
+            if (array_key_exists(0, $rules) && $rules[0] === $ruleParser::ABSOLUTE_RIGHTS) {
                 Log::info("[Authorization] You have full '$eventName' rights for '$modelClass' model.");
                 return true;
             }
 
-            $fetched = $this->executeQuery($modelClass, $authValues, $eloquentModel);
+            $fetched = $this->executeQuery($modelClass, $rules, $eloquentModel);
 
             // Compare primary keys only ... what if there are none?
             return in_array($eloquentModel->getKey(), $fetched);

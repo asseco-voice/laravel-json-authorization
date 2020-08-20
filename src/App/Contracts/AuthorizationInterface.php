@@ -2,7 +2,7 @@
 
 namespace Voice\JsonAuthorization\App\Contracts;
 
-interface AuthorizesUsers
+interface AuthorizationInterface
 {
     /**
      * List of things to authorize by. Check readme for more details

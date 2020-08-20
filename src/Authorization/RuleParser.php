@@ -5,6 +5,8 @@ namespace Voice\JsonAuthorization\Authorization;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
+use Voice\JsonAuthorization\App\AuthorizableModel;
+use Voice\JsonAuthorization\App\AuthorizableSetType;
 use Voice\JsonAuthorization\Exceptions\AuthorizationException;
 
 class RuleParser
@@ -27,18 +29,15 @@ class RuleParser
     ];
 
     protected AuthenticatedUser  $authenticatedUser;
-    protected AuthorizableModels $authorizableModels;
     protected RuleResolver       $ruleResolver;
 
     /**
      * RightParser constructor.
      * @param AuthenticatedUser $authenticatedUser
-     * @param AuthorizableModels $authorizableModels
      * @param RuleResolver $ruleResolver
      */
-    public function __construct(AuthenticatedUser $authenticatedUser, AuthorizableModels $authorizableModels, RuleResolver $ruleResolver)
+    public function __construct(AuthenticatedUser $authenticatedUser, RuleResolver $ruleResolver)
     {
-        $this->authorizableModels = $authorizableModels;
         $this->ruleResolver = $ruleResolver;
         $this->authenticatedUser = $authenticatedUser;
     }
@@ -49,10 +48,10 @@ class RuleParser
      * @return array|string[]
      * @throws \Exception
      */
-    public function getAuthValues(string $modelClass, string $right = self::READ_RIGHT): array
+    public function getRules(string $modelClass, string $right = self::READ_RIGHT): array
     {
-        if (!$this->authorizableModels->isModelAuthorizable($modelClass)) {
-            Log::info("[Authorization] Model '$modelClass' does not implement AuthorizesWithJson trait (or you forgot to flush the cache). Skipping authorization...");
+        if (!AuthorizableModel::isAuthorizable($modelClass)) {
+            Log::info("[Authorization] Model '$modelClass' does not implement Voice\JsonAuthorization\App\Traits\Authorizable trait (or you forgot to flush the cache). Skipping authorization...");
             return [self::ABSOLUTE_RIGHTS];
         }
 
@@ -73,8 +72,8 @@ class RuleParser
     protected function getMergedRules(string $modelClass, string $right): array
     {
         $authorizableSets = Arr::wrap($this->authenticatedUser->user->getAuthorizableSets());
-        $authorizableSetTypes = AuthorizableSetTypes::getAuthorizableSetTypes();
-        $authorizableModelId = $this->authorizableModels->resolveAuthorizableModelId($modelClass);
+        $authorizableSetTypes = AuthorizableSetType::getCached();
+        $authorizableModelId = AuthorizableModel::getCachedId($modelClass);
 
         $mergedRules = $this->mergeRules($authorizableSets, $authorizableSetTypes, $authorizableModelId, $modelClass, $right);
 

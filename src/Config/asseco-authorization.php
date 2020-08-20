@@ -12,9 +12,9 @@ return [
     ],
 
     /**
-     * Namespace to AuthorizesWithJson trait
+     * Namespace to Authorizable trait
      */
-    'trait_path'       => 'Voice\JsonAuthorization\App\Traits\AuthorizesWithJson',
+    'trait_path'       => 'Voice\JsonAuthorization\App\Traits\Authorizable',
 
     /**
      * List of roles/groups/etc which have absolute admin/root rights.

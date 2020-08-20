@@ -5,7 +5,6 @@ namespace Voice\JsonAuthorization;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use Voice\JsonAuthorization\Authorization\AuthenticatedUser;
-use Voice\JsonAuthorization\Authorization\AuthorizableModels;
 use Voice\JsonAuthorization\Authorization\EloquentEvents;
 use Voice\JsonAuthorization\Authorization\RuleParser;
 use Voice\JsonAuthorization\Authorization\RuleResolver;
@@ -48,7 +47,7 @@ class JsonAuthorizationServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(RuleParser::class, function ($app) {
-            return new RuleParser(new AuthenticatedUser(), new AuthorizableModels(), new RuleResolver());
+            return new RuleParser(new AuthenticatedUser(), new RuleResolver());
         });
 
         $this->app->singleton(EloquentEvents::class, function ($app) {

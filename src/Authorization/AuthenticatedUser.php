@@ -3,12 +3,12 @@
 namespace Voice\JsonAuthorization\Authorization;
 
 use Illuminate\Support\Facades\Auth;
-use Voice\JsonAuthorization\App\Contracts\AuthorizesUsers;
+use Voice\JsonAuthorization\App\Contracts\AuthorizationInterface;
 use Voice\JsonAuthorization\Exceptions\AuthorizationException;
 
 class AuthenticatedUser
 {
-    public ?AuthorizesUsers $user = null;
+    public ?AuthorizationInterface $user = null;
 
     /**
      * AuthenticatedUser constructor.
@@ -24,7 +24,7 @@ class AuthenticatedUser
 
         $this->user = Auth::user();
 
-        if (!$this->user instanceof AuthorizesUsers) {
+        if (!$this->user instanceof AuthorizationInterface) {
             throw new AuthorizationException("User model must implement AuthorizesUsers interface.");
         }
     }

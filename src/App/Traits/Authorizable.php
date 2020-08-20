@@ -4,7 +4,7 @@ namespace Voice\JsonAuthorization\App\Traits;
 
 use Voice\JsonAuthorization\App\Scopes\AuthorizationScope;
 
-trait AuthorizesWithJson
+trait Authorizable
 {
     /**
      * The "booted" method of the model.

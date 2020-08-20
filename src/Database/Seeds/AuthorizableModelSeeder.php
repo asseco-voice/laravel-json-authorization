@@ -5,7 +5,6 @@ namespace Voice\JsonAuthorization\Database\Seeds;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Cache;
 use Voice\JsonAuthorization\App\AuthorizableModel;
-use Voice\JsonAuthorization\Authorization\AuthorizableModels;
 
 class AuthorizableModelSeeder extends Seeder
 {
@@ -20,10 +19,10 @@ class AuthorizableModelSeeder extends Seeder
         // but the classes which have trait already
 
         Cache::forget('authorization_models');
-        $models = new AuthorizableModels();
+        $models = AuthorizableModel::getCached();
         $data = [];
 
-        foreach ($models->models as $model) {
+        foreach ($models as $model) {
             $data[] = ['name' => $model];
         }
 
