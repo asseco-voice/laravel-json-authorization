@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Throwable;
-use Voice\JsonAuthorization\Authorization\AuthenticatedUser;
+use Voice\JsonAuthorization\App\CachedModels\CachedAuthorizableModel;
 use Voice\JsonAuthorization\Authorization\AuthorizableSet;
 use Voice\JsonAuthorization\Authorization\AuthorizableSets;
 use Voice\JsonAuthorization\Authorization\CachedRule;
@@ -32,14 +32,13 @@ class AuthorizationRule extends Model
     }
 
     /**
-     * @param AuthenticatedUser $user
      * @param string $modelClass
      * @return CachedRuleCollection
      * @throws Throwable
      */
-    public static function getCached(AuthenticatedUser $user, string $modelClass): CachedRuleCollection
+    public static function getCached(string $modelClass): CachedRuleCollection
     {
-        $authorizableSets = self::getAuthorizableSets($user);
+        $authorizableSets = (new AuthorizableSets())->get();
 
         $cachedRules = self::resolveFromCache($authorizableSets, $modelClass);
         $dbRules = self::resolveFromDb($authorizableSets, $modelClass);
@@ -49,17 +48,6 @@ class AuthorizationRule extends Model
         self::cache($toCache, $modelClass);
 
         return $cachedRules->mergeRecursive($dbRules);
-    }
-
-    /**
-     * @param AuthenticatedUser $user
-     * @param Collection $authorizableSetTypes
-     * @return Collection
-     * @throws Throwable
-     */
-    protected static function getAuthorizableSets(AuthenticatedUser $user): Collection
-    {
-        return (new AuthorizableSets($user))->get();
     }
 
     /**
@@ -124,7 +112,7 @@ class AuthorizationRule extends Model
 
         Log::info("[Authorization] Resolving non-cached rights from DB for '$modelClass' model.");
 
-        $modelId = AuthorizableModel::getCachedId($modelClass);
+        $modelId = self::getAuthorizableModelId($modelClass);
 
         $typesWithRules = App::make('cached-authorizable-set-types')
             ->load(['rules' => function ($builder) use ($modelId, $authorizableSets) {
@@ -149,6 +137,15 @@ class AuthorizationRule extends Model
             }]);
 
         return self::prepareDbData($typesWithRules, $authorizableSets);
+    }
+
+    protected static function getAuthorizableModelId(string $modelClass): int
+    {
+        /**
+         * @var $cachedAuthorizableModel CachedAuthorizableModel
+         */
+        $cachedAuthorizableModel = App::make(CachedAuthorizableModel::class);
+        return $cachedAuthorizableModel->getCachedId($modelClass);
     }
 
     /**

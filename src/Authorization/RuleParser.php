@@ -4,11 +4,11 @@ namespace Voice\JsonAuthorization\Authorization;
 
 use Exception;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Throwable;
-use Voice\JsonAuthorization\App\AuthorizableModel;
-use Voice\JsonAuthorization\App\AuthorizableSetType;
 use Voice\JsonAuthorization\App\AuthorizationRule;
+use Voice\JsonAuthorization\App\CachedModels\CachedAuthorizableModel;
 use Voice\JsonAuthorization\Exceptions\AuthorizationException;
 
 class RuleParser
@@ -29,17 +29,14 @@ class RuleParser
         'eloquent.deleting' => self::DELETE_RIGHT,
     ];
 
-    protected AuthenticatedUser $user;
     protected AbsoluteRights    $absoluteRights;
 
     /**
      * RightParser constructor.
-     * @param AuthenticatedUser $user
      * @param AbsoluteRights $absoluteRights
      */
-    public function __construct(AuthenticatedUser $user, AbsoluteRights $absoluteRights)
+    public function __construct(AbsoluteRights $absoluteRights)
     {
-        $this->user = $user;
         $this->absoluteRights = $absoluteRights;
     }
 
@@ -52,23 +49,27 @@ class RuleParser
      */
     public function getRules(string $modelClass, string $right = self::READ_RIGHT): array
     {
-        if (!$this->user->isLoggedIn()) {
-            Log::info("[Authorization] You are logged out.");
-            return [];
-        }
-
-        if (!AuthorizableModel::isAuthorizable($modelClass)) {
+        if (!$this->isAuthorizable($modelClass)) {
             Log::info("[Authorization] Model '$modelClass' does not implement 'Voice\JsonAuthorization\App\Traits\Authorizable' trait (or you forgot to flush the cache). Skipping authorization...");
             return [self::ABSOLUTE_RIGHTS];
         }
 
-        $authorizationRules = AuthorizationRule::getCached($this->user, $modelClass);
+        $authorizationRules = AuthorizationRule::getCached($modelClass);
 
         if ($this->absoluteRights->check($authorizationRules)) {
             return [self::ABSOLUTE_RIGHTS];
         }
 
         return $this->getMergedRules($authorizationRules, $modelClass, $right);
+    }
+
+    protected function isAuthorizable(string $modelClass): bool
+    {
+        /**
+         * @var $authorizableModel CachedAuthorizableModel
+         */
+        $authorizableModel = App::make(CachedAuthorizableModel::class);
+        return $authorizableModel->isAuthorizable($modelClass);
     }
 
     /**

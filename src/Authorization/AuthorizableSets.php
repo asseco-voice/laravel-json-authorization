@@ -5,26 +5,25 @@ namespace Voice\JsonAuthorization\Authorization;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 use Voice\JsonAuthorization\App\AuthorizableSetType;
+use Voice\JsonAuthorization\App\Contracts\AuthorizationInterface;
 use Voice\JsonAuthorization\Exceptions\AuthorizationException;
 
 class AuthorizableSets
 {
     const VIRTUAL_ROLE = 'virtual-role';
 
-    protected AuthenticatedUser $authenticatedUser;
     protected Collection $authorizableSetTypes;
 
     /**
      * AuthorizableSet constructor.
-     * @param AuthenticatedUser $authenticatedUser
      */
-    public function __construct(AuthenticatedUser $authenticatedUser)
+    public function __construct()
     {
-        $this->authenticatedUser = $authenticatedUser;
         $this->authorizableSetTypes = App::make('cached-authorizable-set-types');
     }
 
@@ -34,12 +33,28 @@ class AuthorizableSets
      */
     public function get(): Collection
     {
-        $authorizableSets = $this->authenticatedUser->getAuthorizableSets();
+        $authorizableSets = $this->getUserAuthorizableSets();
 
         $this->filterSupported($authorizableSets);
         $this->attachVirtualRole($authorizableSets);
 
         return $this->initAuthorizableSetCollection($authorizableSets);
+    }
+
+    protected function getUserAuthorizableSets()
+    {
+        $user = Auth::user();
+
+        if(!$user){
+            Log::info("[Authorization] You are logged out.");
+            return [];
+        }
+
+        if (!$user instanceof AuthorizationInterface) {
+            throw new AuthorizationException("User model must implement AuthorizesUsers interface.");
+        }
+
+        return $user->getAuthorizableSets();
     }
 
     /**
