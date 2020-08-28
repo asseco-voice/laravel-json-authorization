@@ -103,11 +103,8 @@ where you'd like to merge [authorizable set values](#terminology) from different
 With regard to the performance, everything is cached to the great extent, invalidated (TODO) and re-cached
 upon change. 
 
-Two seeders are available. If you want to use them, attach them directly to your ``DatabaseSeeder``:
-
-- ``AuthorizableSetTypesSeeder`` - will add `roles`, `groups` and `id` as type sets. 
-- ``AuthorizableModelSeeder`` - is not a seeder per-se, as it will read 
-[authorizable models](#pick-authorizable-models) and add them to the DB.
+Seeders are available to use by including `AuthorizationSeeder` (wrapper for several seeders)
+within your app ``DatabaseSeeder``. If needed, you can include single seeders from that class as well. 
 
 ### Modify User
 
@@ -216,6 +213,35 @@ Giving you a read right to all rows for the given model.
 In case you need some sort of admin available which has absolute rights to everything, 
 [publish the configuration](#additional) and add it to the ``absolute_rights`` key, 
 and you will not need to give the explicit CRUD rights for it.
+
+#### Universal (virtual) role
+
+// TODO: napiši ono za auto seed ako ne postoji, reserved word virtual-role
+// ako ne želiš koristiti, ništa ne trebaš dirati...u najgorem slučaju doda record u set_types tablicu
+
+If you have the need to protect resources globally or give the permission for a single resource to all users across the system, you can do
+so by utilizing universal (virtual) role. By default, that role is ``voice-all-mighty``, but can be overridden with `.env` value `UNIVERSAL_ROLE`.
+
+This works in a way that you will i.e. give a read right for some resource to **universal role** which will then be inherited by all other 
+users.
+
+Example:
+
+```
+ID  Role               Authorization model ID
+1   voice-all-mighty   1                      
+
+Rules
+{
+	"read": {
+		"search": {
+			"id": "=1"
+		}
+	}
+} 
+```
+
+Will give a read right to model ``1`` to all users across the system independently of their system roles.
 
 ### Flush cache
 

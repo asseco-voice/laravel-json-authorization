@@ -33,4 +33,9 @@ class AuthenticatedUser
     {
         return $this->user !== null;
     }
+
+    public function getAuthorizableSets(): array
+    {
+        return $this->user->getAuthorizableSets();
+    }
 }

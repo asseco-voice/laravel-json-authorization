@@ -3,6 +3,9 @@
 namespace Voice\JsonAuthorization\Database\Seeds;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Config;
+use Voice\JsonAuthorization\App\AuthorizableModel;
+use Voice\JsonAuthorization\App\AuthorizationRule;
 
 class AuthorizationRuleSeeder extends Seeder
 {
@@ -13,47 +16,77 @@ class AuthorizationRuleSeeder extends Seeder
      */
     public function run()
     {
-        $rule1 = [
-            'read'   => '*',
-            'create' => '*',
-            'update' => [
-                'search' => [
-                    'id' => '<5',
-                ],
-            ],
-        ];
+        $role = Config::get('asseco-authorization.universal_role');
 
-        $rule2 = [
-            'read' => [
-                'search' => [
-                    'id' => '=3;4;6;7',
-                ],
-            ],
-        ];
+        $authorizableModels = AuthorizableModel::all();
 
-        $rule3 = [
-            'read'   => [
-                'search' => [
-                    'id' => '>15',
-                ],
-            ],
-            'delete' => '*',
-        ];
+        foreach ($authorizableModels as $authorizableModel) {
 
-        $rule4 = [
-            'read' => '*',
-        ];
+            $rules = $this->generateRules();
 
-        $rule5 = [
-            'delete' => '*',
-        ];
-
-        $rules = [
-            json_encode($rule1),
-            json_encode($rule2),
-            json_encode($rule3),
-            json_encode($rule4),
-            json_encode($rule5),
-        ];
+            AuthorizationRule::create([
+                'authorizable_set_type_id' => 1,
+                'authorizable_set_value'   => $role,
+                'authorizable_model_id'    => $authorizableModel->id,
+                'rules'                    => json_encode($rules),
+            ]);
+        }
     }
+
+    protected function generateRules()
+    {
+        $rules = [];
+        $rights = [
+            'read', 'create', 'update', 'delete'
+        ];
+
+        $counter = rand(1, 4);
+
+        for ($i = 0; $i < $counter; $i++) {
+
+            $right = $rights[$i];
+
+            if ($right === 'read') {
+                $randRight = rand(1, 2);
+
+                if ($randRight === 1) {
+                    $rule = "*";
+                } else {
+                    $ids = $this->getRandomNumbers();
+
+                    $rule = [
+                        'search' => [
+                            'id' => '=' . implode(";", $ids),
+                        ]
+                    ];
+                }
+            } else {
+                $ids = $this->getRandomNumbers();
+
+                $rule = [
+                    'search' => [
+                        'id' => '=' . implode(";", $ids),
+                    ]
+                ];
+            }
+
+            $rules[$rights[$i]] = $rule;
+        }
+
+        return $rules;
+    }
+
+
+    protected function getRandomNumbers()
+    {
+        $counter = rand(1, 4);
+
+        $random = [];
+        for ($i = 0; $i < $counter; $i++) {
+            $random[$i] = rand(0, 50);
+        }
+
+        return $random;
+    }
+
 }

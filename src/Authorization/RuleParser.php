@@ -2,11 +2,13 @@
 
 namespace Voice\JsonAuthorization\Authorization;
 
+use Exception;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 use Voice\JsonAuthorization\App\AuthorizableModel;
 use Voice\JsonAuthorization\App\AuthorizableSetType;
+use Voice\JsonAuthorization\App\AuthorizationRule;
 use Voice\JsonAuthorization\Exceptions\AuthorizationException;
 
 class RuleParser
@@ -19,8 +21,7 @@ class RuleParser
     const DELETE_RIGHT = 'delete';
 
     /**
-     * These should reflect the same events from events to listen
-     * but without the wildcard.
+     * These should reflect the same events from events to listen but without the '*' wildcard.
      */
     public array $eventRightMapping = [
         'eloquent.creating' => self::CREATE_RIGHT,
@@ -28,137 +29,83 @@ class RuleParser
         'eloquent.deleting' => self::DELETE_RIGHT,
     ];
 
-    protected AuthenticatedUser  $authenticatedUser;
-    protected RuleResolver       $ruleResolver;
+    protected AuthenticatedUser $user;
+    protected AbsoluteRights    $absoluteRights;
 
     /**
      * RightParser constructor.
-     * @param AuthenticatedUser $authenticatedUser
-     * @param RuleResolver $ruleResolver
+     * @param AuthenticatedUser $user
+     * @param AbsoluteRights $absoluteRights
      */
-    public function __construct(AuthenticatedUser $authenticatedUser, RuleResolver $ruleResolver)
+    public function __construct(AuthenticatedUser $user, AbsoluteRights $absoluteRights)
     {
-        $this->ruleResolver = $ruleResolver;
-        $this->authenticatedUser = $authenticatedUser;
+        $this->user = $user;
+        $this->absoluteRights = $absoluteRights;
     }
 
     /**
      * @param string $modelClass
      * @param string $right
      * @return array|string[]
-     * @throws \Exception
+     * @throws Exception
+     * @throws Throwable
      */
     public function getRules(string $modelClass, string $right = self::READ_RIGHT): array
     {
-        if (!AuthorizableModel::isAuthorizable($modelClass)) {
-            Log::info("[Authorization] Model '$modelClass' does not implement Voice\JsonAuthorization\App\Traits\Authorizable trait (or you forgot to flush the cache). Skipping authorization...");
-            return [self::ABSOLUTE_RIGHTS];
-        }
-
-        if (!$this->authenticatedUser->isLoggedIn()) {
+        if (!$this->user->isLoggedIn()) {
             Log::info("[Authorization] You are logged out.");
             return [];
         }
 
-        return $this->getMergedRules($modelClass, $right);
+        if (!AuthorizableModel::isAuthorizable($modelClass)) {
+            Log::info("[Authorization] Model '$modelClass' does not implement 'Voice\JsonAuthorization\App\Traits\Authorizable' trait (or you forgot to flush the cache). Skipping authorization...");
+            return [self::ABSOLUTE_RIGHTS];
+        }
+
+        $authorizableSetTypes = AuthorizableSetType::getCached();
+        $authorizationRules = AuthorizationRule::getCached($this->user, $modelClass, $authorizableSetTypes);
+
+        if ($this->absoluteRights->check($authorizationRules)) {
+            return [self::ABSOLUTE_RIGHTS];
+        }
+
+        return $this->getMergedRules($authorizationRules, $modelClass, $right);
     }
 
     /**
+     * @param CachedRuleCollection $authorizationRules
      * @param string $modelClass
      * @param string $right
      * @return array
-     * @throws AuthorizationException
      */
-    protected function getMergedRules(string $modelClass, string $right): array
+    protected function getMergedRules(CachedRuleCollection $authorizationRules, string $modelClass, string $right): array
     {
-        $authorizableSets = Arr::wrap($this->authenticatedUser->user->getAuthorizableSets());
-        $authorizableSetTypes = AuthorizableSetType::getCached();
-        $authorizableModelId = AuthorizableModel::getCachedId($modelClass);
+        $mergedRules = [];
 
-        $mergedRules = $this->mergeRules($authorizableSets, $authorizableSetTypes, $authorizableModelId, $modelClass, $right);
+        /**
+         * @var $authorizationRule CachedRule
+         */
+        foreach ($authorizationRules as $authorizationRule) {
+
+            if (!array_key_exists($right, $authorizationRule->rules)) {
+                Log::info("[Authorization] No '$right' rights found for $modelClass.");
+                continue;
+            }
+
+            $wrapped = Arr::wrap($authorizationRule->rules[$right]);
+
+            if (array_key_exists(0, $wrapped) && $wrapped[0] === self::ABSOLUTE_RIGHTS) {
+                return [self::ABSOLUTE_RIGHTS];
+            }
+
+            Log::info("[Authorization] Found rules for '$right' right: " . print_r($wrapped, true));
+
+            $mergedRules = $this->mergeRules($mergedRules, $authorizationRule->rules[$right]);
+        }
 
         Log::info("[Authorization] Merged rules: " . print_r($mergedRules, true));
 
         return $mergedRules;
-    }
-
-    /**
-     * @param $authorizableSetTypes
-     * @param array $authorizableSets
-     * @param string $modelClass
-     * @param int $authorizableModelId
-     * @param string $right
-     * @return array
-     * @throws AuthorizationException
-     */
-    protected function mergeRules(array $authorizableSets, array $authorizableSetTypes, int $authorizableModelId, string $modelClass, string $right): array
-    {
-        $mergedRules = [];
-
-        foreach ($authorizableSetTypes as $authorizableSetType => $authorizableSetTypeId) {
-            if (!array_key_exists($authorizableSetType, $authorizableSets)) {
-                Log::info("[Authorization] Type '{$authorizableSetType}' is missing within your User::getAuthorizableSets() method");
-                continue;
-            }
-
-            $authorizableSet = Arr::wrap($authorizableSets[$authorizableSetType]);
-
-            if ($this->hasAbsoluteRights($authorizableSetType, $authorizableSet)) {
-                return [self::ABSOLUTE_RIGHTS];
-            }
-
-            foreach ($authorizableSet as $authorizableValue) {
-                Log::info("[Authorization] Processing: {$authorizableSetType} - $authorizableValue");
-
-                $rules = $this->ruleResolver->resolveRules($authorizableSetType, $authorizableSetTypeId, $authorizableValue, $modelClass, $authorizableModelId, $right);
-
-                if (array_key_exists(0, $rules) && $rules[0] === self::ABSOLUTE_RIGHTS) {
-                    return [self::ABSOLUTE_RIGHTS];
-                }
-
-                $mergedRules = $this->ruleResolver->mergeRules($mergedRules, $rules);
-            }
-        }
-
-        return $mergedRules;
-    }
-
-    /**
-     * @param string $authorizableSetType
-     * @param array $authorizableSets
-     * @return bool
-     * @throws AuthorizationException
-     */
-    protected function hasAbsoluteRights(string $authorizableSetType, array $authorizableSets): bool
-    {
-        $authorizableSetsWithAbsoluteRights = $this->getAuthorizableSetsWithAbsoluteRights();
-
-        if (!array_key_exists($authorizableSetType, $authorizableSetsWithAbsoluteRights)) {
-            return false;
-        }
-
-        foreach ($authorizableSets as $authorizableSet) {
-            if (in_array($authorizableSet, $authorizableSetsWithAbsoluteRights[$authorizableSetType])) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @return array
-     * @throws AuthorizationException
-     */
-    protected function getAuthorizableSetsWithAbsoluteRights(): array
-    {
-        $absoluteRights = Config::get('asseco-authorization.absolute_rights');
-
-        if (!is_array($absoluteRights)) {
-            throw new AuthorizationException("Absolute rights are not configured correctly, this should be an array of values.");
-        }
-
-        return $absoluteRights;
     }
 
     /**
@@ -176,4 +123,49 @@ class RuleParser
             throw new AuthorizationException("Event '$eventName' is not mapped correctly.");
         }
     }
+
+    public function mergeRules(array $mergedRules, array $rules): array
+    {
+        $search = 'search';
+        $or = '||';
+
+        if ($this->rulesMalformed($search, $rules)) {
+            return $mergedRules;
+        }
+
+        $mergedRules = $this->initMergedRulesArrayKeys($search, $mergedRules, $or);
+        $mergedRules[$search][$or][] = $rules[$search];
+
+        return $mergedRules;
+    }
+
+    /**
+     * @param string $search
+     * @param array $rules
+     * @return bool
+     */
+    protected function rulesMalformed(string $search, array $rules): bool
+    {
+        return !array_key_exists($search, $rules);
+    }
+
+    /**
+     * @param string $search
+     * @param array $mergedRules
+     * @param string $or
+     * @return array
+     */
+    protected function initMergedRulesArrayKeys(string $search, array $mergedRules, string $or): array
+    {
+        if (!array_key_exists($search, $mergedRules)) {
+            $mergedRules[$search] = [];
+        }
+
+        if (!array_key_exists($or, $mergedRules[$search])) {
+            $mergedRules[$search][$or] = [];
+        }
+
+        return $mergedRules;
+    }
+
 }

@@ -2,13 +2,16 @@
 
 namespace Voice\JsonAuthorization\App\Scopes;
 
+use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 use Voice\JsonAuthorization\Authorization\RuleParser;
+use Voice\JsonQueryBuilder\Exceptions\JsonQueryBuilderException;
 use Voice\JsonQueryBuilder\JsonQuery;
 
 class AuthorizationScope implements Scope
@@ -16,11 +19,12 @@ class AuthorizationScope implements Scope
     /**
      * Apply the scope to a given Eloquent query builder.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $builder
-     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param Builder $builder
+     * @param Model $model
      * @return void
-     * @throws \Voice\JsonQueryBuilder\Exceptions\JsonQueryBuilderException
-     * @throws \Exception
+     * @throws JsonQueryBuilderException
+     * @throws Exception
+     * @throws Throwable
      */
     public function apply(Builder $builder, Model $model)
     {

@@ -21,9 +21,9 @@ return [
      * Key must resemble names from authorization_manage_types table
      */
     'absolute_rights' => [
-        'roles' => [
-            //'asseco-voice-admin'
-        ],
+        // 'roles' => [
+        //      'asseco-voice-admin'
+        // ],
         // 'groups' => [
         //     'asseco-voice-admin'
         // ],
@@ -33,4 +33,11 @@ return [
      * For dev purposes. Setting to true will ignore authorization completely
      */
     'override_authorization' => env('OVERRIDE_AUTHORIZATION', false) === true,
+
+    /**
+     * Virtual role whose rules will attach to any authenticated user. DO NOT add this role to
+     * your auth service (or whoever is responsible for providing user roles). Check readme
+     * for more details.
+     */
+    'universal_role' => env('UNIVERSAL_ROLE', 'voice-all-mighty'),
 ];

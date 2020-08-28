@@ -15,9 +15,22 @@ class AuthorizableSetTypeSeeder extends Seeder
     public function run()
     {
         $data = [
-            ['name' => 'roles'],
-            ['name' => 'groups'],
-            ['name' => 'id'],
+            [
+                'name'        => 'virtual-role',
+                'description' => "Virtual role which doesn't and shouldn't exist in authentication service. Attached automatically to every user.",
+            ],
+            [
+                'name'        => 'roles',
+                'description' => 'Authentication service roles',
+            ],
+            [
+                'name'        => 'groups',
+                'description' => 'Authentication service groups',
+            ],
+            [
+                'name'        => 'id',
+                'description' => 'Authentication service ID',
+            ],
         ];
 
         AuthorizableSetType::insert($data);

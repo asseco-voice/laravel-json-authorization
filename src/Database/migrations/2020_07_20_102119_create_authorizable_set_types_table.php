@@ -18,6 +18,7 @@ class CreateAuthorizableSetTypesTable extends Migration
             $table->timestamps();
 
             $table->string('name')->unique();
+            $table->string('description');
         });
     }
 
