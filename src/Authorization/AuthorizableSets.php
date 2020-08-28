@@ -4,6 +4,7 @@ namespace Voice\JsonAuthorization\Authorization;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -20,12 +21,11 @@ class AuthorizableSets
     /**
      * AuthorizableSet constructor.
      * @param AuthenticatedUser $authenticatedUser
-     * @param Collection $authorizableSetTypes
      */
-    public function __construct(AuthenticatedUser $authenticatedUser, Collection $authorizableSetTypes)
+    public function __construct(AuthenticatedUser $authenticatedUser)
     {
         $this->authenticatedUser = $authenticatedUser;
-        $this->authorizableSetTypes = $authorizableSetTypes;
+        $this->authorizableSetTypes = App::make('cached-authorizable-set-types');
     }
 
     /**

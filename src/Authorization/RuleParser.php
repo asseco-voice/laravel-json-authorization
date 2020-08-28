@@ -62,8 +62,7 @@ class RuleParser
             return [self::ABSOLUTE_RIGHTS];
         }
 
-        $authorizableSetTypes = AuthorizableSetType::getCached();
-        $authorizationRules = AuthorizationRule::getCached($this->user, $modelClass, $authorizableSetTypes);
+        $authorizationRules = AuthorizationRule::getCached($this->user, $modelClass);
 
         if ($this->absoluteRights->check($authorizationRules)) {
             return [self::ABSOLUTE_RIGHTS];

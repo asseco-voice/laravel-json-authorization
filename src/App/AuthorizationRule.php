@@ -4,6 +4,7 @@ namespace Voice\JsonAuthorization\App;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -33,16 +34,15 @@ class AuthorizationRule extends Model
     /**
      * @param AuthenticatedUser $user
      * @param string $modelClass
-     * @param Collection $authorizableSetTypes
      * @return CachedRuleCollection
      * @throws Throwable
      */
-    public static function getCached(AuthenticatedUser $user, string $modelClass, Collection $authorizableSetTypes): CachedRuleCollection
+    public static function getCached(AuthenticatedUser $user, string $modelClass): CachedRuleCollection
     {
-        $authorizableSets = self::getAuthorizableSets($user, $authorizableSetTypes);
+        $authorizableSets = self::getAuthorizableSets($user);
 
         $cachedRules = self::resolveFromCache($authorizableSets, $modelClass);
-        $dbRules = self::resolveFromDb($authorizableSets, $modelClass, $authorizableSetTypes);
+        $dbRules = self::resolveFromDb($authorizableSets, $modelClass);
         $unresolvedResults = self::prepareResultsForCaching($authorizableSets);
 
         $toCache = $dbRules->mergeRecursive($unresolvedResults);
@@ -57,9 +57,9 @@ class AuthorizationRule extends Model
      * @return Collection
      * @throws Throwable
      */
-    protected static function getAuthorizableSets(AuthenticatedUser $user, Collection $authorizableSetTypes): Collection
+    protected static function getAuthorizableSets(AuthenticatedUser $user): Collection
     {
-        return (new AuthorizableSets($user, $authorizableSetTypes))->get();
+        return (new AuthorizableSets($user))->get();
     }
 
     /**
@@ -113,11 +113,10 @@ class AuthorizationRule extends Model
      * Query builder for fetching required records at once to avoid multiple queries
      * @param Collection $authorizableSets
      * @param string $modelClass
-     * @param Collection $authorizableSetTypes
      * @return CachedRuleCollection
      * @throws Throwable
      */
-    protected static function resolveFromDb(Collection $authorizableSets, string $modelClass, Collection $authorizableSetTypes): CachedRuleCollection
+    protected static function resolveFromDb(Collection $authorizableSets, string $modelClass): CachedRuleCollection
     {
         if ($authorizableSets->isEmpty()) {
             return new CachedRuleCollection();
@@ -127,7 +126,7 @@ class AuthorizationRule extends Model
 
         $modelId = AuthorizableModel::getCachedId($modelClass);
 
-        $typesWithRules = $authorizableSetTypes
+        $typesWithRules = App::make('cached-authorizable-set-types')
             ->load(['rules' => function ($builder) use ($modelId, $authorizableSets) {
                 $builder
                     ->select('authorizable_set_type_id', 'authorizable_set_value', 'rules')

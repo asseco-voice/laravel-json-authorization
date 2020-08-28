@@ -4,6 +4,7 @@ namespace Voice\JsonAuthorization;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
+use Voice\JsonAuthorization\App\AuthorizableSetType;
 use Voice\JsonAuthorization\Authorization\AbsoluteRights;
 use Voice\JsonAuthorization\Authorization\AuthenticatedUser;
 use Voice\JsonAuthorization\Authorization\EloquentEvents;
@@ -42,6 +43,10 @@ class JsonAuthorizationServiceProvider extends ServiceProvider
 
     protected function registerAuthorizationClasses(): void
     {
+        $this->app->singleton('cached-authorizable-set-types', function ($app) {
+            return AuthorizableSetType::getCached();
+        });
+
         $this->app->singleton(AuthenticatedUser::class, function ($app) {
             return new AuthenticatedUser();
         });
