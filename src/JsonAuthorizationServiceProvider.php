@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Voice\JsonAuthorization;
 
 use Illuminate\Support\Facades\Config;
@@ -12,10 +14,7 @@ use Voice\JsonAuthorization\Authorization\RuleParser;
 
 class JsonAuthorizationServiceProvider extends ServiceProvider
 {
-    /**
-     * Register the application services.
-     */
-    public function register()
+    public function register(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/Config/asseco-authorization.php', 'asseco-authorization');
         $this->loadMigrationsFrom(__DIR__ . '/Database/migrations');
@@ -24,47 +23,30 @@ class JsonAuthorizationServiceProvider extends ServiceProvider
         $this->registerAuthorizationClasses();
     }
 
-    /**
-     * Bootstrap the application services.
-     */
-    public function boot()
+    public function boot(): void
     {
         $this->publishes([__DIR__ . '/Config/asseco-authorization.php' => config_path('asseco-authorization.php'),]);
 
         $override = Config::get('asseco-authorization.override_authorization');
 
         if (!$this->app->runningInConsole() && !$override) {
-            /**
-             * @var EloquentEvents $eloquentEvents
-             */
-            $eloquentEvents = $this->app->make(EloquentEvents::class);
-            $eloquentEvents->attachEloquentListener();
+            $this->app->make(EloquentEvents::class)->attachEloquentListener();
         }
     }
 
-    protected function registerCachedModels()
+    protected function registerCachedModels(): void
     {
-        $this->app->singleton(CachedAuthorizableModel::class, function ($app) {
-            return new CachedAuthorizableModel();
-        });
+        $this->app->singleton(CachedAuthorizableModel::class);
     }
 
     protected function registerAuthorizationClasses(): void
     {
-        $this->app->singleton('cached-authorizable-set-types', function ($app) {
+        $this->app->singleton('cached-authorizable-set-types', static function ($app) {
             return AuthorizableSetType::getCached();
         });
 
-        $this->app->singleton(AbsoluteRights::class, function ($app) {
-            return new AbsoluteRights();
-        });
-
-        $this->app->singleton(RuleParser::class, function ($app) {
-            return new RuleParser($app->make(AbsoluteRights::class));
-        });
-
-        $this->app->singleton(EloquentEvents::class, function ($app) {
-            return new EloquentEvents();
-        });
+        $this->app->singleton(AbsoluteRights::class);
+        $this->app->singleton(RuleParser::class);
+        $this->app->singleton(EloquentEvents::class);
     }
 }
