@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Voice\JsonAuthorization\Database\Seeds;
 
 use Illuminate\Database\Seeder;
@@ -7,32 +9,27 @@ use Voice\JsonAuthorization\App\AuthorizableSetType;
 
 class AuthorizableSetTypeSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
+    public function run(): void
     {
         $data = [
             [
-                'name'        => 'virtual-role',
+                'name' => 'virtual-role',
                 'description' => "Virtual role which doesn't and shouldn't exist in authentication service. Attached automatically to every user.",
             ],
             [
-                'name'        => 'roles',
+                'name' => 'roles',
                 'description' => 'Authentication service roles',
             ],
             [
-                'name'        => 'groups',
+                'name' => 'groups',
                 'description' => 'Authentication service groups',
             ],
             [
-                'name'        => 'id',
+                'name' => 'id',
                 'description' => 'Authentication service ID',
             ],
         ];
 
-        AuthorizableSetType::insert($data);
+        AuthorizableSetType::query()->insert($data);
     }
 }

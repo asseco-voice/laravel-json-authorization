@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Voice\JsonAuthorization\Authorization;
 
 use Exception;
@@ -13,12 +15,12 @@ use Voice\JsonAuthorization\Exceptions\AuthorizationException;
 
 class RuleParser
 {
-    const ABSOLUTE_RIGHTS = '*';
+    public const ABSOLUTE_RIGHTS = '*';
 
-    const CREATE_RIGHT = 'create';
-    const READ_RIGHT = 'read';
-    const UPDATE_RIGHT = 'update';
-    const DELETE_RIGHT = 'delete';
+    public const CREATE_RIGHT = 'create';
+    public const READ_RIGHT = 'read';
+    public const UPDATE_RIGHT = 'update';
+    public const DELETE_RIGHT = 'delete';
 
     /**
      * These should reflect the same events from events to listen but without the '*' wildcard.
@@ -29,7 +31,7 @@ class RuleParser
         'eloquent.deleting' => self::DELETE_RIGHT,
     ];
 
-    protected AbsoluteRights    $absoluteRights;
+    protected AbsoluteRights $absoluteRights;
 
     /**
      * RightParser constructor.
@@ -86,7 +88,6 @@ class RuleParser
          * @var $authorizationRule CachedRule
          */
         foreach ($authorizationRules as $authorizationRule) {
-
             if (!array_key_exists($right, $authorizationRule->rules)) {
                 Log::info("[Authorization] No '$right' rights found for $modelClass.");
                 continue;
@@ -115,7 +116,7 @@ class RuleParser
      * @param string $eventName
      * @throws AuthorizationException
      */
-    public function checkEventMapping(string $eventName)
+    public function checkEventMapping(string $eventName): void
     {
         $eventMapped = array_key_exists($eventName, $this->eventRightMapping);
 
@@ -167,5 +168,4 @@ class RuleParser
 
         return $mergedRules;
     }
-
 }

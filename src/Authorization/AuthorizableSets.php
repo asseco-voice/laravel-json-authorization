@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Voice\JsonAuthorization\Authorization;
 
 use Illuminate\Database\Eloquent\Collection;
@@ -45,7 +47,7 @@ class AuthorizableSets
     {
         $user = Auth::user();
 
-        if(!$user){
+        if (!$user) {
             Log::info("[Authorization] You are logged out.");
             return [];
         }
@@ -65,7 +67,6 @@ class AuthorizableSets
     protected function filterSupported(array &$authorizableSets): void
     {
         foreach ($authorizableSets as $authorizableSetType => $authorizableSetValues) {
-
             $typeSupported = $this->authorizableSetTypes->pluck('name')->contains($authorizableSetType);
 
             if (!$typeSupported) {
@@ -84,7 +85,7 @@ class AuthorizableSets
     {
         if (!$this->authorizableSetTypes->pluck('name')->contains(self::VIRTUAL_ROLE)) {
             AuthorizableSetType::create([
-                'name'        => self::VIRTUAL_ROLE,
+                'name' => self::VIRTUAL_ROLE,
                 'description' => "Virtual role which doesn't and shouldn't exist in authentication service. Attached automatically to every user."
             ]);
             $this->authorizableSetTypes = AuthorizableSetType::reCache();
@@ -104,7 +105,6 @@ class AuthorizableSets
         $authorizableSetTypes = $this->authorizableSetTypes->pluck('id', 'name')->toArray();
 
         foreach ($authorizableSets as $type => $values) {
-
             if (!array_key_exists($type, $authorizableSetTypes)) {
                 throw new AuthorizationException("Something went wrong...");
             }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Voice\JsonAuthorization\Authorization;
 
 use Illuminate\Support\Arr;
@@ -17,7 +19,6 @@ class AbsoluteRights
     public function check(CachedRuleCollection $authorizationRules): bool
     {
         foreach ($this->absoluteRights as $absoluteRightType => $absoluteRightValues) {
-
             $userRules = $authorizationRules->where('type', $absoluteRightType);
 
             if ($userRules->isEmpty()) {

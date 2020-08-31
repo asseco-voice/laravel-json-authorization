@@ -1,12 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Voice\JsonAuthorization\App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\JsonResponse;
-use Voice\JsonAuthorization\App\AuthorizableModel;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller; // Stock Laravel controller class
+use Illuminate\Support\Facades\Response;
+use Voice\JsonAuthorization\App\AuthorizableModel;
+
+// Stock Laravel controller class
 
 class AuthorizableModelController extends Controller
 {
@@ -15,9 +20,9 @@ class AuthorizableModelController extends Controller
      *
      * @return JsonResponse
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        return response()->json(AuthorizableModel::all());
+        return Response::json(AuthorizableModel::all());
     }
 
     /**
@@ -26,11 +31,11 @@ class AuthorizableModelController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        $authorizationModel = AuthorizableModel::create($request->all());
+        $authorizationModel = AuthorizableModel::query()->create($request->all());
 
-        return response()->json($authorizationModel);
+        return Response::json($authorizationModel);
     }
 
     /**
@@ -39,9 +44,9 @@ class AuthorizableModelController extends Controller
      * @param AuthorizableModel $authorizationModel
      * @return JsonResponse
      */
-    public function show(AuthorizableModel $authorizationModel)
+    public function show(AuthorizableModel $authorizationModel): JsonResponse
     {
-        return response()->json($authorizationModel);
+        return Response::json($authorizationModel);
     }
 
     /**
@@ -51,11 +56,11 @@ class AuthorizableModelController extends Controller
      * @param AuthorizableModel $authorizationModel
      * @return JsonResponse
      */
-    public function update(Request $request, AuthorizableModel $authorizationModel)
+    public function update(Request $request, AuthorizableModel $authorizationModel): JsonResponse
     {
         $isUpdated = $authorizationModel->update($request->all());
 
-        return response()->json($isUpdated);
+        return Response::json($isUpdated ? 'true' : 'false');
     }
 
     /**
@@ -65,10 +70,10 @@ class AuthorizableModelController extends Controller
      * @return JsonResponse
      * @throws Exception
      */
-    public function destroy(AuthorizableModel $authorizationModel)
+    public function destroy(AuthorizableModel $authorizationModel): JsonResponse
     {
         $isDeleted = $authorizationModel->delete();
 
-        return response()->json($isDeleted);
+        return Response::json($isDeleted ? 'true' : 'false');
     }
 }

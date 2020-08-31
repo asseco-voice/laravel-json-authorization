@@ -1,12 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Voice\JsonAuthorization\App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\JsonResponse;
-use Voice\JsonAuthorization\App\AuthorizationRule;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller; // Stock Laravel controller class
+use Illuminate\Support\Facades\Response;
+use Voice\JsonAuthorization\App\AuthorizationRule;
+
+// Stock Laravel controller class
 
 class AuthorizationRuleController extends Controller
 {
@@ -15,9 +20,9 @@ class AuthorizationRuleController extends Controller
      *
      * @return JsonResponse
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        return response()->json(AuthorizationRule::all());
+        return Response::json(AuthorizationRule::all());
     }
 
     /**
@@ -26,11 +31,11 @@ class AuthorizationRuleController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $authorization = AuthorizationRule::create($request->all());
 
-        return response()->json($authorization);
+        return Response::json($authorization);
     }
 
     /**
@@ -39,9 +44,9 @@ class AuthorizationRuleController extends Controller
      * @param AuthorizationRule $authorization
      * @return JsonResponse
      */
-    public function show(AuthorizationRule $authorization)
+    public function show(AuthorizationRule $authorization): JsonResponse
     {
-        return response()->json($authorization);
+        return Response::json($authorization);
     }
 
     /**
@@ -51,11 +56,11 @@ class AuthorizationRuleController extends Controller
      * @param AuthorizationRule $authorization
      * @return JsonResponse
      */
-    public function update(Request $request, AuthorizationRule $authorization)
+    public function update(Request $request, AuthorizationRule $authorization): JsonResponse
     {
         $isUpdated = $authorization->update($request->all());
 
-        return response()->json($isUpdated);
+        return Response::json($isUpdated ? 'true' : 'false');
     }
 
     /**
@@ -65,10 +70,10 @@ class AuthorizationRuleController extends Controller
      * @return JsonResponse
      * @throws Exception
      */
-    public function destroy(AuthorizationRule $authorization)
+    public function destroy(AuthorizationRule $authorization): JsonResponse
     {
         $isDeleted = $authorization->delete();
 
-        return response()->json($isDeleted);
+        return Response::json($isDeleted ? 'true' : 'false');
     }
 }

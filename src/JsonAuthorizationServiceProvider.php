@@ -32,6 +32,22 @@ class JsonAuthorizationServiceProvider extends ServiceProvider
         if (!$this->app->runningInConsole() && !$override) {
             $this->app->make(EloquentEvents::class)->attachEloquentListener();
         }
+
+        if (!class_exists('CreateAuthorizableModelsTable')) {
+            $timestamp = date('Y_m_d_His');
+            $path      = __DIR__ . '/../migrations/';
+
+            $this->publishes(
+                collect(glob($path, GLOB_NOSORT))
+                    ->mapToDictionary(
+                        static fn($file) => [
+                            $file => database_path('/migrations/' . $timestamp . str_replace('.stub', '', $file))
+                        ]
+                    )
+                    ->toArray(),
+                'migrations'
+            );
+        }
     }
 
     protected function registerCachedModels(): void

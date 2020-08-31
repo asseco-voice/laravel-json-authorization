@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Voice\JsonAuthorization\Database\Seeds;
 
 use Illuminate\Database\Seeder;
 
 class AuthorizationSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
         $this->call([
             AuthorizableModelSeeder::class,

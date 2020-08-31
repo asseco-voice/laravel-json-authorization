@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Voice\JsonAuthorization\Authorization;
 
 use Throwable;
@@ -46,7 +48,7 @@ class AuthorizableSet
         }
     }
 
-    public function removeValueByKey($key)
+    public function removeValueByKey($key): void
     {
         if (array_key_exists($key, $this->values)) {
             unset($this->values[$key]);

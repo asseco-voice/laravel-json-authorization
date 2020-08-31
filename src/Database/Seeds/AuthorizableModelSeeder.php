@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Voice\JsonAuthorization\Database\Seeds;
 
 use Illuminate\Database\Seeder;
@@ -8,12 +10,7 @@ use Voice\JsonAuthorization\App\AuthorizableModel;
 
 class AuthorizableModelSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
+    public function run(): void
     {
         // This seeder actually doesn't seed random data
         // but the classes which have trait already
@@ -26,6 +23,6 @@ class AuthorizableModelSeeder extends Seeder
             $data[] = ['name' => $model];
         }
 
-        AuthorizableModel::insert($data);
+        AuthorizableModel::query()->insert($data);
     }
 }

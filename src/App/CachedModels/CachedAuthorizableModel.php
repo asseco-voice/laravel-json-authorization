@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Voice\JsonAuthorization\App\CachedModels;
 
 use Illuminate\Support\Facades\Cache;
@@ -13,11 +15,11 @@ class CachedAuthorizableModel
     use FindsTraits;
 
     const CACHE_PREFIX = 'authorizable_models';
-    const CACHE_TTL = 60 * 60 * 24;
+    const CACHE_TTL = DAY_IN_SECONDS;
 
     public function isAuthorizable(string $model): bool
     {
-        return in_array($model, $this->getCached());
+        return in_array($model, $this->getCached(), true);
     }
 
     public function getCached(): array
@@ -44,7 +46,7 @@ class CachedAuthorizableModel
             return Cache::get($cacheKey);
         }
 
-        $resolveFromDb = AuthorizableModel::where('name', $model)->pluck('id')->first();
+        $resolveFromDb = AuthorizableModel::query()->where('name', $model)->pluck('id')->first();
 
         if ($resolveFromDb) {
             Log::info("[Authorization] Resolved $model from DB. Adding to cache and returning.");
@@ -53,7 +55,7 @@ class CachedAuthorizableModel
         }
 
         Log::info("[Authorization] Model $model is authorizable, but doesn't exist in DB yet. Creating...");
-        $newModel = AuthorizableModel::create(['name' => $model]);
+        $newModel = AuthorizableModel::query()->create(['name' => $model]);
 
         Cache::put($cacheKey, $newModel->id, self::CACHE_TTL);
         return $newModel->id;

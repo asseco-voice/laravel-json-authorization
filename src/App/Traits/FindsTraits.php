@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Voice\JsonAuthorization\App\Traits;
 
 use Illuminate\Support\Facades\Config;
@@ -12,7 +14,6 @@ trait FindsTraits
         $models = [];
 
         foreach ($paths as $path => $namespace) {
-
             $files = scandir($path);
 
             foreach ($files as $file) {
@@ -36,7 +37,6 @@ trait FindsTraits
     {
         $traits = class_uses($class);
 
-        return in_array($traitPath, $traits);
+        return in_array($traitPath, $traits, true);
     }
-
 }
