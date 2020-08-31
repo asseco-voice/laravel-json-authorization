@@ -16,9 +16,9 @@ class JsonAuthorizationServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__ . '/Config/asseco-authorization.php', 'asseco-authorization');
-        $this->loadMigrationsFrom(__DIR__ . '/Database/migrations');
-        $this->loadRoutesFrom(__DIR__ . '/Routes/api.php');
+        $this->mergeConfigFrom(__DIR__ . '/../config/asseco-authorization.php', 'asseco-authorization');
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
         $this->registerCachedModels();
         $this->registerAuthorizationClasses();
     }
