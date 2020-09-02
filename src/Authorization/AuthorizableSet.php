@@ -2,54 +2,38 @@
 
 namespace Voice\JsonAuthorization\Authorization;
 
-use Throwable;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Voice\JsonAuthorization\App\AuthorizableSetType;
+use Voice\JsonAuthorization\App\Collections\AuthorizableSetCollection;
+use Voice\JsonAuthorization\App\Contracts\AuthorizationInterface;
 use Voice\JsonAuthorization\Exceptions\AuthorizationException;
 
 class AuthorizableSet
 {
-    public string $id;
-    public string $type;
-    public array $values;
-
-    /**
-     * AuthorizableSet constructor.
-     * @param string $id
-     * @param string $type
-     * @param array $values
-     * @throws Throwable
-     */
-    public function __construct(string $id, string $type, array $values)
+    public static function unresolvedRules(): AuthorizableSetCollection
     {
-        $this->id = $id;
-        $this->type = $type;
-        $this->values = $values;
+        $user = Auth::user();
 
-        $this->areValuesValid();
+        if (!$user) {
+            Log::info("[Authorization] You are logged out.");
+            return new AuthorizableSetCollection();
+        }
+
+        if (!$user instanceof AuthorizationInterface) {
+            throw new AuthorizationException("User model must implement AuthorizesUsers interface.");
+        }
+
+        $authorizableSetTypes = AuthorizableSetType::cached()->pluck('name');
+
+        return self::getUserAuthorizableSets($user)
+            ->filterSupported($authorizableSetTypes)
+            ->appendVirtualRole($authorizableSetTypes)
+            ->toAuthorizationRuleFormat();
     }
 
-    /**
-     * @throws Throwable
-     */
-    protected function areValuesValid(): void
+    protected static function getUserAuthorizableSets(AuthorizationInterface $user): AuthorizableSetCollection
     {
-        foreach ($this->values as $value) {
-            throw_if(!is_string($value), new AuthorizationException("Authorizable sets must be a 2 dimensional array."));
-        }
-    }
-
-    public function removeValue(string $value): void
-    {
-        $key = array_search($value, $this->values, true);
-
-        if ($key !== false) {
-            unset($this->values[$key]);
-        }
-    }
-
-    public function removeValueByKey($key)
-    {
-        if (array_key_exists($key, $this->values)) {
-            unset($this->values[$key]);
-        }
+        return new AuthorizableSetCollection($user->getAuthorizableSets());
     }
 }

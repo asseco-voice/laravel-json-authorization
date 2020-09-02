@@ -4,26 +4,35 @@ namespace Voice\JsonAuthorization\App;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 use Throwable;
-use Voice\JsonAuthorization\App\CachedModels\CachedAuthorizableModel;
-use Voice\JsonAuthorization\Authorization\AuthorizableSet;
-use Voice\JsonAuthorization\Authorization\AuthorizableSets;
-use Voice\JsonAuthorization\Authorization\CachedRule;
-use Voice\JsonAuthorization\Authorization\CachedRuleCollection;
+use Voice\JsonAuthorization\App\Traits\Cacheable;
 
 class AuthorizationRule extends Model
 {
-    const CACHE_PREFIX = 'authorization_rules_';
-    const CACHE_TTL = 60 * 60 * 24;
+    use Cacheable;
+
+    // DB attributes
+    const MODEL_ID = 'authorizable_model_id';
+    const SET_TYPE_ID = 'authorizable_set_type_id';
+    const SET_VALUE = 'authorizable_set_value';
+    const RULES = 'rules';
+
+    protected static function cacheKey(): string
+    {
+        return 'authorization_rules';
+    }
+
+    protected static function cacheAlternative(): array
+    {
+        // We don't want to cache anything from the start, we want rules to be appended to cache when used
+        return [];
+    }
 
     protected $guarded = ['id'];
 
     public function model()
     {
-        return $this->belongsTo(AuthorizableModel::class, 'authorization_model_id');
+        return $this->belongsTo(AuthorizableModel::class, self::MODEL_ID);
     }
 
     public function authorizableSetType()
@@ -32,184 +41,125 @@ class AuthorizationRule extends Model
     }
 
     /**
+     * Retrieve what you can from the cache, go to the DB for rest.
+     * Cache and return everything asked for (independently of whether search was a hit or not)
+     * to prevent additional trips to the DB.
+     * @param Collection $authorizableSets
      * @param string $modelClass
-     * @return CachedRuleCollection
+     * @return Collection
      * @throws Throwable
      */
-    public static function getCached(string $modelClass): CachedRuleCollection
+    public static function cachedBy(Collection $authorizableSets, string $modelClass): Collection
     {
-        $authorizableSets = (new AuthorizableSets())->get();
+        $modelId = AuthorizableModel::getIdFor($modelClass);
 
-        $cachedRules = self::resolveFromCache($authorizableSets, $modelClass);
-        $dbRules = self::resolveFromDb($authorizableSets, $modelClass);
-        $unresolvedResults = self::prepareResultsForCaching($authorizableSets);
+        // Authorizable sets get reduced each iteration
+        $cached = self::getCached($authorizableSets, $modelId);
+        $stored = self::getStored($authorizableSets, $modelId);
 
-        $toCache = $dbRules->mergeRecursive($unresolvedResults);
-        self::cache($toCache, $modelClass);
+        $merged = array_merge_recursive($cached, $stored, $authorizableSets->toArray());
 
-        return $cachedRules->mergeRecursive($dbRules);
+        self::appendToCache($merged);
+
+        return new Collection($merged);
+    }
+
+    protected static function getCached(Collection $authorizableSets, int $modelId): array
+    {
+        $rules = self::cached()->where(self::MODEL_ID, $modelId);
+        self::cleanup($authorizableSets, $rules);
+
+
+        return $rules->toArray();
     }
 
     /**
-     * Resolves keys from cache if they exist.
-     * Resolved keys are removed from $authorizableSets so that DB knows what to skip resolving
      * @param Collection $authorizableSets
-     * @param string $modelClass
-     * @return CachedRuleCollection
-     * @throws Throwable
+     * @param int $modelId
+     * @return array
      */
-    protected static function resolveFromCache(Collection $authorizableSets, string $modelClass): CachedRuleCollection
+    protected static function getStored(Collection $authorizableSets, int $modelId): array
     {
-        $ruleCollection = new CachedRuleCollection();
-
-        Log::info("[Authorization] Resolving cached rights for '$modelClass' model.");
-
-        /**
-         * @var $authorizableSet AuthorizableSet
-         */
-        foreach ($authorizableSets as $authorizableSet) {
-            foreach ($authorizableSet->values as $key => $authorizableSetValue) {
-
-                $cacheKey = self::CACHE_PREFIX . "{$authorizableSet->type}_{$authorizableSetValue}_model_{$modelClass}";
-
-                if (!Cache::has($cacheKey)) {
-                    continue;
-                }
-
-                $cachedRule = Cache::get($cacheKey);
-                $ruleCollection->add(new CachedRule($cachedRule['typeId'], $cachedRule['type'], $cachedRule['value'], $cachedRule['rules']));
-
-                $authorizableSet->removeValueByKey($key);
-            }
+        if ($authorizableSets->isEmpty()) {
+            return [];
         }
 
-        self::authorizableSetCleanup($authorizableSets);
+        $rules = AuthorizationRule::where(self::MODEL_ID, $modelId)->where(function ($builder) use ($authorizableSets) {
+            foreach ($authorizableSets as $authorizableSet) {
+                // orWhere because authorizable set values are not unique. It is valid to have 'role xy' together with 'group xy'.
+                $builder
+                    ->orWhere(function ($builder) use ($authorizableSet) {
+                        // pair up ID's with values to get the unique pairs back
+                        // TODO: ovdje bi mi dobro došlo da su ipak grupirani...flatten (prepare) ili ne u onom collectionu?
+                        $builder
+                            ->where(self::SET_TYPE_ID, $authorizableSet[self::SET_TYPE_ID])
+                            ->where(self::SET_VALUE, $authorizableSet[self::SET_VALUE]);
+                    });
+            }
+        })->get([self::SET_TYPE_ID, self::SET_VALUE, self::RULES]);
 
-        return $ruleCollection;
+        self::cleanup($authorizableSets, $rules);
+
+        return self::decodeRules($rules->toArray());
     }
 
-    protected static function authorizableSetCleanup(Collection $authorizableSets)
+    /**
+     * Decode to array to prepare for cache insertion. We don't want to decode every time the rule is returned
+     * @param array $rules
+     * @return array
+     */
+    protected static function decodeRules(array $rules): array
     {
+        foreach ($rules as &$rule) {
+            $rule['rules'] = json_decode($rule['rules'], true);
+        }
+
+        return $rules;
+    }
+
+    /**
+     * Remove records which were found to prevent searching for same record at more than one place.
+     * @param Collection $authorizableSets
+     * @param Collection $collection
+     */
+    protected static function cleanup(Collection $authorizableSets, Collection $collection): void
+    {
+        if ($collection->isEmpty()) {
+            return;
+        }
+
         foreach ($authorizableSets as $key => $authorizableSet) {
-            if (empty($authorizableSet->values)) {
+            if (self::existsInTheCollection($authorizableSet, $collection)) {
                 $authorizableSets->forget($key);
             }
         }
     }
 
     /**
-     * Query builder for fetching required records at once to avoid multiple queries
-     * @param Collection $authorizableSets
-     * @param string $modelClass
-     * @return CachedRuleCollection
-     * @throws Throwable
+     * Check if the collection contains a given authorizable set
+     * @param array $authorizableSet
+     * @param Collection $collection
+     * @return Collection
      */
-    protected static function resolveFromDb(Collection $authorizableSets, string $modelClass): CachedRuleCollection
+    protected static function existsInTheCollection(array $authorizableSet, Collection $collection): bool
     {
-        if ($authorizableSets->isEmpty()) {
-            return new CachedRuleCollection();
-        }
-
-        Log::info("[Authorization] Resolving non-cached rights from DB for '$modelClass' model.");
-
-        $modelId = self::getAuthorizableModelId($modelClass);
-
-        $typesWithRules = App::make('cached-authorizable-set-types')
-            ->load(['rules' => function ($builder) use ($modelId, $authorizableSets) {
-                $builder
-                    ->select('authorizable_set_type_id', 'authorizable_set_value', 'rules')
-                    ->where('authorizable_model_id', $modelId)
-                    ->where(function ($builder) use ($authorizableSets) { // AND wrapper. Otherwise it will attach OR and mess up the results
-                        /**
-                         * @var AuthorizableSet $authorizableSet
-                         */
-                        foreach ($authorizableSets as $authorizableSet) {
-                            // orWhere because authorizable set values are not unique. It is valid to have 'role xy' together with 'group xy'.
-                            $builder
-                                ->orWhere(function ($builder) use ($authorizableSet) {
-                                    // pair up ID's with values to get the unique pairs back
-                                    $builder
-                                        ->where('authorizable_set_type_id', $authorizableSet->id)
-                                        ->whereIn('authorizable_set_value', $authorizableSet->values);
-                                });
-                        }
-                    });
-            }]);
-
-        return self::prepareDbData($typesWithRules, $authorizableSets);
-    }
-
-    protected static function getAuthorizableModelId(string $modelClass): int
-    {
-        /**
-         * @var $cachedAuthorizableModel CachedAuthorizableModel
-         */
-        $cachedAuthorizableModel = App::make(CachedAuthorizableModel::class);
-        return $cachedAuthorizableModel->getCachedId($modelClass);
+        return $collection->where(self::SET_TYPE_ID, $authorizableSet[self::SET_TYPE_ID])
+            ->where(self::SET_VALUE, $authorizableSet[self::SET_VALUE])->isNotEmpty();
     }
 
     /**
-     * @param Collection $typesWithRules
-     * @param Collection $authorizableSets
-     * @return CachedRuleCollection
-     * @throws Throwable
+     * Data preparation for pushing to collection which will ultimately end up in the cache in this format
+     * @param string $authorizableSetTypeId
+     * @param string $authorizableSetValue
+     * @param array $rules
+     * @return array
      */
-    protected static function prepareDbData(Collection $typesWithRules, Collection $authorizableSets): CachedRuleCollection
+    public static function prepare(string $authorizableSetTypeId, string $authorizableSetValue, array $rules = [])
     {
-        $ruleCollection = new CachedRuleCollection();
-
-        foreach ($typesWithRules as $type) {
-
-            $rules = $type->rules;
-
-            foreach ($rules as $rule) {
-                $ruleCollection->add(new CachedRule($type->id, $type->name, $rule->authorizable_set_value, json_decode($rule->rules, true)));
-
-                /**
-                 * @var $authorizableSet AuthorizableSet
-                 */
-                $authorizableSet = $authorizableSets->where('type', $type->name)->first();
-
-                if ($authorizableSet) {
-                    $authorizableSet->removeValue($rule->authorizable_set_value);
-                }
-            }
-        }
-
-        return $ruleCollection;
+        return [
+            self::SET_TYPE_ID => $authorizableSetTypeId,
+            self::SET_VALUE   => $authorizableSetValue,
+            self::RULES       => $rules,
+        ];
     }
-
-    /**
-     * @param Collection $unresolvedAuthorizableSets
-     * @return CachedRuleCollection
-     * @throws Throwable
-     */
-    protected static function prepareResultsForCaching(Collection $unresolvedAuthorizableSets): CachedRuleCollection
-    {
-        $ruleCollection = new CachedRuleCollection();
-
-        foreach ($unresolvedAuthorizableSets as $authorizableSet) {
-            foreach ($authorizableSet->values as $authorizableSetValue) {
-                $ruleCollection->add(new CachedRule($authorizableSet->id, $authorizableSet->type, $authorizableSetValue, []));
-            }
-        }
-
-        return $ruleCollection;
-    }
-
-    /**
-     * @param Collection $authorizableSets
-     * @param string $modelClass
-     */
-    protected static function cache(Collection $authorizableSets, string $modelClass): void
-    {
-        /**
-         * @var $authorizableSet CachedRule
-         */
-        foreach ($authorizableSets as $authorizableSet) {
-            $cacheKey = self::CACHE_PREFIX . "{$authorizableSet->type}_{$authorizableSet->value}_model_{$modelClass}";
-            Cache::put($cacheKey, $authorizableSet->prepare(), self::CACHE_TTL);
-        }
-    }
-
 }

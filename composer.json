@@ -11,6 +11,7 @@
         "asseco-voice/laravel-json-query-builder": "dev-master",
         "illuminate/support": "^7.17",
         "illuminate/database": "^7.17",
+        "illuminate/cache": "^7.17",
         "illuminate/http": "^7.17"
     },
     "require-dev": {

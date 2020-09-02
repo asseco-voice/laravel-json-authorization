@@ -3,12 +3,12 @@
 namespace Voice\JsonAuthorization\Authorization;
 
 use Exception;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Throwable;
+use Voice\JsonAuthorization\App\AuthorizableModel;
 use Voice\JsonAuthorization\App\AuthorizationRule;
-use Voice\JsonAuthorization\App\CachedModels\CachedAuthorizableModel;
 use Voice\JsonAuthorization\Exceptions\AuthorizationException;
 
 class RuleParser
@@ -29,7 +29,7 @@ class RuleParser
         'eloquent.deleting' => self::DELETE_RIGHT,
     ];
 
-    protected AbsoluteRights    $absoluteRights;
+    protected AbsoluteRights $absoluteRights;
 
     /**
      * RightParser constructor.
@@ -49,12 +49,13 @@ class RuleParser
      */
     public function getRules(string $modelClass, string $right = self::READ_RIGHT): array
     {
-        if (!$this->isAuthorizable($modelClass)) {
+        if (!AuthorizableModel::isAuthorizable($modelClass)) {
             Log::info("[Authorization] Model '$modelClass' does not implement 'Voice\JsonAuthorization\App\Traits\Authorizable' trait (or you forgot to flush the cache). Skipping authorization...");
             return [self::ABSOLUTE_RIGHTS];
         }
 
-        $authorizationRules = AuthorizationRule::getCached($modelClass);
+        $authorizableSets = AuthorizableSet::unresolvedRules();
+        $authorizationRules = AuthorizationRule::cachedBy($authorizableSets, $modelClass);
 
         if ($this->absoluteRights->check($authorizationRules)) {
             return [self::ABSOLUTE_RIGHTS];
@@ -63,36 +64,25 @@ class RuleParser
         return $this->getMergedRules($authorizationRules, $modelClass, $right);
     }
 
-    protected function isAuthorizable(string $modelClass): bool
-    {
-        /**
-         * @var $authorizableModel CachedAuthorizableModel
-         */
-        $authorizableModel = App::make(CachedAuthorizableModel::class);
-        return $authorizableModel->isAuthorizable($modelClass);
-    }
-
     /**
-     * @param CachedRuleCollection $authorizationRules
+     * @param Collection $authorizationRules
      * @param string $modelClass
      * @param string $right
      * @return array
      */
-    protected function getMergedRules(CachedRuleCollection $authorizationRules, string $modelClass, string $right): array
+    protected function getMergedRules(Collection $authorizationRules, string $modelClass, string $right): array
     {
         $mergedRules = [];
 
-        /**
-         * @var $authorizationRule CachedRule
-         */
         foreach ($authorizationRules as $authorizationRule) {
 
-            if (!array_key_exists($right, $authorizationRule->rules)) {
+            $rules = $authorizationRule['rules'];
+            if (!array_key_exists($right, $rules)) {
                 Log::info("[Authorization] No '$right' rights found for $modelClass.");
                 continue;
             }
 
-            $wrapped = Arr::wrap($authorizationRule->rules[$right]);
+            $wrapped = Arr::wrap($rules[$right]);
 
             if (array_key_exists(0, $wrapped) && $wrapped[0] === self::ABSOLUTE_RIGHTS) {
                 return [self::ABSOLUTE_RIGHTS];
@@ -100,7 +90,7 @@ class RuleParser
 
             Log::info("[Authorization] Found rules for '$right' right: " . print_r($wrapped, true));
 
-            $mergedRules = $this->mergeRules($mergedRules, $authorizationRule->rules[$right]);
+            $mergedRules = $this->mergeRules($mergedRules, $rules[$right]);
         }
 
         Log::info("[Authorization] Merged rules: " . print_r($mergedRules, true));
@@ -167,5 +157,4 @@ class RuleParser
 
         return $mergedRules;
     }
-
 }

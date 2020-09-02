@@ -19,13 +19,6 @@ class AuthorizableModelSeeder extends Seeder
         // but the classes which have trait already
 
         Cache::forget('authorization_models');
-        $models = AuthorizableModel::getCached();
-        $data = [];
-
-        foreach ($models as $model) {
-            $data[] = ['name' => $model];
-        }
-
-        AuthorizableModel::insert($data);
+        AuthorizableModel::cached();
     }
 }

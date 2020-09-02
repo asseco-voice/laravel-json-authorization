@@ -2,6 +2,7 @@
 
 namespace Voice\JsonAuthorization\Authorization;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
 
@@ -14,7 +15,7 @@ class AbsoluteRights
         $this->absoluteRights = Config::get('asseco-authorization.absolute_rights');
     }
 
-    public function check(CachedRuleCollection $authorizationRules): bool
+    public function check(Collection $authorizationRules): bool
     {
         foreach ($this->absoluteRights as $absoluteRightType => $absoluteRightValues) {
 
