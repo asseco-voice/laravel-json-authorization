@@ -15,21 +15,10 @@ class AuthorizationRule extends Model
     use Cacheable;
 
     // DB attributes
-    const MODEL_ID = 'authorizable_model_id';
-    const SET_TYPE_ID = 'authorizable_set_type_id';
-    const SET_VALUE = 'authorizable_set_value';
-    const RULES = 'rules';
-
-    protected static function cacheKey(): string
-    {
-        return 'authorization_rules';
-    }
-
-    protected static function cacheAlternative(): array
-    {
-        // We don't want to cache anything from the start, we want rules to be appended to cache when used
-        return [];
-    }
+    public const MODEL_ID = 'authorizable_model_id';
+    public const SET_TYPE_ID = 'authorizable_set_type_id';
+    public const SET_VALUE = 'authorizable_set_value';
+    public const RULES = 'rules';
 
     protected $guarded = ['id'];
 
@@ -41,6 +30,17 @@ class AuthorizationRule extends Model
     public function authorizableSetType(): BelongsTo
     {
         return $this->belongsTo(AuthorizableSetType::class);
+    }
+
+    protected static function cacheKey(): string
+    {
+        return 'authorization_rules';
+    }
+
+    protected static function cacheAlternative(): array
+    {
+        // We don't want to cache anything from the start, we want rules to be appended to cache when used
+        return [];
     }
 
     /**
@@ -114,7 +114,7 @@ class AuthorizationRule extends Model
     protected static function decodeRules(array $rules): array
     {
         foreach ($rules as &$rule) {
-            $rule['rules'] = json_decode($rule['rules'], true);
+            $rule['rules'] = json_decode($rule['rules'], true, 512, JSON_THROW_ON_ERROR);
         }
 
         return $rules;
@@ -157,7 +157,7 @@ class AuthorizationRule extends Model
      * @param array $rules
      * @return array
      */
-    public static function prepare(string $authorizableSetTypeId, string $authorizableSetValue, array $rules = [])
+    public static function prepare(string $authorizableSetTypeId, string $authorizableSetValue, array $rules = []): array
     {
         return [
             self::SET_TYPE_ID => $authorizableSetTypeId,

@@ -9,12 +9,7 @@ use Voice\JsonAuthorization\App\AuthorizableSetType;
 
 class AuthorizableSetTypeSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
+    public function run(): void
     {
         $data = [
             [
@@ -35,6 +30,6 @@ class AuthorizableSetTypeSeeder extends Seeder
             ],
         ];
 
-        AuthorizableSetType::insert($data);
+        AuthorizableSetType::query()->insert($data);
     }
 }

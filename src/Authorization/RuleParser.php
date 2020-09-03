@@ -107,7 +107,7 @@ class RuleParser
      * @param string $eventName
      * @throws AuthorizationException
      */
-    public function checkEventMapping(string $eventName)
+    public function checkEventMapping(string $eventName): void
     {
         $eventMapped = array_key_exists($eventName, $this->eventRightMapping);
 

@@ -11,12 +11,7 @@ use Voice\JsonAuthorization\App\AuthorizationRule;
 
 class AuthorizationRuleSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
+    public function run(): void
     {
         $role = Config::get('asseco-authorization.universal_role');
 
@@ -26,16 +21,16 @@ class AuthorizationRuleSeeder extends Seeder
 
             $rules = $this->generateRules();
 
-            AuthorizationRule::create([
+            AuthorizationRule::query()->create([
                 'authorizable_set_type_id' => 1,
                 'authorizable_set_value'   => $role,
                 'authorizable_model_id'    => $authorizableModel->id,
-                'rules'                    => json_encode($rules),
+                'rules'                    => json_encode($rules, JSON_THROW_ON_ERROR),
             ]);
         }
     }
 
-    protected function generateRules()
+    protected function generateRules(): array
     {
         $rules = [];
         $rights = [
@@ -79,7 +74,7 @@ class AuthorizationRuleSeeder extends Seeder
     }
 
 
-    protected function getRandomNumbers()
+    protected function getRandomNumbers(): array
     {
         $counter = rand(1, 4);
 

@@ -10,12 +10,7 @@ use Voice\JsonAuthorization\App\AuthorizableModel;
 
 class AuthorizableModelSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
+    public function run(): void
     {
         // This seeder actually doesn't seed random data
         // but the classes which have trait already
