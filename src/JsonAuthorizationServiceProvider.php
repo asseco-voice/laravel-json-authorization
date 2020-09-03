@@ -28,7 +28,7 @@ class JsonAuthorizationServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->publishes([__DIR__ . '/Config/asseco-authorization.php' => config_path('asseco-authorization.php'),]);
+        $this->publishes([__DIR__ . '/../config/asseco-authorization.php' => config_path('asseco-authorization.php'),]);
 
         $override = Config::get('asseco-authorization.override_authorization');
 
