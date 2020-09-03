@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Voice\JsonAuthorization\App;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Throwable;
 use Voice\JsonAuthorization\App\Traits\Cacheable;
 
@@ -30,12 +33,12 @@ class AuthorizationRule extends Model
 
     protected $guarded = ['id'];
 
-    public function model()
+    public function model(): BelongsTo
     {
         return $this->belongsTo(AuthorizableModel::class, self::MODEL_ID);
     }
 
-    public function authorizableSetType()
+    public function authorizableSetType(): BelongsTo
     {
         return $this->belongsTo(AuthorizableSetType::class);
     }

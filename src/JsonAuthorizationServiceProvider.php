@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Voice\JsonAuthorization;
 
 use Illuminate\Support\Facades\Config;
@@ -13,7 +15,7 @@ class JsonAuthorizationServiceProvider extends ServiceProvider
     /**
      * Register the application services.
      */
-    public function register()
+    public function register(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/Config/asseco-authorization.php', 'asseco-authorization');
         $this->loadMigrationsFrom(__DIR__ . '/Database/migrations');
@@ -24,7 +26,7 @@ class JsonAuthorizationServiceProvider extends ServiceProvider
     /**
      * Bootstrap the application services.
      */
-    public function boot()
+    public function boot(): void
     {
         $this->publishes([__DIR__ . '/Config/asseco-authorization.php' => config_path('asseco-authorization.php'),]);
 
@@ -41,12 +43,8 @@ class JsonAuthorizationServiceProvider extends ServiceProvider
 
     protected function registerAuthorizationClasses(): void
     {
-        $this->app->singleton(RuleParser::class, function ($app) {
-            return new RuleParser($app->make(AbsoluteRights::class));
-        });
-
-        $this->app->singleton(EloquentEvents::class, function ($app) {
-            return new EloquentEvents();
-        });
+        $this->app->singleton(AbsoluteRights::class);
+        $this->app->singleton(RuleParser::class);
+        $this->app->singleton(EloquentEvents::class);
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Voice\JsonAuthorization\Authorization;
 
 use Illuminate\Support\Facades\Auth;

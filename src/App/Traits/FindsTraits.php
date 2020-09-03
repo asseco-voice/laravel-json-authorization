@@ -36,7 +36,7 @@ trait FindsTraits
     {
         $traits = class_uses($class);
 
-        return in_array($traitPath, $traits);
+        return in_array($traitPath, $traits, true);
     }
 
 }

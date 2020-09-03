@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Voice\JsonAuthorization\Authorization;
 
 use Exception;
@@ -13,12 +15,12 @@ use Voice\JsonAuthorization\Exceptions\AuthorizationException;
 
 class RuleParser
 {
-    const ABSOLUTE_RIGHTS = '*';
+    public const ABSOLUTE_RIGHTS = '*';
 
-    const CREATE_RIGHT = 'create';
-    const READ_RIGHT = 'read';
-    const UPDATE_RIGHT = 'update';
-    const DELETE_RIGHT = 'delete';
+    public const CREATE_RIGHT = 'create';
+    public const READ_RIGHT = 'read';
+    public const UPDATE_RIGHT = 'update';
+    public const DELETE_RIGHT = 'delete';
 
     /**
      * These should reflect the same events from events to listen but without the '*' wildcard.

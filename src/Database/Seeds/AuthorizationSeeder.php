@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Voice\JsonAuthorization\Database\Seeds;
 
 use Illuminate\Database\Seeder;

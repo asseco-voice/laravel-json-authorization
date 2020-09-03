@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Voice\JsonAuthorization\Authorization;
 
 use Illuminate\Database\Eloquent\Builder;
@@ -46,7 +48,7 @@ class EloquentEvents
             $fetched = $this->executeQuery($modelClass, $rules, $eloquentModel);
 
             // Compare primary keys only ... what if there are none?
-            return in_array($eloquentModel->getKey(), $fetched);
+            return in_array($eloquentModel->getKey(), $fetched, true);
         });
     }
 
@@ -75,7 +77,7 @@ class EloquentEvents
     {
         $parsed = explode(':', $event);
 
-        if (count($parsed) != 2) {
+        if (count($parsed) !== 2) {
             throw new AuthorizationException("Something went wrong parsing the '$event' event.");
         }
 
@@ -94,7 +96,7 @@ class EloquentEvents
      * @return mixed
      * @throws JsonQueryBuilderException
      */
-    protected function executeQuery(string $modelClass, array $input, Model $eloquentModel)
+    protected function executeQuery(string $modelClass, array $input, Model $eloquentModel): array
     {
         /**
          * @var Model $model

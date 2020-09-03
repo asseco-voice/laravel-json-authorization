@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Voice\JsonAuthorization\App\Scopes;
 
 use Exception;
@@ -26,7 +28,7 @@ class AuthorizationScope implements Scope
      * @throws Exception
      * @throws Throwable
      */
-    public function apply(Builder $builder, Model $model)
+    public function apply(Builder $builder, Model $model): void
     {
         $override = Config::get('asseco-authorization.override_authorization');
 

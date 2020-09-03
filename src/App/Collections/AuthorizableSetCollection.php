@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Voice\JsonAuthorization\App\Collections;
 
 use Illuminate\Database\Eloquent\Collection;
