@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Voice\JsonAuthorization\App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
 use Voice\JsonAuthorization\App\AuthorizableSetType;
-use App\Http\Controllers\Controller; // Stock Laravel controller class
 
 class AuthorizableSetTypeController extends Controller
 {
@@ -17,9 +18,9 @@ class AuthorizableSetTypeController extends Controller
      *
      * @return JsonResponse
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        return response()->json(AuthorizableSetType::all());
+        return Response::json(AuthorizableSetType::all());
     }
 
     /**
@@ -28,49 +29,49 @@ class AuthorizableSetTypeController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        $authorizationManageType = AuthorizableSetType::create($request->all());
+        $authorizableSetType = AuthorizableSetType::query()->create($request->all());
 
-        return response()->json($authorizationManageType);
+        return Response::json($authorizableSetType);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param AuthorizableSetType $authorizationManageType
+     * @param AuthorizableSetType $authorizableSetType
      * @return JsonResponse
      */
-    public function show(AuthorizableSetType $authorizationManageType)
+    public function show(AuthorizableSetType $authorizableSetType): JsonResponse
     {
-        return response()->json($authorizationManageType);
+        return Response::json($authorizableSetType);
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param Request $request
-     * @param AuthorizableSetType $authorizationManageType
+     * @param AuthorizableSetType $authorizableSetType
      * @return JsonResponse
      */
-    public function update(Request $request, AuthorizableSetType $authorizationManageType)
+    public function update(Request $request, AuthorizableSetType $authorizableSetType): JsonResponse
     {
-        $isUpdated = $authorizationManageType->update($request->all());
+        $isUpdated = $authorizableSetType->update($request->all());
 
-        return response()->json($isUpdated);
+        return Response::json($isUpdated ? 'true' : 'false');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param AuthorizableSetType $authorizationManageType
+     * @param AuthorizableSetType $authorizableSetType
      * @return JsonResponse
      * @throws Exception
      */
-    public function destroy(AuthorizableSetType $authorizationManageType)
+    public function destroy(AuthorizableSetType $authorizableSetType): JsonResponse
     {
-        $isDeleted = $authorizationManageType->delete();
+        $isDeleted = $authorizableSetType->delete();
 
-        return response()->json($isDeleted);
+        return Response::json($isDeleted ? 'true' : 'false');
     }
 }

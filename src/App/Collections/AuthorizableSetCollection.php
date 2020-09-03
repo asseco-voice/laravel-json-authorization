@@ -79,7 +79,7 @@ class AuthorizableSetCollection extends Collection
 
     protected function createVirtualRole(): void
     {
-        AuthorizableSetType::create([
+        AuthorizableSetType::query()->create([
             'name'        => self::VIRTUAL_ROLE,
             'description' => "Virtual role which doesn't and shouldn't exist in authentication service. Attached automatically to every user."
         ]);

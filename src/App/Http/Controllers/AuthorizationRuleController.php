@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Voice\JsonAuthorization\App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\JsonResponse;
-use Voice\JsonAuthorization\App\AuthorizationRule;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller; // Stock Laravel controller class
+use Illuminate\Support\Facades\Response;
+use Voice\JsonAuthorization\App\AuthorizationRule;
 
 class AuthorizationRuleController extends Controller
 {
@@ -17,9 +18,9 @@ class AuthorizationRuleController extends Controller
      *
      * @return JsonResponse
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        return response()->json(AuthorizationRule::all());
+        return Response::json(AuthorizationRule::all());
     }
 
     /**
@@ -28,49 +29,49 @@ class AuthorizationRuleController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        $authorization = AuthorizationRule::create($request->all());
+        $authorizationRule = AuthorizationRule::query()->create($request->all());
 
-        return response()->json($authorization);
+        return Response::json($authorizationRule);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param AuthorizationRule $authorization
+     * @param AuthorizationRule $authorizationRule
      * @return JsonResponse
      */
-    public function show(AuthorizationRule $authorization)
+    public function show(AuthorizationRule $authorizationRule): JsonResponse
     {
-        return response()->json($authorization);
+        return Response::json($authorizationRule);
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param Request $request
-     * @param AuthorizationRule $authorization
+     * @param AuthorizationRule $authorizationRule
      * @return JsonResponse
      */
-    public function update(Request $request, AuthorizationRule $authorization)
+    public function update(Request $request, AuthorizationRule $authorizationRule): JsonResponse
     {
-        $isUpdated = $authorization->update($request->all());
+        $isUpdated = $authorizationRule->update($request->all());
 
-        return response()->json($isUpdated);
+        return Response::json($isUpdated ? 'true' : 'false');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param AuthorizationRule $authorization
+     * @param AuthorizationRule $authorizationRule
      * @return JsonResponse
      * @throws Exception
      */
-    public function destroy(AuthorizationRule $authorization)
+    public function destroy(AuthorizationRule $authorizationRule): JsonResponse
     {
-        $isDeleted = $authorization->delete();
+        $isDeleted = $authorizationRule->delete();
 
-        return response()->json($isDeleted);
+        return Response::json($isDeleted ? 'true' : 'false');
     }
 }
