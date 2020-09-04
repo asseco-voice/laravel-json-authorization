@@ -1,4 +1,4 @@
-# Laravel JSON authorization
+# Laravel JSON authorization 
 
 This package enables authorization via JSON objects imposed on each model which can be authorized.
 
