@@ -7,6 +7,7 @@ namespace Voice\JsonAuthorization\App;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use JsonException;
 use Throwable;
 use Voice\JsonAuthorization\App\Traits\Cacheable;
 
@@ -80,6 +81,7 @@ class AuthorizationRule extends Model
      * @param Collection $authorizableSets
      * @param int $modelId
      * @return array
+     * @throws JsonException
      */
     protected static function getStored(Collection $authorizableSets, int $modelId): array
     {
@@ -87,7 +89,7 @@ class AuthorizationRule extends Model
             return [];
         }
 
-        $rules = AuthorizationRule::where(self::MODEL_ID, $modelId)->where(function ($builder) use ($authorizableSets) {
+        $rules = AuthorizationRule::query()->where(self::MODEL_ID, $modelId)->where(function ($builder) use ($authorizableSets) {
             foreach ($authorizableSets as $authorizableSet) {
                 // orWhere because authorizable set values are not unique. It is valid to have 'role xy' together with 'group xy'.
                 $builder
@@ -110,6 +112,7 @@ class AuthorizationRule extends Model
      * Decode to array to prepare for cache insertion. We don't want to decode every time the rule is returned
      * @param array $rules
      * @return array
+     * @throws JsonException
      */
     protected static function decodeRules(array $rules): array
     {
@@ -142,7 +145,7 @@ class AuthorizationRule extends Model
      * Check if the collection contains a given authorizable set
      * @param array $authorizableSet
      * @param Collection $collection
-     * @return Collection
+     * @return bool
      */
     protected static function existsInTheCollection(array $authorizableSet, Collection $collection): bool
     {
@@ -152,12 +155,12 @@ class AuthorizationRule extends Model
 
     /**
      * Data preparation for pushing to collection which will ultimately end up in the cache in this format
-     * @param string $authorizableSetTypeId
+     * @param mixed $authorizableSetTypeId // TODO: type hint on PHP 8 when mixed arrives
      * @param string $authorizableSetValue
      * @param array $rules
      * @return array
      */
-    public static function prepare(string $authorizableSetTypeId, string $authorizableSetValue, array $rules = []): array
+    public static function prepare($authorizableSetTypeId, string $authorizableSetValue, array $rules = []): array
     {
         return [
             self::SET_TYPE_ID => $authorizableSetTypeId,
