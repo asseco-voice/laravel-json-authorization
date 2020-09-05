@@ -40,7 +40,8 @@ class AuthorizationScope implements Scope
          * @var $ruleParser RuleParser
          */
         $ruleParser = App::make(RuleParser::class);
-        $rules = $ruleParser->getRules(get_class($model));
+        $modelClass = get_class($model);
+        $rules = $ruleParser->getRules($modelClass);
 
         if (count($rules) < 1) {
             Log::info("[Authorization] You have no rights for this action.");
@@ -49,7 +50,7 @@ class AuthorizationScope implements Scope
         }
 
         if (array_key_exists(0, $rules) && $rules[0] === $ruleParser::ABSOLUTE_RIGHTS) {
-            Log::info("[Authorization] You have full rights for this action.");
+            Log::info("[Authorization] You have full 'read' rights for '$modelClass' model.");
             return;
         }
 
