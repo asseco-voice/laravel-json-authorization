@@ -18,6 +18,9 @@ class AuthorizableModelSeeder extends Seeder
         Cache::forget('authorization_models');
         $modelsWithTrait = AuthorizableModel::cached();
 
-        AuthorizableModel::query()->insert($modelsWithTrait->toArray());
+        foreach ($modelsWithTrait as $model) {
+            AuthorizableModel::query()->updateOrCreate(['name' => $model['name']], ['name' => $model['name']]);
+        }
+
     }
 }
