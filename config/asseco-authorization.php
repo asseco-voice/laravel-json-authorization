@@ -1,5 +1,7 @@
 <?php
 
+use Voice\JsonAuthorization\App\Traits\Authorizable;
+
 return [
     /**
      * Path to Laravel models in 'path => namespace' format
@@ -14,7 +16,7 @@ return [
     /**
      * Namespace to Authorizable trait
      */
-    'trait_path'       => 'Voice\JsonAuthorization\App\Traits\Authorizable',
+    'trait_path'       => Authorizable::class,
 
     /**
      * List of roles/groups/etc which have absolute admin/root rights.
