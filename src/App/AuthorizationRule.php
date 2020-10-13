@@ -21,7 +21,7 @@ class AuthorizationRule extends Model
     public const SET_VALUE = 'authorizable_set_value';
     public const RULES = 'rules';
 
-    protected $guarded = ['id'];
+    protected $guarded = ['id', 'created_at', 'updated_at'];
 
     public function model(): BelongsTo
     {

@@ -17,7 +17,7 @@ class AuthorizableModel extends Model
 {
     use FindsTraits, Cacheable;
 
-    protected $guarded = ['id'];
+    protected $fillable = ['name'];
 
     public function rules(): HasMany
     {

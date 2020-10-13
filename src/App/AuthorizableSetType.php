@@ -12,7 +12,7 @@ class AuthorizableSetType extends Model
 {
     use Cacheable;
 
-    protected $guarded = ['id'];
+    protected $fillable = ['name', 'description'];
 
     public function rules(): HasMany
     {
