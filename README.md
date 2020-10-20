@@ -1,3 +1,5 @@
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://github.com/asseco-voice/art/blob/main/asseco_logo.png" width="500"></a></p>
+
 # Laravel JSON authorization 
 
 This package enables authorization via JSON objects imposed on each model which can be authorized.
