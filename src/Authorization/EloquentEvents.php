@@ -37,11 +37,13 @@ class EloquentEvents
 
             if (count($rules) < 1) {
                 Log::info("[Authorization] You have no '$eventName' rights for '$modelClass' model.");
+
                 return false;
             }
 
             if (array_key_exists(0, $rules) && $rules[0] === $ruleParser::ABSOLUTE_RIGHTS) {
                 Log::info("[Authorization] You have full '$eventName' rights for '$modelClass' model.");
+
                 return true;
             }
 
@@ -60,7 +62,7 @@ class EloquentEvents
     protected function getModel(array $model): Model
     {
         if (count($model) < 1) {
-            throw new AuthorizationException("Something went wrong parsing the model from event.");
+            throw new AuthorizationException('Something went wrong parsing the model from event.');
         }
 
         return $model[0];

@@ -15,7 +15,7 @@ class AuthorizableSetCollection extends Collection
     const VIRTUAL_ROLE = 'virtual-role';
 
     /**
-     * Get collection of supported set types (authorizable_set_types table) and filter user set types to return only supported
+     * Get collection of supported set types (authorizable_set_types table) and filter user set types to return only supported.
      * @param \Illuminate\Support\Collection $authorizableSetTypes
      * @return $this|Collection
      */
@@ -29,7 +29,7 @@ class AuthorizableSetCollection extends Collection
 
     /**
      * Append virtual role to already existing user set type collection.
-     * It will also create role in the DB (authorizable_set_types table) if it doesn't exist
+     * It will also create role in the DB (authorizable_set_types table) if it doesn't exist.
      * @param \Illuminate\Support\Collection $authorizableSetTypes
      * @return $this|Collection
      */
@@ -52,13 +52,12 @@ class AuthorizableSetCollection extends Collection
      */
     public function toAuthorizationRuleFormat(): AuthorizableSetCollection
     {
-        $prepared = new AuthorizableSetCollection ();
+        $prepared = new AuthorizableSetCollection();
 
         $authorizableSets = $this->all();
         $setTypes = AuthorizableSetType::cached();
 
         foreach ($authorizableSets as $authorizableSetType => $authorizableSetValues) {
-
             $authorizableSetValues = Arr::wrap($authorizableSetValues);
             $authorizableSetTypeId = $setTypes->firstWhere('name', $authorizableSetType)['id'];
 
@@ -81,7 +80,7 @@ class AuthorizableSetCollection extends Collection
     {
         AuthorizableSetType::query()->create([
             'name'        => self::VIRTUAL_ROLE,
-            'description' => "Virtual role which doesn't and shouldn't exist in authentication service. Attached automatically to every user."
+            'description' => "Virtual role which doesn't and shouldn't exist in authentication service. Attached automatically to every user.",
         ]);
 
         AuthorizableSetType::reCache();

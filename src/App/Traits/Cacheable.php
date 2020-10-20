@@ -10,12 +10,12 @@ use Illuminate\Support\Facades\Cache;
 trait Cacheable
 {
     /**
-     * Key to find cache by
+     * Key to find cache by.
      */
     abstract protected static function cacheKey(): string;
 
     /**
-     * Collection to be returned if cache doesn't find anything
+     * Collection to be returned if cache doesn't find anything.
      */
     abstract protected static function cacheAlternative(): array;
 

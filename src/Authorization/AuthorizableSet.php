@@ -18,12 +18,13 @@ class AuthorizableSet
         $user = Auth::user();
 
         if (!$user) {
-            Log::info("[Authorization] You are logged out.");
+            Log::info('[Authorization] You are logged out.');
+
             return new AuthorizableSetCollection();
         }
 
         if (!$user instanceof AuthorizationInterface) {
-            throw new AuthorizationException("User model must implement AuthorizesUsers interface.");
+            throw new AuthorizationException('User model must implement AuthorizesUsers interface.');
         }
 
         $authorizableSetTypes = AuthorizableSetType::cached()->pluck('name');

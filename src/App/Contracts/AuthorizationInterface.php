@@ -7,7 +7,7 @@ namespace Voice\JsonAuthorization\App\Contracts;
 interface AuthorizationInterface
 {
     /**
-     * List of things to authorize by. Check readme for more details
+     * List of things to authorize by. Check readme for more details.
      *
      * @return array
      */
