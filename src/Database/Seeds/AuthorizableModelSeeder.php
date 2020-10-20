@@ -21,6 +21,5 @@ class AuthorizableModelSeeder extends Seeder
         foreach ($modelsWithTrait as $model) {
             AuthorizableModel::query()->updateOrCreate(['name' => $model['name']], ['name' => $model['name']]);
         }
-
     }
 }

@@ -73,7 +73,6 @@ class AuthorizationRule extends Model
         $rules = self::cached()->where(self::MODEL_ID, $modelId);
         self::cleanup($authorizableSets, $rules);
 
-
         return $rules->toArray();
     }
 
@@ -109,7 +108,7 @@ class AuthorizationRule extends Model
     }
 
     /**
-     * Decode to array to prepare for cache insertion. We don't want to decode every time the rule is returned
+     * Decode to array to prepare for cache insertion. We don't want to decode every time the rule is returned.
      * @param array $rules
      * @return array
      * @throws JsonException
@@ -142,7 +141,7 @@ class AuthorizationRule extends Model
     }
 
     /**
-     * Check if the collection contains a given authorizable set
+     * Check if the collection contains a given authorizable set.
      * @param array $authorizableSet
      * @param Collection $collection
      * @return bool
@@ -154,7 +153,7 @@ class AuthorizationRule extends Model
     }
 
     /**
-     * Data preparation for pushing to collection which will ultimately end up in the cache in this format
+     * Data preparation for pushing to collection which will ultimately end up in the cache in this format.
      * @param mixed $authorizableSetTypeId // TODO: type hint on PHP 8 when mixed arrives
      * @param string $authorizableSetValue
      * @param array $rules

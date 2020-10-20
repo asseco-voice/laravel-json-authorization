@@ -38,7 +38,7 @@ class AuthorizableModel extends Model
     }
 
     /**
-     * Find models which implement Authorizable trait
+     * Find models which implement Authorizable trait.
      * @return Collection
      */
     protected static function withTrait(): Collection
@@ -49,7 +49,7 @@ class AuthorizableModel extends Model
     }
 
     /**
-     * Remove models from DB which no longer implement the trait and add those which implement it but don't yet exist in DB
+     * Remove models from DB which no longer implement the trait and add those which implement it but don't yet exist in DB.
      * @param Collection $modelsInDb
      * @param Collection $modelsWithTrait
      * @return Collection
@@ -101,5 +101,4 @@ class AuthorizableModel extends Model
 
         return $cachedId;
     }
-
 }

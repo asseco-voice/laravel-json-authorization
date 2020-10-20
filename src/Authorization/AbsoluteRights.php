@@ -20,7 +20,6 @@ class AbsoluteRights
     public function check(Collection $authorizationRules): bool
     {
         foreach ($this->absoluteRights as $absoluteRightType => $absoluteRightValues) {
-
             $userRules = $authorizationRules->where('type', $absoluteRightType);
 
             if ($userRules->isEmpty()) {

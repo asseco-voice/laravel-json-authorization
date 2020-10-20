@@ -53,6 +53,7 @@ class RuleParser
     {
         if (!AuthorizableModel::isAuthorizable($modelClass)) {
             Log::info("[Authorization] Model '$modelClass' does not implement 'Voice\JsonAuthorization\App\Traits\Authorizable' trait (or you forgot to flush the cache). Skipping authorization...");
+
             return [self::ABSOLUTE_RIGHTS];
         }
 
@@ -77,7 +78,6 @@ class RuleParser
         $mergedRules = [];
 
         foreach ($authorizationRules as $authorizationRule) {
-
             $rules = $authorizationRule['rules'];
             if (!array_key_exists($right, $rules)) {
                 Log::info("[Authorization] No '$right' rights found for $modelClass.");
@@ -95,14 +95,14 @@ class RuleParser
             $mergedRules = $this->mergeRules($mergedRules, $rules[$right]);
         }
 
-        Log::info("[Authorization] Merged rules: " . print_r($mergedRules, true));
+        Log::info('[Authorization] Merged rules: ' . print_r($mergedRules, true));
 
         return $mergedRules;
     }
 
     /**
      * Events mapped within this class should reflect events registered within EloquentEvents class
-     * (without the wildcard character)
+     * (without the wildcard character).
      *
      * @param string $eventName
      * @throws AuthorizationException

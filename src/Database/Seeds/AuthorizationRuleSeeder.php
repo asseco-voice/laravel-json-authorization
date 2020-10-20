@@ -18,7 +18,6 @@ class AuthorizationRuleSeeder extends Seeder
         $authorizableModels = AuthorizableModel::all();
 
         foreach ($authorizableModels as $authorizableModel) {
-
             $rules = $this->generateRules();
 
             AuthorizationRule::query()->create([
@@ -34,27 +33,26 @@ class AuthorizationRuleSeeder extends Seeder
     {
         $rules = [];
         $rights = [
-            'read', 'create', 'update', 'delete'
+            'read', 'create', 'update', 'delete',
         ];
 
         $counter = rand(1, 4);
 
         for ($i = 0; $i < $counter; $i++) {
-
             $right = $rights[$i];
 
             if ($right === 'read') {
                 $randRight = rand(1, 2);
 
                 if ($randRight === 1) {
-                    $rule = "*";
+                    $rule = '*';
                 } else {
                     $ids = $this->getRandomNumbers();
 
                     $rule = [
                         'search' => [
-                            'id' => '=' . implode(";", $ids),
-                        ]
+                            'id' => '=' . implode(';', $ids),
+                        ],
                     ];
                 }
             } else {
@@ -62,8 +60,8 @@ class AuthorizationRuleSeeder extends Seeder
 
                 $rule = [
                     'search' => [
-                        'id' => '=' . implode(";", $ids),
-                    ]
+                        'id' => '=' . implode(';', $ids),
+                    ],
                 ];
             }
 
@@ -72,7 +70,6 @@ class AuthorizationRuleSeeder extends Seeder
 
         return $rules;
     }
-
 
     protected function getRandomNumbers(): array
     {
@@ -85,5 +82,4 @@ class AuthorizationRuleSeeder extends Seeder
 
         return $random;
     }
-
 }
