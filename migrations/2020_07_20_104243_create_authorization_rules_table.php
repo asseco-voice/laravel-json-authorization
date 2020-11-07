@@ -17,10 +17,10 @@ class CreateAuthorizationRulesTable extends Migration
             $table->id();
             $table->timestamps();
 
-            $table->foreignId('authorizable_set_type_id')->constrained()->onDelete('cascade');
+            $table->foreignId('authorizable_set_type_id')->constrained()->cascadeOnDelete();
             $table->string('authorizable_set_value');
 
-            $table->foreignId('authorizable_model_id')->constrained()->onDelete('cascade');
+            $table->foreignId('authorizable_model_id')->constrained()->cascadeOnDelete();
 
             $table->json('rules');
         });
