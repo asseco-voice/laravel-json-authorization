@@ -41,7 +41,7 @@ class JsonAuthorizationServiceProvider extends ServiceProvider
         }
 
         $this->commands([
-            SyncAuthorizableModels::class
+            SyncAuthorizableModels::class,
         ]);
     }
 
