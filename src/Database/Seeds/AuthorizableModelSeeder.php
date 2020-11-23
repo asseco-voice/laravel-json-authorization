@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Voice\JsonAuthorization\Database\Seeds;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Cache;
 use Voice\JsonAuthorization\App\AuthorizableModel;
 
 class AuthorizableModelSeeder extends Seeder
@@ -15,11 +14,14 @@ class AuthorizableModelSeeder extends Seeder
         // This seeder actually doesn't seed random data
         // but the classes which have trait already
 
-        Cache::forget('authorization_models');
+        AuthorizableModel::invalidateCache();
         $modelsWithTrait = AuthorizableModel::cached();
 
+        $models = [];
         foreach ($modelsWithTrait as $model) {
-            AuthorizableModel::query()->updateOrCreate(['name' => $model['name']], ['name' => $model['name']]);
+            $models[] = ['name' => $model['name']];
         }
+
+        AuthorizableModel::query()->upsert($models, 'name');
     }
 }

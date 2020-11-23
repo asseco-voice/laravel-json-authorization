@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Voice\JsonAuthorization\Database\Seeds;
 
-use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Voice\JsonAuthorization\App\AuthorizableSetType;
 
@@ -31,16 +30,6 @@ class AuthorizableSetTypeSeeder extends Seeder
             ],
         ];
 
-        $now = Carbon::now();
-
-        foreach ($basicTypes as $basicType) {
-            AuthorizableSetType::query()->updateOrCreate(
-                ['name' => $basicType['name']],
-                [
-                    'description' => $basicType['description'],
-                    'created_at'  => $now,
-                    'updated_at'  => $now,
-                ]);
-        }
+        AuthorizableSetType::query()->upsert($basicTypes, 'name');
     }
 }
