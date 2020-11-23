@@ -8,7 +8,7 @@ use Voice\JsonAuthorization\App\Scopes\AuthorizationScope;
 
 trait Authorizable
 {
-    protected static function booted(): void
+    protected static function bootAuthorizable(): void
     {
         static::addGlobalScope(new AuthorizationScope());
     }

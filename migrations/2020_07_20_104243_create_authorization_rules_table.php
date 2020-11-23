@@ -15,9 +15,9 @@ class CreateAuthorizationRulesTable extends Migration
     {
         Schema::create('authorization_rules', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('authorizable_set_type_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('authorizable_set_type_id')->constrained();
             $table->string('authorizable_set_value');
-            $table->foreignId('authorizable_model_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('authorizable_model_id')->constrained();
             $table->json('rules');
             $table->timestamps();
         });

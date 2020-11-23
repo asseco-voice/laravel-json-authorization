@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Voice\JsonAuthorization;
 
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
+use Voice\JsonAuthorization\App\Console\Commands\SyncAuthorizableModels;
 use Voice\JsonAuthorization\Authorization\AbsoluteRights;
 use Voice\JsonAuthorization\Authorization\EloquentEvents;
 use Voice\JsonAuthorization\Authorization\RuleParser;
@@ -30,21 +30,25 @@ class JsonAuthorizationServiceProvider extends ServiceProvider
     {
         $this->publishes([__DIR__ . '/../config/asseco-authorization.php' => config_path('asseco-authorization.php')]);
 
-        $override = Config::get('asseco-authorization.override_authorization');
+        $override = config('asseco-authorization.override_authorization');
 
-        if (!$this->app->runningInConsole() && !$override) {
+        if (!app()->runningInConsole() && !$override) {
             /**
              * @var EloquentEvents $eloquentEvents
              */
-            $eloquentEvents = $this->app->make(EloquentEvents::class);
+            $eloquentEvents = app()->make(EloquentEvents::class);
             $eloquentEvents->attachEloquentListener();
         }
+
+        $this->commands([
+            SyncAuthorizableModels::class
+        ]);
     }
 
     protected function registerAuthorizationClasses(): void
     {
-        $this->app->singleton(AbsoluteRights::class);
-        $this->app->singleton(RuleParser::class);
-        $this->app->singleton(EloquentEvents::class);
+        app()->singleton(AbsoluteRights::class);
+        app()->singleton(RuleParser::class);
+        app()->singleton(EloquentEvents::class);
     }
 }

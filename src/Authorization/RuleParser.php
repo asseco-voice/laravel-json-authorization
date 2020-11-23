@@ -22,6 +22,9 @@ class RuleParser
     public const UPDATE_RIGHT = 'update';
     public const DELETE_RIGHT = 'delete';
 
+    public const SEARCH = 'search';
+    public const OR = '||';
+
     /**
      * These should reflect the same events from events to listen but without the '*' wildcard.
      */
@@ -118,15 +121,12 @@ class RuleParser
 
     public function mergeRules(array $mergedRules, array $rules): array
     {
-        $search = 'search';
-        $or = '||';
-
-        if ($this->rulesMalformed($search, $rules)) {
+        if ($this->rulesMalformed(self::SEARCH, $rules)) {
             return $mergedRules;
         }
 
-        $mergedRules = $this->initMergedRulesArrayKeys($search, $mergedRules, $or);
-        $mergedRules[$search][$or][] = $rules[$search];
+        $mergedRules = $this->initMergedRulesArrayKeys(self::SEARCH, $mergedRules, self::OR);
+        $mergedRules[self::SEARCH][self::OR][] = $rules[self::SEARCH];
 
         return $mergedRules;
     }

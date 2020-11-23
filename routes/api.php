@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Voice\JsonAuthorization\App\Http\Controllers\AuthorizableModelController;
+use Voice\JsonAuthorization\App\Http\Controllers\AuthorizableSetTypeController;
+use Voice\JsonAuthorization\App\Http\Controllers\AuthorizationRuleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,11 +16,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::namespace('Voice\JsonAuthorization\App\Http\Controllers')
-    ->prefix('api')
+Route::prefix('api')
     ->middleware('api')
     ->group(function () {
-        Route::apiResource('authorization-rules', 'AuthorizationRuleController');
-        Route::apiResource('authorizable-models', 'AuthorizableModelController');
-        Route::apiResource('authorizable-set-types', 'AuthorizableSetTypeController');
+        Route::apiResource('authorizable-models', AuthorizableModelController::class)->only(['index', 'show']);
+        Route::apiResource('authorization-rules', AuthorizationRuleController::class);
+        Route::apiResource('authorizable-set-types', AuthorizableSetTypeController::class);
     });

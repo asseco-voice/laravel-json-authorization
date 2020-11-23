@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Response;
 use Voice\JsonAuthorization\App\AuthorizationRule;
 
 class AuthorizationRuleController extends Controller
@@ -20,7 +19,7 @@ class AuthorizationRuleController extends Controller
      */
     public function index(): JsonResponse
     {
-        return Response::json(AuthorizationRule::all());
+        return response()->json(AuthorizationRule::all());
     }
 
     /**
@@ -33,7 +32,7 @@ class AuthorizationRuleController extends Controller
     {
         $authorizationRule = AuthorizationRule::query()->create($request->all());
 
-        return Response::json($authorizationRule->refresh());
+        return response()->json($authorizationRule->refresh());
     }
 
     /**
@@ -44,7 +43,7 @@ class AuthorizationRuleController extends Controller
      */
     public function show(AuthorizationRule $authorizationRule): JsonResponse
     {
-        return Response::json($authorizationRule);
+        return response()->json($authorizationRule);
     }
 
     /**
@@ -58,7 +57,7 @@ class AuthorizationRuleController extends Controller
     {
         $authorizationRule->update($request->all());
 
-        return Response::json($authorizationRule->refresh());
+        return response()->json($authorizationRule->refresh());
     }
 
     /**
@@ -72,6 +71,6 @@ class AuthorizationRuleController extends Controller
     {
         $isDeleted = $authorizationRule->delete();
 
-        return Response::json($isDeleted ? 'true' : 'false');
+        return response()->json($isDeleted ? 'true' : 'false');
     }
 }

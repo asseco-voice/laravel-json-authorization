@@ -6,7 +6,6 @@ namespace Voice\JsonAuthorization\App\Collections;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Config;
 use Voice\JsonAuthorization\App\AuthorizableSetType;
 use Voice\JsonAuthorization\App\AuthorizationRule;
 
@@ -39,7 +38,7 @@ class AuthorizableSetCollection extends Collection
             $this->createVirtualRole();
         }
 
-        $this->put(self::VIRTUAL_ROLE, Arr::wrap(Config::get('asseco-authorization.universal_role')));
+        $this->put(self::VIRTUAL_ROLE, Arr::wrap(config('asseco-authorization.universal_role')));
 
         return $this;
     }

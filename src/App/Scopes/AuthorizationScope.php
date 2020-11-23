@@ -8,8 +8,6 @@ use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 use Voice\JsonAuthorization\Authorization\RuleParser;
@@ -30,16 +28,16 @@ class AuthorizationScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
-        $override = Config::get('asseco-authorization.override_authorization');
+        $override = config('asseco-authorization.override_authorization');
 
-        if (App::runningInConsole() || $override) {
+        if (app()->runningInConsole() || $override) {
             return;
         }
 
         /**
          * @var $ruleParser RuleParser
          */
-        $ruleParser = App::make(RuleParser::class);
+        $ruleParser = app()->make(RuleParser::class);
         $modelClass = get_class($model);
         $rules = $ruleParser->getRules($modelClass);
 

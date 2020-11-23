@@ -6,7 +6,6 @@ namespace Voice\JsonAuthorization\Authorization;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Voice\JsonAuthorization\Exceptions\AuthorizationException;
@@ -28,7 +27,7 @@ class EloquentEvents
             /**
              * @var $ruleParser RuleParser
              */
-            $ruleParser = App::make(RuleParser::class);
+            $ruleParser = app()->make(RuleParser::class);
             $eloquentModel = $this->getModel($model);
             [$eventName, $modelClass] = $this->parseEventName($event, $ruleParser);
             $rules = $ruleParser->getRules($modelClass, $ruleParser->eventRightMapping[$eventName]);

@@ -7,7 +7,6 @@ namespace Voice\JsonAuthorization\App;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Config;
 use Throwable;
 use Voice\JsonAuthorization\App\Traits\Cacheable;
 use Voice\JsonAuthorization\App\Traits\FindsTraits;
@@ -43,7 +42,7 @@ class AuthorizableModel extends Model
      */
     protected static function withTrait(): Collection
     {
-        $authorizableTraitPath = Config::get('asseco-authorization.trait_path');
+        $authorizableTraitPath = config('asseco-authorization.trait_path');
 
         return new Collection(static::getModelsWithTrait($authorizableTraitPath));
     }
@@ -68,7 +67,7 @@ class AuthorizableModel extends Model
     protected static function deleteModelsWithoutTrait(array $deleteDiff): void
     {
         if ($deleteDiff) {
-            AuthorizableModel::whereIn('name', $deleteDiff)->delete();
+            AuthorizableModel::query()->whereIn('name', $deleteDiff)->delete();
         }
     }
 
@@ -79,7 +78,7 @@ class AuthorizableModel extends Model
         }, $insertDiff);
 
         if ($insertData) {
-            AuthorizableModel::insert(array_values($insertData));
+            AuthorizableModel::query()->insert(array_values($insertData));
         }
     }
 

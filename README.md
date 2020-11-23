@@ -71,6 +71,15 @@ Package initialization requires few steps to set up:
 
 Models you want protected MUST implement ``Voice\JsonAuthorization\App\Traits\Authorizable`` trait.
 
+After this is done, be sure to run ``php artisan voice:sync-authorizable-models`` to sync models which
+implement ``Authorizable`` trait with the DB.
+
+Run this command each time you add or remove ``Authorizable`` trait from a model.
+
+If model already has relation to some rules, the command will throw an exception. This is purposely done
+to make you manually delete rules for the models you're about to delete, so that it doesn't happen
+by accident.
+
 ### Migrate tables
 
 Running ``php artisan migrate`` will publish 3 tables:
@@ -102,7 +111,7 @@ authorizing only by roles, then it makes sense to have only ``roles`` there, how
 where you'd like to merge [authorizable set values](#terminology) from different 
 [authorizable set types](#terminology) in which case you will add those as well. 
 
-With regard to the performance, everything is cached to the great extent, invalidated (TODO) and re-cached
+With regard to the performance, everything is cached to the great extent, invalidated and re-cached
 upon change. 
 
 Seeders are available to use by including `AuthorizationSeeder` (wrapper for several seeders)
@@ -218,14 +227,15 @@ and you will not need to give the explicit CRUD rights for it.
 
 #### Universal (virtual) role
 
-// TODO: napiši ono za auto seed ako ne postoji, reserved word virtual-role
-// ako ne želiš koristiti, ništa ne trebaš dirati...u najgorem slučaju doda record u set_types tablicu
+If you have the need to protect resources globally or give the permission for a single resource to all users
+across the system, you can do so by utilizing universal (virtual) role. By default, that role is 
+``voice-all-mighty``, but can be overridden with `.env` value `UNIVERSAL_ROLE`.
 
-If you have the need to protect resources globally or give the permission for a single resource to all users across the system, you can do
-so by utilizing universal (virtual) role. By default, that role is ``voice-all-mighty``, but can be overridden with `.env` value `UNIVERSAL_ROLE`.
+A universal role **MUST NOT** exist as a standard role within your auth service. It will conflict with this and
+will not work well.
 
-This works in a way that you will i.e. give a read right for some resource to **universal role** which will then be inherited by all other 
-users.
+This works in a way that you will i.e. give a read right for some resource to **universal role** which will 
+then be inherited by all other users.
 
 Example:
 

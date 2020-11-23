@@ -4,11 +4,32 @@ declare(strict_types=1);
 
 namespace Voice\JsonAuthorization\App\Traits;
 
+use Closure;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 
 trait Cacheable
 {
+    protected static function bootCacheable()
+    {
+        static::created(self::reCacheClosure());
+
+        static::updated(self::reCacheClosure());
+
+        static::deleted(self::reCacheClosure());
+    }
+
+    protected static function reCacheClosure(): Closure
+    {
+        return function ($model) {
+            if (!$model instanceof self) {
+                return;
+            }
+
+            $model::reCache();
+        };
+    }
+
     /**
      * Key to find cache by.
      */
@@ -56,7 +77,9 @@ trait Cacheable
     public static function appendToCache(array $values): void
     {
         $current = Cache::get(static::cacheKey()) ?: [];
+
         $current[] = $values;
+
         Cache::put(static::cacheKey(), $current, self::getCacheTtl());
     }
 }

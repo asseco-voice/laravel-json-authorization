@@ -13,7 +13,7 @@ class AuthorizableSetTypeSeeder extends Seeder
     {
         $basicTypes = [
             [
-                'name'        => 'virtual-role',
+                'name'        => config('asseco-authorization.universal_role'),
                 'description' => "Virtual role which doesn't and shouldn't exist in authentication service. Attached automatically to every user.",
             ],
             [

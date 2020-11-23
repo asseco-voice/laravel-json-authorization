@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Voice\JsonAuthorization\App\Traits;
 
-use Illuminate\Support\Facades\Config;
-
 trait FindsTraits
 {
     protected static function getModelsWithTrait(string $traitPath): array
     {
-        $paths = Config::get('asseco-authorization.models_path');
+        $paths = config('asseco-authorization.models_path');
         $models = [];
 
         foreach ($paths as $path => $namespace) {

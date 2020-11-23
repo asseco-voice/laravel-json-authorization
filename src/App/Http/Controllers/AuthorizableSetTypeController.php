@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Response;
 use Voice\JsonAuthorization\App\AuthorizableSetType;
 
 class AuthorizableSetTypeController extends Controller
@@ -20,7 +19,7 @@ class AuthorizableSetTypeController extends Controller
      */
     public function index(): JsonResponse
     {
-        return Response::json(AuthorizableSetType::all());
+        return response()->json(AuthorizableSetType::all());
     }
 
     /**
@@ -33,7 +32,7 @@ class AuthorizableSetTypeController extends Controller
     {
         $authorizableSetType = AuthorizableSetType::query()->create($request->all());
 
-        return Response::json($authorizableSetType->refresh());
+        return response()->json($authorizableSetType->refresh());
     }
 
     /**
@@ -44,7 +43,7 @@ class AuthorizableSetTypeController extends Controller
      */
     public function show(AuthorizableSetType $authorizableSetType): JsonResponse
     {
-        return Response::json($authorizableSetType);
+        return response()->json($authorizableSetType);
     }
 
     /**
@@ -58,7 +57,7 @@ class AuthorizableSetTypeController extends Controller
     {
         $authorizableSetType->update($request->all());
 
-        return Response::json($authorizableSetType->refresh());
+        return response()->json($authorizableSetType->refresh());
     }
 
     /**
@@ -72,6 +71,6 @@ class AuthorizableSetTypeController extends Controller
     {
         $isDeleted = $authorizableSetType->delete();
 
-        return Response::json($isDeleted ? 'true' : 'false');
+        return response()->json($isDeleted ? 'true' : 'false');
     }
 }

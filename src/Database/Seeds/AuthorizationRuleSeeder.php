@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Voice\JsonAuthorization\Database\Seeds;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Config;
 use Voice\JsonAuthorization\App\AuthorizableModel;
 use Voice\JsonAuthorization\App\AuthorizationRule;
 
@@ -13,7 +12,7 @@ class AuthorizationRuleSeeder extends Seeder
 {
     public function run(): void
     {
-        $role = Config::get('asseco-authorization.universal_role');
+        $role = config('asseco-authorization.universal_role');
 
         $authorizableModels = AuthorizableModel::all();
 
