@@ -33,7 +33,7 @@ class AuthorizableSetTypeController extends Controller
     {
         $authorizableSetType = AuthorizableSetType::query()->create($request->all());
 
-        return Response::json($authorizableSetType);
+        return Response::json($authorizableSetType->refresh());
     }
 
     /**
@@ -56,9 +56,9 @@ class AuthorizableSetTypeController extends Controller
      */
     public function update(Request $request, AuthorizableSetType $authorizableSetType): JsonResponse
     {
-        $isUpdated = $authorizableSetType->update($request->all());
+        $authorizableSetType->update($request->all());
 
-        return Response::json($isUpdated ? 'true' : 'false');
+        return Response::json($authorizableSetType->refresh());
     }
 
     /**

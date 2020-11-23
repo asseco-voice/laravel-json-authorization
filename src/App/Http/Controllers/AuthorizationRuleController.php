@@ -33,7 +33,7 @@ class AuthorizationRuleController extends Controller
     {
         $authorizationRule = AuthorizationRule::query()->create($request->all());
 
-        return Response::json($authorizationRule);
+        return Response::json($authorizationRule->refresh());
     }
 
     /**
@@ -56,9 +56,9 @@ class AuthorizationRuleController extends Controller
      */
     public function update(Request $request, AuthorizationRule $authorizationRule): JsonResponse
     {
-        $isUpdated = $authorizationRule->update($request->all());
+        $authorizationRule->update($request->all());
 
-        return Response::json($isUpdated ? 'true' : 'false');
+        return Response::json($authorizationRule->refresh());
     }
 
     /**

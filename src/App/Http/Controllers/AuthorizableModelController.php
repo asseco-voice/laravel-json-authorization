@@ -33,7 +33,7 @@ class AuthorizableModelController extends Controller
     {
         $authorizableModel = AuthorizableModel::query()->create($request->all());
 
-        return Response::json($authorizableModel);
+        return Response::json($authorizableModel->refresh());
     }
 
     /**
@@ -56,9 +56,9 @@ class AuthorizableModelController extends Controller
      */
     public function update(Request $request, AuthorizableModel $authorizableModel): JsonResponse
     {
-        $isUpdated = $authorizableModel->update($request->all());
+        $authorizableModel->update($request->all());
 
-        return Response::json($isUpdated ? 'true' : 'false');
+        return Response::json($authorizableModel->refresh());
     }
 
     /**
