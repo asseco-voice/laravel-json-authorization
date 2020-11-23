@@ -15,9 +15,8 @@ class CreateAuthorizableModelsTable extends Migration
     {
         Schema::create('authorizable_models', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
-
             $table->string('name')->unique();
+            $table->timestamps();
         });
     }
 
