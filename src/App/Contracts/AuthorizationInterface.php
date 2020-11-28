@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Voice\JsonAuthorization\App\Contracts;
+namespace Asseco\JsonAuthorization\App\Contracts;
 
 interface AuthorizationInterface
 {

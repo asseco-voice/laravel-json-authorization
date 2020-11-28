@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Voice\JsonAuthorization\App\Collections;
+namespace Asseco\JsonAuthorization\App\Collections;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
-use Voice\JsonAuthorization\App\AuthorizableSetType;
-use Voice\JsonAuthorization\App\AuthorizationRule;
+use Asseco\JsonAuthorization\App\AuthorizableSetType;
+use Asseco\JsonAuthorization\App\AuthorizationRule;
 
 class AuthorizableSetCollection extends Collection
 {

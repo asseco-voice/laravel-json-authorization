@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Voice\JsonAuthorization\App;
+namespace Asseco\JsonAuthorization\App;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Throwable;
-use Voice\JsonAuthorization\App\Traits\Cacheable;
-use Voice\JsonAuthorization\App\Traits\FindsTraits;
-use Voice\JsonAuthorization\Exceptions\AuthorizationException;
+use Asseco\JsonAuthorization\App\Traits\Cacheable;
+use Asseco\JsonAuthorization\App\Traits\FindsTraits;
+use Asseco\JsonAuthorization\Exceptions\AuthorizationException;
 
 class AuthorizableModel extends Model
 {

@@ -20,13 +20,13 @@
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
-            "Voice\\JsonAuthorization\\": "src/"
+            "Asseco\\JsonAuthorization\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Voice\\JsonAuthorization\\JsonAuthorizationServiceProvider"
+                "Asseco\\JsonAuthorization\\JsonAuthorizationServiceProvider"
             ]
         }
     }

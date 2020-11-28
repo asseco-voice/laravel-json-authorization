@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Voice\JsonAuthorization\App\Http\Controllers;
+namespace Asseco\JsonAuthorization\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Voice\JsonAuthorization\App\AuthorizableSetType;
+use Asseco\JsonAuthorization\App\AuthorizableSetType;
 
 class AuthorizableSetTypeController extends Controller
 {

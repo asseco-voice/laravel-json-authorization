@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Voice\JsonAuthorization\Authorization;
+namespace Asseco\JsonAuthorization\Authorization;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
-use Voice\JsonAuthorization\Exceptions\AuthorizationException;
-use Voice\JsonQueryBuilder\Exceptions\JsonQueryBuilderException;
-use Voice\JsonQueryBuilder\JsonQuery;
+use Asseco\JsonAuthorization\Exceptions\AuthorizationException;
+use Asseco\JsonQueryBuilder\Exceptions\JsonQueryBuilderException;
+use Asseco\JsonQueryBuilder\JsonQuery;
 
 class EloquentEvents
 {

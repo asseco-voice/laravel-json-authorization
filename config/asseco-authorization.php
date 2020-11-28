@@ -1,6 +1,6 @@
 <?php
 
-use Voice\JsonAuthorization\App\Traits\Authorizable;
+use Asseco\JsonAuthorization\App\Traits\Authorizable;
 
 return [
     /**

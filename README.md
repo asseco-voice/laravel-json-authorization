@@ -69,7 +69,7 @@ Package initialization requires few steps to set up:
 
 ### Pick authorizable models
 
-Models you want protected MUST implement ``Voice\JsonAuthorization\App\Traits\Authorizable`` trait.
+Models you want protected MUST implement ``Asseco\JsonAuthorization\App\Traits\Authorizable`` trait.
 
 After this is done, be sure to run ``php artisan voice:sync-authorizable-models`` to sync models which
 implement ``Authorizable`` trait with the DB.
@@ -258,7 +258,7 @@ Will give a read right to model ``1`` to all users across the system independent
 ### Flush cache
 
 Due to the heavy workload this package has to do, everything is cached with 1 day TTL. 
-Be sure to flush the cache after each manual code update (i.e. you add `Voice\JsonAuthorization\App\Traits\Authorizable` trait on a model).
+Be sure to flush the cache after each manual code update (i.e. you add `Asseco\JsonAuthorization\App\Traits\Authorizable` trait on a model).
 
 You can flush the cache [the Laravel way](https://laravel.com/docs/7.x/cache#removing-items-from-the-cache),
 or if you're using Redis as your cache driver you may use [one of our packages](https://github.com/asseco-voice/laravel-redis-cache-extension)
@@ -314,4 +314,4 @@ For dev purposes, you can disable authorization completely by adding this to you
 
 Publish and override the configuration for the package:
 
-    php artisan vendor:publish --provider="Voice\JsonAuthorization\JsonAuthorizationServiceProvider"
+    php artisan vendor:publish --provider="Asseco\JsonAuthorization\JsonAuthorizationServiceProvider"

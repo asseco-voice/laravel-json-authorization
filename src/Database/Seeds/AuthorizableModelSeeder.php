@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Voice\JsonAuthorization\Database\Seeds;
+namespace Asseco\JsonAuthorization\Database\Seeds;
 
 use Illuminate\Database\Seeder;
-use Voice\JsonAuthorization\App\AuthorizableModel;
+use Asseco\JsonAuthorization\App\AuthorizableModel;
 
 class AuthorizableModelSeeder extends Seeder
 {

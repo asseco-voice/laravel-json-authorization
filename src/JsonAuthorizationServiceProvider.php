@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Voice\JsonAuthorization;
+namespace Asseco\JsonAuthorization;
 
 use Illuminate\Support\ServiceProvider;
-use Voice\JsonAuthorization\App\Console\Commands\SyncAuthorizableModels;
-use Voice\JsonAuthorization\Authorization\AbsoluteRights;
-use Voice\JsonAuthorization\Authorization\EloquentEvents;
-use Voice\JsonAuthorization\Authorization\RuleParser;
+use Asseco\JsonAuthorization\App\Console\Commands\SyncAuthorizableModels;
+use Asseco\JsonAuthorization\Authorization\AbsoluteRights;
+use Asseco\JsonAuthorization\Authorization\EloquentEvents;
+use Asseco\JsonAuthorization\Authorization\RuleParser;
 
 class JsonAuthorizationServiceProvider extends ServiceProvider
 {

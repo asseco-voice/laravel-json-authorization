@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Voice\JsonAuthorization\App\Console\Commands;
+namespace Asseco\JsonAuthorization\App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Voice\JsonAuthorization\App\AuthorizableModel;
+use Asseco\JsonAuthorization\App\AuthorizableModel;
 
 class SyncAuthorizableModels extends Command
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Voice\JsonAuthorization\Authorization;
+namespace Asseco\JsonAuthorization\Authorization;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
