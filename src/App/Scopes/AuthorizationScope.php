@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization\App\Scopes;
 
+use Asseco\JsonAuthorization\Authorization\RuleParser;
+use Asseco\JsonQueryBuilder\Exceptions\JsonQueryBuilderException;
+use Asseco\JsonQueryBuilder\JsonQuery;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
 use Illuminate\Support\Facades\Log;
 use Throwable;
-use Asseco\JsonAuthorization\Authorization\RuleParser;
-use Asseco\JsonQueryBuilder\Exceptions\JsonQueryBuilderException;
-use Asseco\JsonQueryBuilder\JsonQuery;
 
 class AuthorizationScope implements Scope
 {

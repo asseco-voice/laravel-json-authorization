@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Asseco\JsonAuthorization\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Asseco\JsonAuthorization\App\AuthorizableSetType;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Asseco\JsonAuthorization\App\AuthorizableSetType;
 
 class AuthorizableSetTypeController extends Controller
 {

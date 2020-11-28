@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization\App;
 
+use Asseco\JsonAuthorization\App\Traits\Cacheable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use JsonException;
 use Throwable;
-use Asseco\JsonAuthorization\App\Traits\Cacheable;
 
 class AuthorizationRule extends Model
 {

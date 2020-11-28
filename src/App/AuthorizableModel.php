@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization\App;
 
+use Asseco\JsonAuthorization\App\Traits\Cacheable;
+use Asseco\JsonAuthorization\App\Traits\FindsTraits;
+use Asseco\JsonAuthorization\Exceptions\AuthorizationException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Throwable;
-use Asseco\JsonAuthorization\App\Traits\Cacheable;
-use Asseco\JsonAuthorization\App\Traits\FindsTraits;
-use Asseco\JsonAuthorization\Exceptions\AuthorizationException;
 
 class AuthorizableModel extends Model
 {

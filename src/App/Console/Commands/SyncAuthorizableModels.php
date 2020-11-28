@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization\App\Console\Commands;
 
-use Illuminate\Console\Command;
 use Asseco\JsonAuthorization\App\AuthorizableModel;
+use Illuminate\Console\Command;
 
 class SyncAuthorizableModels extends Command
 {

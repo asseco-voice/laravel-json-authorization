@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization\App\Collections;
 
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Arr;
 use Asseco\JsonAuthorization\App\AuthorizableSetType;
 use Asseco\JsonAuthorization\App\AuthorizationRule;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Arr;
 
 class AuthorizableSetCollection extends Collection
 {

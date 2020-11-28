@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization\Authorization;
 
+use Asseco\JsonAuthorization\App\AuthorizableModel;
+use Asseco\JsonAuthorization\App\AuthorizationRule;
+use Asseco\JsonAuthorization\Exceptions\AuthorizationException;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Throwable;
-use Asseco\JsonAuthorization\App\AuthorizableModel;
-use Asseco\JsonAuthorization\App\AuthorizationRule;
-use Asseco\JsonAuthorization\Exceptions\AuthorizationException;
 
 class RuleParser
 {
