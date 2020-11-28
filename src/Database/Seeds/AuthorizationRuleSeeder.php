@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization\Database\Seeds;
 
-use Illuminate\Database\Seeder;
 use Asseco\JsonAuthorization\App\AuthorizableModel;
 use Asseco\JsonAuthorization\App\AuthorizationRule;
+use Illuminate\Database\Seeder;
 
 class AuthorizationRuleSeeder extends Seeder
 {

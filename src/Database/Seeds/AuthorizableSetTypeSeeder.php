@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization\Database\Seeds;
 
-use Illuminate\Database\Seeder;
 use Asseco\JsonAuthorization\App\AuthorizableSetType;
+use Illuminate\Database\Seeder;
 
 class AuthorizableSetTypeSeeder extends Seeder
 {

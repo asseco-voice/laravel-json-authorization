@@ -1,9 +1,9 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use Asseco\JsonAuthorization\App\Http\Controllers\AuthorizableModelController;
 use Asseco\JsonAuthorization\App\Http\Controllers\AuthorizableSetTypeController;
 use Asseco\JsonAuthorization\App\Http\Controllers\AuthorizationRuleController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------

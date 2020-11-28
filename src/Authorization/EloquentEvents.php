@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization\Authorization;
 
+use Asseco\JsonAuthorization\Exceptions\AuthorizationException;
+use Asseco\JsonQueryBuilder\Exceptions\JsonQueryBuilderException;
+use Asseco\JsonQueryBuilder\JsonQuery;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
-use Asseco\JsonAuthorization\Exceptions\AuthorizationException;
-use Asseco\JsonQueryBuilder\Exceptions\JsonQueryBuilderException;
-use Asseco\JsonQueryBuilder\JsonQuery;
 
 class EloquentEvents
 {

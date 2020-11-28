@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization;
 
-use Illuminate\Support\ServiceProvider;
 use Asseco\JsonAuthorization\App\Console\Commands\SyncAuthorizableModels;
 use Asseco\JsonAuthorization\Authorization\AbsoluteRights;
 use Asseco\JsonAuthorization\Authorization\EloquentEvents;
 use Asseco\JsonAuthorization\Authorization\RuleParser;
+use Illuminate\Support\ServiceProvider;
 
 class JsonAuthorizationServiceProvider extends ServiceProvider
 {
@@ -41,7 +41,7 @@ class JsonAuthorizationServiceProvider extends ServiceProvider
         }
 
         $this->commands([
-            SyncAuthorizableModels::class
+            SyncAuthorizableModels::class,
         ]);
     }
 
