@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Voice\JsonAuthorization\Authorization;
+namespace Asseco\JsonAuthorization\Authorization;
 
+use Asseco\JsonAuthorization\App\AuthorizableSetType;
+use Asseco\JsonAuthorization\App\Collections\AuthorizableSetCollection;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizationInterface;
+use Asseco\JsonAuthorization\Exceptions\AuthorizationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Voice\JsonAuthorization\App\AuthorizableSetType;
-use Voice\JsonAuthorization\App\Collections\AuthorizableSetCollection;
-use Voice\JsonAuthorization\App\Contracts\AuthorizationInterface;
-use Voice\JsonAuthorization\Exceptions\AuthorizationException;
 
 class AuthorizableSet
 {

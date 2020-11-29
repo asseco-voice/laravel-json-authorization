@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Voice\JsonAuthorization\App\Http\Controllers;
+namespace Asseco\JsonAuthorization\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Asseco\JsonAuthorization\App\AuthorizableModel;
 use Illuminate\Http\JsonResponse;
-use Voice\JsonAuthorization\App\AuthorizableModel;
 
 class AuthorizableModelController extends Controller
 {

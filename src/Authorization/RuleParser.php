@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Voice\JsonAuthorization\Authorization;
+namespace Asseco\JsonAuthorization\Authorization;
 
+use Asseco\JsonAuthorization\App\AuthorizableModel;
+use Asseco\JsonAuthorization\App\AuthorizationRule;
+use Asseco\JsonAuthorization\Exceptions\AuthorizationException;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Throwable;
-use Voice\JsonAuthorization\App\AuthorizableModel;
-use Voice\JsonAuthorization\App\AuthorizationRule;
-use Voice\JsonAuthorization\Exceptions\AuthorizationException;
 
 class RuleParser
 {
@@ -55,7 +55,7 @@ class RuleParser
     public function getRules(string $modelClass, string $right = self::READ_RIGHT): array
     {
         if (!AuthorizableModel::isAuthorizable($modelClass)) {
-            Log::info("[Authorization] Model '$modelClass' does not implement 'Voice\JsonAuthorization\App\Traits\Authorizable' trait (or you forgot to flush the cache). Skipping authorization...");
+            Log::info("[Authorization] Model '$modelClass' does not implement 'Asseco\JsonAuthorization\App\Traits\Authorizable' trait (or you forgot to flush the cache). Skipping authorization...");
 
             return [self::ABSOLUTE_RIGHTS];
         }

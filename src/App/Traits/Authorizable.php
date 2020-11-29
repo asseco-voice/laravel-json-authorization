@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Voice\JsonAuthorization\App\Traits;
+namespace Asseco\JsonAuthorization\App\Traits;
 
-use Voice\JsonAuthorization\App\Scopes\AuthorizationScope;
+use Asseco\JsonAuthorization\App\Scopes\AuthorizationScope;
 
 trait Authorizable
 {

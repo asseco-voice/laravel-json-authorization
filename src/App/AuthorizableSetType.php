@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Voice\JsonAuthorization\App;
+namespace Asseco\JsonAuthorization\App;
 
+use Asseco\JsonAuthorization\App\Traits\Cacheable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Voice\JsonAuthorization\App\Traits\Cacheable;
 
 class AuthorizableSetType extends Model
 {

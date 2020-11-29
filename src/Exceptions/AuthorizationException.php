@@ -1,6 +1,6 @@
 <?php
 
-namespace Voice\JsonAuthorization\Exceptions;
+namespace Asseco\JsonAuthorization\Exceptions;
 
 use Exception;
 use Throwable;

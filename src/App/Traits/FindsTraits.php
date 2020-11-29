@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Voice\JsonAuthorization\App\Traits;
+namespace Asseco\JsonAuthorization\App\Traits;
 
 trait FindsTraits
 {
