@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Asseco\JsonAuthorization\Database\Seeds;
 
 use Asseco\JsonAuthorization\App\AuthorizableSetType;
+use Asseco\JsonAuthorization\App\Collections\AuthorizableSetCollection;
 use Illuminate\Database\Seeder;
 
 class AuthorizableSetTypeSeeder extends Seeder
@@ -13,7 +14,7 @@ class AuthorizableSetTypeSeeder extends Seeder
     {
         $basicTypes = [
             [
-                'name'        => config('asseco-authorization.universal_role'),
+                'name'        => AuthorizableSetCollection::VIRTUAL_ROLE,
                 'description' => "Virtual role which doesn't and shouldn't exist in authentication service. Attached automatically to every user.",
             ],
             [
