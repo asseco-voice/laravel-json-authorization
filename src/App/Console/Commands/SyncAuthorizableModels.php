@@ -14,7 +14,7 @@ class SyncAuthorizableModels extends Command
      *
      * @var string
      */
-    protected $signature = 'voice:sync-authorizable-models';
+    protected $signature = 'asseco:sync-authorizable-models';
 
     /**
      * The console command description.

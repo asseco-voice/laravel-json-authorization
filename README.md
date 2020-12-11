@@ -71,7 +71,7 @@ Package initialization requires few steps to set up:
 
 Models you want protected MUST implement ``Asseco\JsonAuthorization\App\Traits\Authorizable`` trait.
 
-After this is done, be sure to run ``php artisan voice:sync-authorizable-models`` to sync models which
+After this is done, be sure to run ``php artisan asseco:sync-authorizable-models`` to sync models which
 implement ``Authorizable`` trait with the DB.
 
 Run this command each time you add or remove ``Authorizable`` trait from a model.
