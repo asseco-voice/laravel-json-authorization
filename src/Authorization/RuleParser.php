@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization\Authorization;
 
-use Asseco\JsonAuthorization\App\AuthorizableModel;
-use Asseco\JsonAuthorization\App\AuthorizationRule;
+use Asseco\JsonAuthorization\App\Models\AuthorizableModel;
+use Asseco\JsonAuthorization\App\Models\AuthorizationRule;
 use Asseco\JsonAuthorization\Exceptions\AuthorizationException;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
