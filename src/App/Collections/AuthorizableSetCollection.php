@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization\App\Collections;
 
-use Asseco\JsonAuthorization\App\AuthorizableSetType;
-use Asseco\JsonAuthorization\App\AuthorizationRule;
+use Asseco\JsonAuthorization\App\Models\AuthorizableSetType;
+use Asseco\JsonAuthorization\App\Models\AuthorizationRule;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 

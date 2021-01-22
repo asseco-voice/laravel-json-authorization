@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization\App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Asseco\JsonAuthorization\App\AuthorizableSetType;
+use Asseco\JsonAuthorization\App\Models\AuthorizableSetType;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization\App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Asseco\JsonAuthorization\App\AuthorizableModel;
+use Asseco\JsonAuthorization\App\Models\AuthorizableModel;
 use Illuminate\Http\JsonResponse;
 
 class AuthorizableModelController extends Controller

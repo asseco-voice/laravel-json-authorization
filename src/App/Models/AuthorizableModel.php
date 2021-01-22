@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Asseco\JsonAuthorization\App;
+namespace Asseco\JsonAuthorization\App\Models;
 
 use Asseco\JsonAuthorization\App\Traits\Cacheable;
 use Asseco\JsonAuthorization\App\Traits\FindsTraits;
