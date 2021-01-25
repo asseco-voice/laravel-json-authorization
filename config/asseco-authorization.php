@@ -10,7 +10,7 @@ return [
      * an array of paths if non-standard models are to be used
      */
     'models_path'      => [
-        app_path() => 'App\\',
+        app_path() => 'App\\Models\\',
     ],
 
     /**
