@@ -14,7 +14,7 @@ class AuthorizableSetCollection extends Collection
     const VIRTUAL_SET_TYPE = 'virtual-set-type';
 
     /**
-     * Filter collection based on existing authorizable set types
+     * Filter collection based on existing authorizable set types.
      *
      * Having collection:
      * 'roles' => [...],
@@ -61,7 +61,7 @@ class AuthorizableSetCollection extends Collection
     }
 
     /**
-     * Append virtual role to a collection
+     * Append virtual role to a collection.
      *
      * @return $this|Collection
      */
@@ -86,7 +86,6 @@ class AuthorizableSetCollection extends Collection
         $setTypes = AuthorizableSetType::cached();
 
         foreach ($authorizableSets as $setType => $setValues) {
-
             $setTypeId = Arr::get($setTypes->firstWhere('name', $setType), 'id');
 
             if (!$setTypeId) {

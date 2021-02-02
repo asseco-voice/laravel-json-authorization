@@ -41,28 +41,28 @@ class AuthorizableSetTest extends TestCase
             [
                 'authorizable_set_type_id' => $roleType->id,
                 'authorizable_set_value'   => 'role1',
-                'rules'                    => []
+                'rules'                    => [],
             ],
             [
                 'authorizable_set_type_id' => $roleType->id,
                 'authorizable_set_value'   => 'role2',
-                'rules'                    => []
+                'rules'                    => [],
             ],
             [
                 'authorizable_set_type_id' => $groupType->id,
                 'authorizable_set_value'   => 'group1',
-                'rules'                    => []
+                'rules'                    => [],
             ],
             [
                 'authorizable_set_type_id' => $groupType->id,
                 'authorizable_set_value'   => 'group2',
-                'rules'                    => []
+                'rules'                    => [],
             ],
             [
                 'authorizable_set_type_id' => 3,
                 'authorizable_set_value'   => 'voice-all-mighty',
-                'rules'                    => []
-            ]
+                'rules'                    => [],
+            ],
         ];
 
         $this->assertEquals($expected, AuthorizableSet::unresolvedRules()->toArray());
