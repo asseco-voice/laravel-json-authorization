@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Asseco\JsonAuthorization\App\Models;
 
 use Asseco\JsonAuthorization\App\Traits\Cacheable;
+use Asseco\JsonAuthorization\Authorization\AuthorizableSet;
 use Asseco\JsonAuthorization\Database\Factories\AuthorizationRuleFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -30,9 +31,13 @@ class AuthorizationRule extends Model
         return AuthorizationRuleFactory::new();
     }
 
-    public function model(): BelongsTo
+    /**
+     * Don't ever rename this to just 'model', it will conflict with Laravel.
+     * @return BelongsTo
+     */
+    public function authorizableModel(): BelongsTo
     {
-        return $this->belongsTo(AuthorizableModel::class, self::MODEL_ID);
+        return $this->belongsTo(AuthorizableModel::class);
     }
 
     public function authorizableSetType(): BelongsTo
@@ -55,13 +60,15 @@ class AuthorizationRule extends Model
      * Retrieve what you can from the cache, go to the DB for rest.
      * Cache and return everything asked for (independently of whether search was a hit or not)
      * to prevent additional trips to the DB.
-     * @param Collection $authorizableSets
+     *
      * @param string $modelClass
      * @return Collection
      * @throws Throwable
      */
-    public static function cachedBy(Collection $authorizableSets, string $modelClass): Collection
+    public static function cachedBy(string $modelClass): Collection
     {
+        $authorizableSets = AuthorizableSet::unresolvedRules();
+
         $modelId = AuthorizableModel::getIdFor($modelClass);
 
         // Authorizable sets get reduced each iteration
@@ -161,6 +168,7 @@ class AuthorizationRule extends Model
 
     /**
      * Data preparation for pushing to collection which will ultimately end up in the cache in this format.
+     *
      * @param mixed $authorizableSetTypeId // TODO: type hint on PHP 8 when mixed arrives
      * @param string $authorizableSetValue
      * @param array $rules

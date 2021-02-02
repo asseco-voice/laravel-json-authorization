@@ -19,6 +19,33 @@ class AuthorizableModelTest extends TestCase
         ]]);
     }
 
+    /** @test */
+    public function syncs_authorizable_models_independently_of_what_you_try_to_add()
+    {
+        // There is only one model in given config location (in setUp method)
+        // which has Authorizable trait. Package forces to always have a realistic
+        // state of authorizable models, so trying to add models at random will
+        // always re-scan models and write to DB only models which actually do have
+        // the trait, ignoring others.
+
+        AuthorizableModel::factory()->create();
+        AuthorizableModel::factory()->create(['name' => 'SomeOther::class']);
+        AuthorizableModel::factory()->count(5)->create();
+
+        $this->assertCount(1, AuthorizableModel::all());
+    }
+
+    /** @test */
+    public function fails_to_find_authorizable_model_if_models_path_is_not_configured_correctly()
+    {
+        config(['asseco-authorization.models_path' => []]);
+
+        AuthorizableModel::factory()->create([
+            'name' => TestUser::class,
+        ]);
+
+        $this->assertCount(0, AuthorizableModel::all());
+    }
 
     /** @test */
     public function has_rules()

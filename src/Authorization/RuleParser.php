@@ -61,8 +61,7 @@ class RuleParser
             return [self::ABSOLUTE_RIGHTS];
         }
 
-        $authorizableSets = AuthorizableSet::unresolvedRules();
-        $authorizationRules = AuthorizationRule::cachedBy($authorizableSets, $modelClass);
+        $authorizationRules = AuthorizationRule::cachedBy($modelClass);
 
         if ($this->absoluteRights->check($authorizationRules)) {
             return [self::ABSOLUTE_RIGHTS];
