@@ -25,7 +25,7 @@ class AuthorizableSetCollectionTest extends TestCase
             'roles' => [
                 'role1',
                 'role2',
-            ]
+            ],
         ];
 
         $filtered = $userSet->filterByExistingTypes();
@@ -73,8 +73,8 @@ class AuthorizableSetCollectionTest extends TestCase
 
         $expected = [
             'virtual-set-type' => [
-                'voice-all-mighty'
-            ]
+                'voice-all-mighty',
+            ],
         ];
 
         $this->assertEquals($expected, $set->toArray());
@@ -94,23 +94,23 @@ class AuthorizableSetCollectionTest extends TestCase
             [
                 'authorizable_set_type_id' => $roleType->id,
                 'authorizable_set_value'   => 'role1',
-                'rules'                    => []
+                'rules'                    => [],
             ],
             [
                 'authorizable_set_type_id' => $roleType->id,
                 'authorizable_set_value'   => 'role2',
-                'rules'                    => []
+                'rules'                    => [],
             ],
             [
                 'authorizable_set_type_id' => $groupType->id,
                 'authorizable_set_value'   => 'group1',
-                'rules'                    => []
+                'rules'                    => [],
             ],
             [
                 'authorizable_set_type_id' => $groupType->id,
                 'authorizable_set_value'   => 'group2',
-                'rules'                    => []
-            ]
+                'rules'                    => [],
+            ],
         ];
 
         $this->assertEquals($expected, $formatted->toArray());
