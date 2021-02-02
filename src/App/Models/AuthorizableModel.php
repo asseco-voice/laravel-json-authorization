@@ -27,7 +27,7 @@ class AuthorizableModel extends Model
 
     public function rules(): HasMany
     {
-        return $this->hasMany(AuthorizationRule::class, 'authorization_rule_id');
+        return $this->hasMany(AuthorizationRule::class);
     }
 
     protected static function cacheKey(): string
