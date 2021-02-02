@@ -9,11 +9,6 @@ use Asseco\JsonAuthorization\Tests\TestUser;
 
 class AuthorizableSetCollectionTest extends TestCase
 {
-    public function setUp(): void
-    {
-        parent::setUp();
-    }
-
     /** @test */
     public function filters_supported_set_types()
     {
@@ -81,7 +76,7 @@ class AuthorizableSetCollectionTest extends TestCase
     }
 
     /** @test */
-    public function transforms()
+    public function transforms_output_to_authorization_rule_format()
     {
         $roleType = AuthorizableSetType::factory()->create(['name' => 'roles']);
         $groupType = AuthorizableSetType::factory()->create(['name' => 'groups']);
