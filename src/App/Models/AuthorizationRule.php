@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Asseco\JsonAuthorization\App\Models;
 
 use Asseco\JsonAuthorization\App\Traits\Cacheable;
-use Asseco\JsonAuthorization\Authorization\AuthorizableSet;
+use Asseco\JsonAuthorization\Authorization\UserAuthorizableSet;
 use Asseco\JsonAuthorization\Database\Factories\AuthorizationRuleFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -67,15 +67,15 @@ class AuthorizationRule extends Model
      */
     public static function cachedBy(string $modelClass): Collection
     {
-        $authorizableSets = AuthorizableSet::unresolvedRules();
+        $formattedSet = UserAuthorizableSet::formatted();
 
         $modelId = AuthorizableModel::getIdFor($modelClass);
 
         // Authorizable sets get reduced each iteration
-        $cached = self::getCached($authorizableSets, $modelId);
-        $stored = self::getStored($authorizableSets, $modelId);
+        $cached = self::getCached($formattedSet, $modelId);
+        $stored = self::getStored($formattedSet, $modelId);
 
-        $merged = array_merge_recursive($cached, $stored, $authorizableSets->toArray());
+        $merged = array_merge_recursive($cached, $stored, $formattedSet->toArray());
 
         self::appendToCache($merged);
 

@@ -3,18 +3,18 @@
 namespace Asseco\JsonAuthorization\Tests\Unit\Authorization;
 
 use Asseco\JsonAuthorization\App\Models\AuthorizableSetType;
-use Asseco\JsonAuthorization\Authorization\AuthorizableSet;
+use Asseco\JsonAuthorization\Authorization\UserAuthorizableSet;
 use Asseco\JsonAuthorization\Tests\TestCase;
 use Asseco\JsonAuthorization\Tests\TestUser;
 use Exception;
 use Illuminate\Foundation\Auth\User;
 
-class AuthorizableSetTest extends TestCase
+class UserAuthorizableSetTest extends TestCase
 {
     /** @test */
     public function returns_empty_set_if_not_logged_in()
     {
-        $authorizableSets = AuthorizableSet::unresolvedRules();
+        $authorizableSets = UserAuthorizableSet::formatted();
 
         $this->assertCount(0, $authorizableSets);
     }
@@ -26,7 +26,7 @@ class AuthorizableSetTest extends TestCase
 
         $this->actingAs(new User());
 
-        AuthorizableSet::unresolvedRules();
+        UserAuthorizableSet::formatted();
     }
 
     /** @test */
@@ -65,6 +65,6 @@ class AuthorizableSetTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, AuthorizableSet::unresolvedRules()->toArray());
+        $this->assertEquals($expected, UserAuthorizableSet::formatted()->toArray());
     }
 }

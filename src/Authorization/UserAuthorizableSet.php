@@ -10,13 +10,13 @@ use Asseco\JsonAuthorization\Exceptions\AuthorizationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-class AuthorizableSet
+class UserAuthorizableSet
 {
     /**
      * @return AuthorizableSetCollection
      * @throws AuthorizationException
      */
-    public static function unresolvedRules(): AuthorizableSetCollection
+    public static function formatted(): AuthorizableSetCollection
     {
         $user = Auth::user();
 
