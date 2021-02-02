@@ -56,7 +56,7 @@ class RuleParser
     public function getRules(string $modelClass, string $right = self::READ_RIGHT): array
     {
         if (!AuthorizableModel::isAuthorizable($modelClass)) {
-            Log::info("[Authorization] Model '$modelClass' does not implement " . Authorizable::class . "trait (or you forgot to flush the cache). Skipping authorization...");
+            Log::info("[Authorization] Model '$modelClass' does not implement " . Authorizable::class . 'trait (or you forgot to flush the cache). Skipping authorization...');
 
             return [self::ABSOLUTE_RIGHTS];
         }

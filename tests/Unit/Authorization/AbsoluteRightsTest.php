@@ -12,7 +12,7 @@ class AbsoluteRightsTest extends TestCase
 
         config(['asseco-authorization.absolute_rights' => [
             'roles' => [
-                'asseco-voice-admin'
+                'asseco-voice-admin',
             ],
         ]]);
     }
@@ -22,5 +22,4 @@ class AbsoluteRightsTest extends TestCase
     {
         $this->assertTrue(true);
     }
-
 }
