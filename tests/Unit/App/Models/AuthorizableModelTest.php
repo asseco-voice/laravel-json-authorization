@@ -15,10 +15,9 @@ class AuthorizableModelTest extends TestCase
         parent::setUp();
 
         config(['asseco-authorization.models_path' => [
-            __DIR__ . '/../../../' => 'Asseco\\JsonAuthorization\\Tests\\'
+            __DIR__ . '/../../../' => 'Asseco\\JsonAuthorization\\Tests\\',
         ]]);
     }
-
 
     /** @test */
     public function has_rules()
