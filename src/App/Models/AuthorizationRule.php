@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Asseco\JsonAuthorization\App\Models;
 
 use Asseco\JsonAuthorization\App\Traits\Cacheable;
+use Asseco\JsonAuthorization\Database\Factories\AuthorizationRuleFactory;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use JsonException;
@@ -13,7 +15,7 @@ use Throwable;
 
 class AuthorizationRule extends Model
 {
-    use Cacheable;
+    use Cacheable, HasFactory;
 
     // DB attributes
     public const MODEL_ID = 'authorizable_model_id';
@@ -22,6 +24,11 @@ class AuthorizationRule extends Model
     public const RULES = 'rules';
 
     protected $guarded = ['id', 'created_at', 'updated_at'];
+
+    protected static function newFactory()
+    {
+        return AuthorizationRuleFactory::new();
+    }
 
     public function model(): BelongsTo
     {
