@@ -12,7 +12,7 @@ class AuthorizationRuleSeeder extends Seeder
 {
     public function run(): void
     {
-        $role = config('asseco-authorization.universal_role');
+        $role = config('asseco-authorization.virtual_role');
 
         $authorizableModels = AuthorizableModel::all();
 

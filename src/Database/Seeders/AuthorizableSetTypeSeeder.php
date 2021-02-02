@@ -14,8 +14,8 @@ class AuthorizableSetTypeSeeder extends Seeder
     {
         $basicTypes = [
             [
-                'name'        => AuthorizableSetCollection::VIRTUAL_ROLE,
-                'description' => "Virtual role which doesn't and shouldn't exist in authentication service. Attached automatically to every user.",
+                'name'        => AuthorizableSetCollection::VIRTUAL_SET_TYPE,
+                'description' => 'Virtual set type attached automatically to every user.',
             ],
             [
                 'name'        => 'roles',

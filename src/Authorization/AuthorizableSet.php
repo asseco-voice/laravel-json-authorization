@@ -6,13 +6,16 @@ namespace Asseco\JsonAuthorization\Authorization;
 
 use Asseco\JsonAuthorization\App\Collections\AuthorizableSetCollection;
 use Asseco\JsonAuthorization\App\Contracts\AuthorizationInterface;
-use Asseco\JsonAuthorization\App\Models\AuthorizableSetType;
 use Asseco\JsonAuthorization\Exceptions\AuthorizationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class AuthorizableSet
 {
+    /**
+     * @return AuthorizableSetCollection
+     * @throws AuthorizationException
+     */
     public static function unresolvedRules(): AuthorizableSetCollection
     {
         $user = Auth::user();
@@ -24,14 +27,13 @@ class AuthorizableSet
         }
 
         if (!$user instanceof AuthorizationInterface) {
-            throw new AuthorizationException('User model must implement AuthorizesUsers interface.');
+            throw new AuthorizationException('User model must implement ' . AuthorizationInterface::class);
         }
 
-        $authorizableSetTypes = AuthorizableSetType::cached()->pluck('name');
-
         return self::getUserAuthorizableSets($user)
-            ->filterSupported($authorizableSetTypes)
-            ->appendVirtualRole($authorizableSetTypes)
+            ->filterByExistingTypes()
+            ->createVirtualRole()
+            ->appendVirtualRole()
             ->toAuthorizationRuleFormat();
     }
 
