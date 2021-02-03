@@ -117,6 +117,4 @@ class AuthorizationRuleTest extends TestCase
         $this->assertArrayHasKey('read', Arr::get($role1Rules, 'rules'));
         $this->assertArrayHasKey('write', Arr::get($role2Rules, 'rules'));
     }
-
-
 }
