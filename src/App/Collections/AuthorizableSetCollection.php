@@ -93,7 +93,7 @@ class AuthorizableSetCollection extends Collection
             }
 
             foreach (Arr::wrap($setValues) as $setValue) {
-                $formatted->push(AuthorizationRule::prepare($setTypeId, $setValue));
+                $formatted->push(AuthorizationRule::format($setTypeId, $setValue));
             }
         }
 

@@ -118,5 +118,20 @@ class AuthorizationRuleTest extends TestCase
         $this->assertArrayHasKey('write', Arr::get($role2Rules, 'rules'));
     }
 
+    /** @test */
+    public function formats_data_for_writing_to_cache()
+    {
+        $expected = [
+            'authorizable_set_type_id' => 1,
+            'authorizable_set_value'   => 'role1',
+            'rules'                    => [
+                'test' => 'test'
+            ],
+        ];
+
+        $actual = AuthorizationRule::format(1, 'role1', ['test' => 'test']);
+
+        $this->assertEquals($expected, $actual);
+    }
 
 }

@@ -175,14 +175,14 @@ class AuthorizationRule extends Model
     }
 
     /**
-     * Data preparation for pushing to collection which will ultimately end up in the cache in this format.
+     * Format input for pushing to collection which will ultimately end up in the cache in this format.
      *
-     * @param mixed $authorizableSetTypeId // TODO: type hint on PHP 8 when mixed arrives
+     * @param mixed $authorizableSetTypeId
      * @param string $authorizableSetValue
      * @param array $rules
      * @return array
      */
-    public static function prepare($authorizableSetTypeId, string $authorizableSetValue, array $rules = []): array
+    public static function format($authorizableSetTypeId, string $authorizableSetValue, array $rules = []): array
     {
         return [
             self::SET_TYPE_ID => $authorizableSetTypeId,
