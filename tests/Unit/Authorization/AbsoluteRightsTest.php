@@ -53,6 +53,4 @@ class AbsoluteRightsTest extends TestCase
 
         $this->assertTrue(AbsoluteRights::hasRole($authorizationRules));
     }
-
-
 }
