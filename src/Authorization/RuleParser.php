@@ -35,17 +35,6 @@ class RuleParser
         'eloquent.deleting' => self::DELETE_RIGHT,
     ];
 
-    protected AbsoluteRights $absoluteRights;
-
-    /**
-     * RightParser constructor.
-     * @param AbsoluteRights $absoluteRights
-     */
-    public function __construct(AbsoluteRights $absoluteRights)
-    {
-        $this->absoluteRights = $absoluteRights;
-    }
-
     /**
      * @param string $modelClass
      * @param string $right
@@ -63,7 +52,7 @@ class RuleParser
 
         $authorizationRules = AuthorizationRule::resolveRulesFor($modelClass);
 
-        if ($this->absoluteRights->check($authorizationRules)) {
+        if (AbsoluteRights::hasRole($authorizationRules)) {
             return [self::ABSOLUTE_RIGHTS];
         }
 

@@ -30,7 +30,7 @@ class UserAuthorizableSetTest extends TestCase
     }
 
     /** @test */
-    public function returns_unresolved_rules()
+    public function returns_prepared_rules()
     {
         $this->actingAs(new TestUser());
 
