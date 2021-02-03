@@ -15,7 +15,6 @@ class AbsoluteRights
         $absoluteRights = config('asseco-authorization.absolute_rights');
 
         foreach ($absoluteRights as $authorizableSetType => $authorizableSetValues) {
-
             $resolvedSetType = AuthorizableSetType::cached()->where('name', $authorizableSetType)->first();
             $setTypeId = Arr::get($resolvedSetType, 'id');
 
