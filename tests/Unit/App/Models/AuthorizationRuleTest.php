@@ -125,7 +125,7 @@ class AuthorizationRuleTest extends TestCase
             'authorizable_set_type_id' => 1,
             'authorizable_set_value'   => 'role1',
             'rules'                    => [
-                'test' => 'test'
+                'test' => 'test',
             ],
         ];
 
@@ -133,5 +133,4 @@ class AuthorizationRuleTest extends TestCase
 
         $this->assertEquals($expected, $actual);
     }
-
 }
