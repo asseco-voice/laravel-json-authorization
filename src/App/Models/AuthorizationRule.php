@@ -66,7 +66,7 @@ class AuthorizationRule extends Model
      * @return Collection
      * @throws Throwable
      */
-    public static function cachedBy(string $modelClass): Collection
+    public static function resolveRulesFor(string $modelClass): Collection
     {
         $formattedSets = UserAuthorizableSet::prepare();
 
