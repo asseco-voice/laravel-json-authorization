@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Arr;
 use JsonException;
 use Throwable;
 
@@ -67,15 +68,15 @@ class AuthorizationRule extends Model
      */
     public static function cachedBy(string $modelClass): Collection
     {
-        $formattedSet = UserAuthorizableSet::formatted();
+        $formattedSets = UserAuthorizableSet::prepare();
 
         $modelId = AuthorizableModel::getIdFor($modelClass);
 
         // Authorizable sets get reduced each iteration
-        $cached = self::getCached($formattedSet, $modelId);
-        $stored = self::getStored($formattedSet, $modelId);
+        $cached = self::getCached($formattedSets, $modelId);
+        $stored = self::getStored($formattedSets, $modelId);
 
-        $merged = array_merge_recursive($cached, $stored, $formattedSet->toArray());
+        $merged = array_merge_recursive($cached, $stored, $formattedSets->toArray());
 
         self::appendToCache($merged);
 
@@ -85,6 +86,7 @@ class AuthorizationRule extends Model
     protected static function getCached(Collection $authorizableSets, int $modelId): array
     {
         $rules = self::cached()->where(self::MODEL_ID, $modelId);
+
         self::cleanup($authorizableSets, $rules);
 
         return $rules->toArray();
@@ -102,23 +104,29 @@ class AuthorizationRule extends Model
             return [];
         }
 
-        $rules = AuthorizationRule::query()->where(self::MODEL_ID, $modelId)->where(function ($builder) use ($authorizableSets) {
-            foreach ($authorizableSets as $authorizableSet) {
-                // orWhere because authorizable set values are not unique. It is valid to have 'role xy' together with 'group xy'.
-                $builder
-                    ->orWhere(function ($builder) use ($authorizableSet) {
-                        // pair up ID's with values to get the unique pairs back
-                        // TODO: ovdje bi mi dobro došlo da su ipak grupirani...flatten (prepare) ili ne u onom collectionu?
-                        $builder
-                            ->where(self::SET_TYPE_ID, $authorizableSet[self::SET_TYPE_ID])
-                            ->where(self::SET_VALUE, $authorizableSet[self::SET_VALUE]);
-                    });
-            }
-        })->get([self::SET_TYPE_ID, self::SET_VALUE, self::RULES]);
+        $rules = self::getRulesForGivenModel($modelId, $authorizableSets);
 
         self::cleanup($authorizableSets, $rules);
 
         return self::decodeRules($rules->toArray());
+    }
+
+    protected static function getRulesForGivenModel(int $modelId, Collection $authorizableSets)
+    {
+        return AuthorizationRule::query()
+            ->where(self::MODEL_ID, $modelId)
+            ->where(function ($builder) use ($authorizableSets) {
+                foreach ($authorizableSets as $authorizableSet) {
+                    // orWhere because authorizable set values are not unique.
+                    // It is valid to have 'role xy' together with 'group xy'.
+                    $builder->orWhere(function ($builder) use ($authorizableSet) {
+                        // Pair up ID's with values to get the unique pairs back
+                        $builder
+                            ->where(self::SET_TYPE_ID, Arr::get($authorizableSet, self::SET_TYPE_ID))
+                            ->where(self::SET_VALUE, Arr::get($authorizableSet, self::SET_VALUE));
+                    });
+                }
+            })->get([self::SET_TYPE_ID, self::SET_VALUE, self::RULES]);
     }
 
     /**

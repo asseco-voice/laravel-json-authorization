@@ -14,9 +14,9 @@ class UserAuthorizableSetTest extends TestCase
     /** @test */
     public function returns_empty_set_if_not_logged_in()
     {
-        $authorizableSets = UserAuthorizableSet::formatted();
+        $prepared = UserAuthorizableSet::prepare();
 
-        $this->assertCount(0, $authorizableSets);
+        $this->assertCount(0, $prepared);
     }
 
     /** @test */
@@ -26,7 +26,7 @@ class UserAuthorizableSetTest extends TestCase
 
         $this->actingAs(new User());
 
-        UserAuthorizableSet::formatted();
+        UserAuthorizableSet::prepare();
     }
 
     /** @test */
@@ -65,6 +65,6 @@ class UserAuthorizableSetTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, UserAuthorizableSet::formatted()->toArray());
+        $this->assertEquals($expected, UserAuthorizableSet::prepare()->toArray());
     }
 }
