@@ -13,14 +13,21 @@
         "laravel/framework": "^8.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.0",
-        "mockery/mockery": "^1.3.1"
+        "phpunit/phpunit": "^9.4",
+        "mockery/mockery": "^1.3.1",
+        "fakerphp/faker": "^1.9.1",
+        "orchestra/testbench": "^6.0"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "Asseco\\JsonAuthorization\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Asseco\\JsonAuthorization\\Tests\\": "tests/"
         }
     },
     "extra": {
