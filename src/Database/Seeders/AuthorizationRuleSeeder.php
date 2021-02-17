@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Asseco\JsonAuthorization\Database\Seeds;
+namespace Asseco\JsonAuthorization\Database\Seeders;
 
 use Asseco\JsonAuthorization\App\Models\AuthorizableModel;
 use Asseco\JsonAuthorization\App\Models\AuthorizationRule;
@@ -12,7 +12,7 @@ class AuthorizationRuleSeeder extends Seeder
 {
     public function run(): void
     {
-        $role = config('asseco-authorization.universal_role');
+        $role = config('asseco-authorization.virtual_role');
 
         $authorizableModels = AuthorizableModel::all();
 

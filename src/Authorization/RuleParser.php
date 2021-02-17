@@ -6,6 +6,7 @@ namespace Asseco\JsonAuthorization\Authorization;
 
 use Asseco\JsonAuthorization\App\Models\AuthorizableModel;
 use Asseco\JsonAuthorization\App\Models\AuthorizationRule;
+use Asseco\JsonAuthorization\App\Traits\Authorizable;
 use Asseco\JsonAuthorization\Exceptions\AuthorizationException;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
@@ -34,17 +35,6 @@ class RuleParser
         'eloquent.deleting' => self::DELETE_RIGHT,
     ];
 
-    protected AbsoluteRights $absoluteRights;
-
-    /**
-     * RightParser constructor.
-     * @param AbsoluteRights $absoluteRights
-     */
-    public function __construct(AbsoluteRights $absoluteRights)
-    {
-        $this->absoluteRights = $absoluteRights;
-    }
-
     /**
      * @param string $modelClass
      * @param string $right
@@ -55,15 +45,14 @@ class RuleParser
     public function getRules(string $modelClass, string $right = self::READ_RIGHT): array
     {
         if (!AuthorizableModel::isAuthorizable($modelClass)) {
-            Log::info("[Authorization] Model '$modelClass' does not implement 'Asseco\JsonAuthorization\App\Traits\Authorizable' trait (or you forgot to flush the cache). Skipping authorization...");
+            Log::info("[Authorization] Model '$modelClass' does not implement " . Authorizable::class . 'trait (or you forgot to flush the cache). Skipping authorization...');
 
             return [self::ABSOLUTE_RIGHTS];
         }
 
-        $authorizableSets = AuthorizableSet::unresolvedRules();
-        $authorizationRules = AuthorizationRule::cachedBy($authorizableSets, $modelClass);
+        $authorizationRules = AuthorizationRule::resolveRulesFor($modelClass);
 
-        if ($this->absoluteRights->check($authorizationRules)) {
+        if (AbsoluteRights::hasRole($authorizationRules)) {
             return [self::ABSOLUTE_RIGHTS];
         }
 
@@ -125,8 +114,8 @@ class RuleParser
             return $mergedRules;
         }
 
-        $mergedRules = $this->initMergedRulesArrayKeys(self::SEARCH, $mergedRules, self::OR);
-        $mergedRules[self::SEARCH][self::OR][] = $rules[self::SEARCH];
+        $mergedRules = $this->initMergedRulesArrayKeys(self::SEARCH, $mergedRules, self:: OR);
+        $mergedRules[self::SEARCH][self:: OR][] = $rules[self::SEARCH];
 
         return $mergedRules;
     }

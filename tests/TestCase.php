@@ -11,6 +11,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     public function setUp(): void
     {
         parent::setUp();
+        $this->runLaravelMigrations();
     }
 
     protected function getPackageProviders($app)

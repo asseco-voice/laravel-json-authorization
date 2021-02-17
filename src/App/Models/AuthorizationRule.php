@@ -5,15 +5,19 @@ declare(strict_types=1);
 namespace Asseco\JsonAuthorization\App\Models;
 
 use Asseco\JsonAuthorization\App\Traits\Cacheable;
+use Asseco\JsonAuthorization\Authorization\UserAuthorizableSet;
+use Asseco\JsonAuthorization\Database\Factories\AuthorizationRuleFactory;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Arr;
 use JsonException;
 use Throwable;
 
 class AuthorizationRule extends Model
 {
-    use Cacheable;
+    use Cacheable, HasFactory;
 
     // DB attributes
     public const MODEL_ID = 'authorizable_model_id';
@@ -23,9 +27,18 @@ class AuthorizationRule extends Model
 
     protected $guarded = ['id', 'created_at', 'updated_at'];
 
-    public function model(): BelongsTo
+    protected static function newFactory()
     {
-        return $this->belongsTo(AuthorizableModel::class, self::MODEL_ID);
+        return AuthorizationRuleFactory::new();
+    }
+
+    /**
+     * Don't ever rename this to just 'model', it will conflict with Laravel.
+     * @return BelongsTo
+     */
+    public function authorizableModel(): BelongsTo
+    {
+        return $this->belongsTo(AuthorizableModel::class);
     }
 
     public function authorizableSetType(): BelongsTo
@@ -48,20 +61,22 @@ class AuthorizationRule extends Model
      * Retrieve what you can from the cache, go to the DB for rest.
      * Cache and return everything asked for (independently of whether search was a hit or not)
      * to prevent additional trips to the DB.
-     * @param Collection $authorizableSets
+     *
      * @param string $modelClass
      * @return Collection
      * @throws Throwable
      */
-    public static function cachedBy(Collection $authorizableSets, string $modelClass): Collection
+    public static function resolveRulesFor(string $modelClass): Collection
     {
+        $formattedSets = UserAuthorizableSet::prepare();
+
         $modelId = AuthorizableModel::getIdFor($modelClass);
 
         // Authorizable sets get reduced each iteration
-        $cached = self::getCached($authorizableSets, $modelId);
-        $stored = self::getStored($authorizableSets, $modelId);
+        $cached = self::getCached($formattedSets, $modelId);
+        $stored = self::getStored($formattedSets, $modelId);
 
-        $merged = array_merge_recursive($cached, $stored, $authorizableSets->toArray());
+        $merged = array_merge_recursive($cached, $stored, $formattedSets->toArray());
 
         self::appendToCache($merged);
 
@@ -71,6 +86,7 @@ class AuthorizationRule extends Model
     protected static function getCached(Collection $authorizableSets, int $modelId): array
     {
         $rules = self::cached()->where(self::MODEL_ID, $modelId);
+
         self::cleanup($authorizableSets, $rules);
 
         return $rules->toArray();
@@ -88,23 +104,29 @@ class AuthorizationRule extends Model
             return [];
         }
 
-        $rules = AuthorizationRule::query()->where(self::MODEL_ID, $modelId)->where(function ($builder) use ($authorizableSets) {
-            foreach ($authorizableSets as $authorizableSet) {
-                // orWhere because authorizable set values are not unique. It is valid to have 'role xy' together with 'group xy'.
-                $builder
-                    ->orWhere(function ($builder) use ($authorizableSet) {
-                        // pair up ID's with values to get the unique pairs back
-                        // TODO: ovdje bi mi dobro došlo da su ipak grupirani...flatten (prepare) ili ne u onom collectionu?
-                        $builder
-                            ->where(self::SET_TYPE_ID, $authorizableSet[self::SET_TYPE_ID])
-                            ->where(self::SET_VALUE, $authorizableSet[self::SET_VALUE]);
-                    });
-            }
-        })->get([self::SET_TYPE_ID, self::SET_VALUE, self::RULES]);
+        $rules = self::getRulesForGivenModel($modelId, $authorizableSets);
 
         self::cleanup($authorizableSets, $rules);
 
         return self::decodeRules($rules->toArray());
+    }
+
+    protected static function getRulesForGivenModel(int $modelId, Collection $authorizableSets)
+    {
+        return AuthorizationRule::query()
+            ->where(self::MODEL_ID, $modelId)
+            ->where(function ($builder) use ($authorizableSets) {
+                foreach ($authorizableSets as $authorizableSet) {
+                    // orWhere because authorizable set values are not unique.
+                    // It is valid to have 'role xy' together with 'group xy'.
+                    $builder->orWhere(function ($builder) use ($authorizableSet) {
+                        // Pair up ID's with values to get the unique pairs back
+                        $builder
+                            ->where(self::SET_TYPE_ID, Arr::get($authorizableSet, self::SET_TYPE_ID))
+                            ->where(self::SET_VALUE, Arr::get($authorizableSet, self::SET_VALUE));
+                    });
+                }
+            })->get([self::SET_TYPE_ID, self::SET_VALUE, self::RULES]);
     }
 
     /**
@@ -153,13 +175,14 @@ class AuthorizationRule extends Model
     }
 
     /**
-     * Data preparation for pushing to collection which will ultimately end up in the cache in this format.
-     * @param mixed $authorizableSetTypeId // TODO: type hint on PHP 8 when mixed arrives
+     * Format input for pushing to collection which will ultimately end up in the cache in this format.
+     *
+     * @param mixed $authorizableSetTypeId
      * @param string $authorizableSetValue
      * @param array $rules
      * @return array
      */
-    public static function prepare($authorizableSetTypeId, string $authorizableSetValue, array $rules = []): array
+    public static function format($authorizableSetTypeId, string $authorizableSetValue, array $rules = []): array
     {
         return [
             self::SET_TYPE_ID => $authorizableSetTypeId,

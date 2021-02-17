@@ -11,15 +11,26 @@ use Illuminate\Support\Arr;
 
 class AuthorizableSetCollection extends Collection
 {
-    const VIRTUAL_ROLE = 'virtual-role';
+    const VIRTUAL_SET_TYPE = 'virtual-set-type';
 
     /**
-     * Get collection of supported set types (authorizable_set_types table) and filter user set types to return only supported.
-     * @param \Illuminate\Support\Collection $authorizableSetTypes
+     * Filter collection based on existing authorizable set types.
+     *
+     * Having collection:
+     * 'roles' => [...],
+     * 'groups' => [...]
+     *
+     * And set types: ['roles']
+     *
+     * Resulting collection will be:
+     * 'roles' => [...]
+     *
      * @return $this|Collection
      */
-    public function filterSupported(\Illuminate\Support\Collection $authorizableSetTypes): Collection
+    public function filterByExistingTypes(): Collection
     {
+        $authorizableSetTypes = AuthorizableSetType::cached()->pluck('name');
+
         $keys = $this->keysToDelete($authorizableSetTypes);
         $this->forget($keys);
 
@@ -27,18 +38,36 @@ class AuthorizableSetCollection extends Collection
     }
 
     /**
-     * Append virtual role to already existing user set type collection.
-     * It will also create role in the DB (authorizable_set_types table) if it doesn't exist.
-     * @param \Illuminate\Support\Collection $authorizableSetTypes
+     * Create a virtual set type in DB if it doesn't already exist in authorizable set types.
+     *
      * @return $this|Collection
      */
-    public function appendVirtualRole(\Illuminate\Support\Collection $authorizableSetTypes): Collection
+    public function createVirtualRole(): Collection
     {
-        if (!$authorizableSetTypes->contains(self::VIRTUAL_ROLE)) {
-            $this->createVirtualRole();
+        $authorizableSetTypes = AuthorizableSetType::cached()->pluck('name');
+
+        if ($authorizableSetTypes->contains(self::VIRTUAL_SET_TYPE)) {
+            return $this;
         }
 
-        $this->put(self::VIRTUAL_ROLE, Arr::wrap(config('asseco-authorization.universal_role')));
+        AuthorizableSetType::query()->updateOrCreate(['name' => self::VIRTUAL_SET_TYPE],
+            [
+                'description' => 'Virtual set type attached automatically to every user.',
+            ]);
+
+        AuthorizableSetType::reCache();
+
+        return $this;
+    }
+
+    /**
+     * Append virtual role to a collection.
+     *
+     * @return $this|Collection
+     */
+    public function appendVirtualRole(): Collection
+    {
+        $this->put(self::VIRTUAL_SET_TYPE, Arr::wrap(config('asseco-authorization.virtual_role')));
 
         return $this;
     }
@@ -51,21 +80,24 @@ class AuthorizableSetCollection extends Collection
      */
     public function toAuthorizationRuleFormat(): AuthorizableSetCollection
     {
-        $prepared = new AuthorizableSetCollection();
+        $formatted = new AuthorizableSetCollection();
 
         $authorizableSets = $this->all();
         $setTypes = AuthorizableSetType::cached();
 
-        foreach ($authorizableSets as $authorizableSetType => $authorizableSetValues) {
-            $authorizableSetValues = Arr::wrap($authorizableSetValues);
-            $authorizableSetTypeId = $setTypes->firstWhere('name', $authorizableSetType)['id'];
+        foreach ($authorizableSets as $setType => $setValues) {
+            $setTypeId = Arr::get($setTypes->firstWhere('name', $setType), 'id');
 
-            foreach ($authorizableSetValues as $authorizableSetValue) {
-                $prepared->push(AuthorizationRule::prepare($authorizableSetTypeId, $authorizableSetValue));
+            if (!$setTypeId) {
+                continue;
+            }
+
+            foreach (Arr::wrap($setValues) as $setValue) {
+                $formatted->push(AuthorizationRule::format($setTypeId, $setValue));
             }
         }
 
-        return $prepared;
+        return $formatted;
     }
 
     protected function keysToDelete(\Illuminate\Support\Collection $authorizableSetTypes): array
@@ -73,15 +105,5 @@ class AuthorizableSetCollection extends Collection
         return $this->reject(function ($value, $key) use ($authorizableSetTypes) {
             return $authorizableSetTypes->contains($key);
         })->keys()->toArray();
-    }
-
-    protected function createVirtualRole(): void
-    {
-        AuthorizableSetType::query()->create([
-            'name'        => self::VIRTUAL_ROLE,
-            'description' => "Virtual role which doesn't and shouldn't exist in authentication service. Attached automatically to every user.",
-        ]);
-
-        AuthorizableSetType::reCache();
     }
 }

@@ -4,31 +4,28 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization\Authorization;
 
+use Asseco\JsonAuthorization\App\Models\AuthorizableSetType;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 
 class AbsoluteRights
 {
-    protected array $absoluteRights;
-
-    public function __construct()
+    public static function hasRole(Collection $authorizationRules): bool
     {
-        $this->absoluteRights = config('asseco-authorization.absolute_rights');
-    }
+        $absoluteRights = config('asseco-authorization.absolute_rights');
 
-    public function check(Collection $authorizationRules): bool
-    {
-        foreach ($this->absoluteRights as $absoluteRightType => $absoluteRightValues) {
-            $userRules = $authorizationRules->where('type', $absoluteRightType);
+        foreach ($absoluteRights as $authorizableSetType => $authorizableSetValues) {
+            $resolvedSetType = AuthorizableSetType::cached()->where('name', $authorizableSetType)->first();
+            $setTypeId = Arr::get($resolvedSetType, 'id');
+
+            $userRules = $authorizationRules->where('authorizable_set_type_id', $setTypeId);
 
             if ($userRules->isEmpty()) {
                 continue;
             }
 
-            $absoluteRightValues = Arr::wrap($absoluteRightValues);
-
-            foreach ($absoluteRightValues as $absoluteRightValue) {
-                if ($userRules->pluck('value')->contains($absoluteRightValue)) {
+            foreach (Arr::wrap($authorizableSetValues) as $authorizableSetValue) {
+                if ($userRules->pluck('authorizable_set_value')->contains($authorizableSetValue)) {
                     return true;
                 }
             }

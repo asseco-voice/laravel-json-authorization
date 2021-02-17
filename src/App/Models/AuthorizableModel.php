@@ -6,21 +6,28 @@ namespace Asseco\JsonAuthorization\App\Models;
 
 use Asseco\JsonAuthorization\App\Traits\Cacheable;
 use Asseco\JsonAuthorization\App\Traits\FindsTraits;
+use Asseco\JsonAuthorization\Database\Factories\AuthorizableModelFactory;
 use Asseco\JsonAuthorization\Exceptions\AuthorizationException;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Throwable;
 
 class AuthorizableModel extends Model
 {
-    use FindsTraits, Cacheable;
+    use FindsTraits, Cacheable, HasFactory;
 
     protected $fillable = ['name'];
 
+    protected static function newFactory()
+    {
+        return AuthorizableModelFactory::new();
+    }
+
     public function rules(): HasMany
     {
-        return $this->hasMany(AuthorizationRule::class, 'authorization_rule_id');
+        return $this->hasMany(AuthorizationRule::class);
     }
 
     protected static function cacheKey(): string

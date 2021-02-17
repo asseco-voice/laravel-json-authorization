@@ -225,16 +225,16 @@ In case you need some sort of admin available which has absolute rights to every
 [publish the configuration](#additional) and add it to the ``absolute_rights`` key, 
 and you will not need to give the explicit CRUD rights for it.
 
-#### Universal (virtual) role
+#### Virtual role
 
 If you have the need to protect resources globally or give the permission for a single resource to all users
-across the system, you can do so by utilizing universal (virtual) role. By default, that role is 
-``voice-all-mighty``, but can be overridden with `.env` value `UNIVERSAL_ROLE`.
+across the system, you can do so by utilizing a virtual role. By default, that role is 
+``voice-all-mighty``, but can be overridden with `.env` value `VIRTUAL_ROLE`.
 
-A universal role **MUST NOT** exist as a standard role within your auth service. It will conflict with this and
+A virtual role **MUST NOT** exist as a standard role within your auth service. It will conflict with this and
 will not work well.
 
-This works in a way that you will i.e. give a read right for some resource to **universal role** which will 
+This works in a way that you will i.e. give a read right for some resource to **virtual role** which will 
 then be inherited by all other users.
 
 Example:
