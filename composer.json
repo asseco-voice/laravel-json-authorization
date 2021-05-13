@@ -9,7 +9,7 @@
     "require": {
         "php": "^7.4 || ^8.0",
         "ext-json": "*",
-        "asseco-voice/laravel-json-query-builder": "dev-master",
+        "asseco-voice/laravel-json-query-builder": "~0.2",
         "laravel/framework": "^8.0"
     },
     "require-dev": {

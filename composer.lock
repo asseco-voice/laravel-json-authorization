@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "33420a0abbdbaa0b227ea926c9d7fb8b",
+    "content-hash": "776223a5644b9e7d4350ef2c595e3656",
     "packages": [
         {
             "name": "asseco-voice/laravel-json-query-builder",
-            "version": "dev-master",
+            "version": "v0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/asseco-voice/laravel-json-query-builder.git",
-                "reference": "22c57af41b400c47b9b2ba405559bed815cb36d6"
+                "reference": "e5a1a7717f48edaa69243be98f952cd5d3e9c85d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/asseco-voice/laravel-json-query-builder/zipball/22c57af41b400c47b9b2ba405559bed815cb36d6",
-                "reference": "22c57af41b400c47b9b2ba405559bed815cb36d6",
+                "url": "https://api.github.com/repos/asseco-voice/laravel-json-query-builder/zipball/e5a1a7717f48edaa69243be98f952cd5d3e9c85d",
+                "reference": "e5a1a7717f48edaa69243be98f952cd5d3e9c85d",
                 "shasum": ""
             },
             "require": {
@@ -30,7 +30,6 @@
                 "orchestra/testbench": "^6.0",
                 "phpunit/phpunit": "^9.0"
             },
-            "default-branch": true,
             "type": "library",
             "extra": {
                 "laravel": {
@@ -55,9 +54,9 @@
             ],
             "support": {
                 "issues": "https://github.com/asseco-voice/laravel-json-query-builder/issues",
-                "source": "https://github.com/asseco-voice/laravel-json-query-builder/tree/master"
+                "source": "https://github.com/asseco-voice/laravel-json-query-builder/tree/v0.2.0"
             },
-            "time": "2021-03-04T06:49:52+00:00"
+            "time": "2021-05-13T12:56:06+00:00"
         },
         {
             "name": "brick/math",
@@ -7185,9 +7184,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "asseco-voice/laravel-json-query-builder": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
