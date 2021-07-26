@@ -39,7 +39,7 @@ class JsonAuthorizationServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../config/asseco-authorization.php' => config_path('asseco-authorization.php'),
         ], 'asseco-authorization');
-        
+
         $override = config('asseco-authorization.override_authorization');
 
         if (!app()->runningInConsole() && !$override) {
