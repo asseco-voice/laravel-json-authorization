@@ -44,13 +44,19 @@ class RuleParser
      */
     public function getRules(string $modelClass, string $right = self::READ_RIGHT): array
     {
-        if (!AuthorizableModel::isAuthorizable($modelClass)) {
+        /** @var AuthorizableModel $authorizableModel */
+        $authorizableModel = config('asseco-authorization.authorizable_model');
+
+        if (!$authorizableModel::isAuthorizable($modelClass)) {
             Log::info("[Authorization] Model '$modelClass' does not implement " . Authorizable::class . 'trait (or you forgot to flush the cache). Skipping authorization...');
 
             return [self::ABSOLUTE_RIGHTS];
         }
 
-        $authorizationRules = AuthorizationRule::resolveRulesFor($modelClass);
+        /** @var AuthorizationRule $authorizationRule */
+        $authorizationRule = config('asseco-authorization.authorization_rule_model');
+
+        $authorizationRules = $authorizationRule::resolveRulesFor($modelClass);
 
         if (AbsoluteRights::hasRole($authorizationRules)) {
             return [self::ABSOLUTE_RIGHTS];

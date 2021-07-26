@@ -44,7 +44,7 @@ class AuthorizationRuleTest extends TestCase
             'authorizable_model_id' => $model->id,
         ]);
 
-        $this->assertEquals($model->name, $rule->authorizableModel->name);
+        $this->assertEquals($model->name, $rule->authorizableSetType->name);
     }
 
     /** @test */

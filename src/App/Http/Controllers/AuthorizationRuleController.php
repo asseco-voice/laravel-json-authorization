@@ -11,6 +11,15 @@ use Illuminate\Http\Request;
 
 class AuthorizationRuleController extends Controller
 {
+    public AuthorizationRule $authorizationRule;
+
+    public function __construct()
+    {
+        $model = config('asseco-authorization.authorization_rule_model');
+
+        $this->authorizationRule = new $model;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -18,7 +27,7 @@ class AuthorizationRuleController extends Controller
      */
     public function index(): JsonResponse
     {
-        return response()->json(AuthorizationRule::all());
+        return response()->json($this->authorizationRule::all());
     }
 
     /**
@@ -29,7 +38,7 @@ class AuthorizationRuleController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $authorizationRule = AuthorizationRule::query()->create($request->all());
+        $authorizationRule = $this->authorizationRule::query()->create($request->all());
 
         return response()->json($authorizationRule->refresh());
     }

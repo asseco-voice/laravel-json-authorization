@@ -27,7 +27,7 @@ class AuthorizableModel extends Model
 
     public function rules(): HasMany
     {
-        return $this->hasMany(AuthorizationRule::class);
+        return $this->hasMany(config('asseco-authorization.authorization_rule_model'));
     }
 
     protected static function cacheKey(): string
@@ -74,7 +74,10 @@ class AuthorizableModel extends Model
     protected static function deleteModelsWithoutTrait(array $deleteDiff): void
     {
         if ($deleteDiff) {
-            AuthorizableModel::query()->whereIn('name', $deleteDiff)->delete();
+            /** @var AuthorizableModel $model */
+            $model = config('asseco-authorization.authorizable_model');
+
+            $model::query()->whereIn('name', $deleteDiff)->delete();
         }
     }
 
@@ -85,7 +88,10 @@ class AuthorizableModel extends Model
         }, $insertDiff);
 
         if ($insertData) {
-            AuthorizableModel::query()->insert(array_values($insertData));
+            /** @var AuthorizableModel $model */
+            $model = config('asseco-authorization.authorizable_model');
+
+            $model::query()->insert(array_values($insertData));
         }
     }
 

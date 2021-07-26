@@ -38,12 +38,12 @@ class AuthorizationRule extends Model
      */
     public function authorizableModel(): BelongsTo
     {
-        return $this->belongsTo(AuthorizableModel::class);
+        return $this->belongsTo(config('asseco-authorization.authorizable_model'));
     }
 
     public function authorizableSetType(): BelongsTo
     {
-        return $this->belongsTo(AuthorizableSetType::class);
+        return $this->belongsTo(config('asseco-authorization.authorizable_set_type_model'));
     }
 
     protected static function cacheKey(): string
@@ -70,7 +70,10 @@ class AuthorizationRule extends Model
     {
         $formattedSets = UserAuthorizableSet::prepare();
 
-        $modelId = AuthorizableModel::getIdFor($modelClass);
+        /** @var AuthorizableModel $authorizableModel */
+        $authorizableModel = config('asseco-authorization.authorizable_model');
+
+        $modelId = $authorizableModel::getIdFor($modelClass);
 
         // Authorizable sets get reduced each iteration
         $cached = self::getCached($formattedSets, $modelId);
@@ -113,7 +116,10 @@ class AuthorizationRule extends Model
 
     protected static function getRulesForGivenModel(int $modelId, Collection $authorizableSets)
     {
-        return AuthorizationRule::query()
+        /** @var AuthorizationRule $model */
+        $model = config('asseco-authorization.authorization_rule_model');
+
+        return $model::query()
             ->where(self::MODEL_ID, $modelId)
             ->where(function ($builder) use ($authorizableSets) {
                 foreach ($authorizableSets as $authorizableSet) {
