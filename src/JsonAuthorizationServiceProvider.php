@@ -18,8 +18,12 @@ class JsonAuthorizationServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/asseco-authorization.php', 'asseco-authorization');
-        $this->loadMigrationsFrom(__DIR__ . '/../migrations');
         $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
+
+        if (config('asseco-authorization.runs_migrations')) {
+            $this->loadMigrationsFrom(__DIR__ . '/../migrations');
+        }
+
         $this->registerAuthorizationClasses();
     }
 
@@ -28,7 +32,13 @@ class JsonAuthorizationServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->publishes([__DIR__ . '/../config/asseco-authorization.php' => config_path('asseco-authorization.php')]);
+        $this->publishes([
+            __DIR__ . '/../migrations' => database_path('migrations'),
+        ], 'asseco-authorization');
+
+        $this->publishes([
+            __DIR__ . '/../config/asseco-authorization.php' => config_path('asseco-authorization.php'),
+        ], 'asseco-authorization');
 
         $override = config('asseco-authorization.override_authorization');
 

@@ -9,6 +9,15 @@ use Illuminate\Http\JsonResponse;
 
 class AuthorizableModelController extends Controller
 {
+    public AuthorizableModel $authorizableModel;
+
+    public function __construct()
+    {
+        $model = config('asseco-authorization.authorizable_model');
+
+        $this->authorizableModel = new $model;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -16,7 +25,7 @@ class AuthorizableModelController extends Controller
      */
     public function index(): JsonResponse
     {
-        return response()->json(AuthorizableModel::all());
+        return response()->json($this->authorizableModel::all());
     }
 
     /**

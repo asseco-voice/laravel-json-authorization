@@ -23,7 +23,7 @@ class AuthorizableSetType extends Model
 
     public function rules(): HasMany
     {
-        return $this->hasMany(AuthorizationRule::class, 'authorizable_set_type_id');
+        return $this->hasMany(config('asseco-authorization.authorization_rule_model'), 'authorizable_set_type_id');
     }
 
     protected static function cacheKey(): string

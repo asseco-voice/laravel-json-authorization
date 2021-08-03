@@ -13,6 +13,20 @@ class AuthorizableSetCollection extends Collection
 {
     const VIRTUAL_SET_TYPE = 'virtual-set-type';
 
+    public AuthorizableSetType $authorizableSetType;
+    public AuthorizationRule $authorizationRule;
+
+    public function __construct($items = [])
+    {
+        parent::__construct($items);
+
+        $authorizableSetType = config('asseco-authorization.authorizable_set_type_model');
+        $this->authorizableSetType = new $authorizableSetType;
+
+        $authorizationRule = config('asseco-authorization.authorization_rule_model');
+        $this->authorizationRule = new $authorizationRule;
+    }
+
     /**
      * Filter collection based on existing authorizable set types.
      *
@@ -29,7 +43,7 @@ class AuthorizableSetCollection extends Collection
      */
     public function filterByExistingTypes(): Collection
     {
-        $authorizableSetTypes = AuthorizableSetType::cached()->pluck('name');
+        $authorizableSetTypes = $this->authorizableSetType::cached()->pluck('name');
 
         $keys = $this->keysToDelete($authorizableSetTypes);
         $this->forget($keys);
@@ -44,18 +58,18 @@ class AuthorizableSetCollection extends Collection
      */
     public function createVirtualRole(): Collection
     {
-        $authorizableSetTypes = AuthorizableSetType::cached()->pluck('name');
+        $authorizableSetTypes = $this->authorizableSetType::cached()->pluck('name');
 
         if ($authorizableSetTypes->contains(self::VIRTUAL_SET_TYPE)) {
             return $this;
         }
 
-        AuthorizableSetType::query()->updateOrCreate(['name' => self::VIRTUAL_SET_TYPE],
-            [
+        $this->authorizableSetType::query()
+            ->updateOrCreate(['name' => self::VIRTUAL_SET_TYPE], [
                 'description' => 'Virtual set type attached automatically to every user.',
             ]);
 
-        AuthorizableSetType::reCache();
+        $this->authorizableSetType::reCache();
 
         return $this;
     }
@@ -83,7 +97,7 @@ class AuthorizableSetCollection extends Collection
         $formatted = new AuthorizableSetCollection();
 
         $authorizableSets = $this->all();
-        $setTypes = AuthorizableSetType::cached();
+        $setTypes = $this->authorizableSetType::cached();
 
         foreach ($authorizableSets as $setType => $setValues) {
             $setTypeId = Arr::get($setTypes->firstWhere('name', $setType), 'id');
@@ -93,7 +107,7 @@ class AuthorizableSetCollection extends Collection
             }
 
             foreach (Arr::wrap($setValues) as $setValue) {
-                $formatted->push(AuthorizationRule::format($setTypeId, $setValue));
+                $formatted->push($this->authorizationRule::format($setTypeId, $setValue));
             }
         }
 

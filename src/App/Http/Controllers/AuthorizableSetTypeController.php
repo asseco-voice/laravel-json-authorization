@@ -11,6 +11,15 @@ use Illuminate\Http\Request;
 
 class AuthorizableSetTypeController extends Controller
 {
+    public AuthorizableSetType $authorizableSetType;
+
+    public function __construct()
+    {
+        $model = config('asseco-authorization.authorizable_set_type_model');
+
+        $this->authorizableSetType = new $model;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -18,7 +27,7 @@ class AuthorizableSetTypeController extends Controller
      */
     public function index(): JsonResponse
     {
-        return response()->json(AuthorizableSetType::all());
+        return response()->json($this->authorizableSetType::all());
     }
 
     /**
@@ -29,7 +38,7 @@ class AuthorizableSetTypeController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $authorizableSetType = AuthorizableSetType::query()->create($request->all());
+        $authorizableSetType = $this->authorizableSetType::query()->create($request->all());
 
         return response()->json($authorizableSetType->refresh());
     }
