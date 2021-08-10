@@ -15,7 +15,7 @@ class AuthorizationRuleTest extends TestCase
     protected AuthorizableModel $authorizableModel;
     protected AuthorizableSetType $authorizableSetType;
     protected AuthorizationRule $authorizationRule;
-    
+
     public function setUp(): void
     {
         parent::setUp();

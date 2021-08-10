@@ -60,7 +60,7 @@ class JsonAuthorizationServiceProvider extends ServiceProvider
         $this->commands([
             SyncAuthorizableModels::class,
         ]);
-     }
+    }
 
     protected function registerAuthorizationClasses(): void
     {

@@ -12,7 +12,7 @@ class AuthorizableModelTest extends TestCase
 {
     protected AuthorizableModel $authorizableModel;
     protected AuthorizationRule $authorizationRule;
-    
+
     public function setUp(): void
     {
         parent::setUp();
