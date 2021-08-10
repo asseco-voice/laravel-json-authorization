@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization\App\Collections;
 
-use Asseco\JsonAuthorization\App\Models\AuthorizableSetType;
-use Asseco\JsonAuthorization\App\Models\AuthorizationRule;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizableSetType;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizationRule;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 
@@ -20,11 +20,8 @@ class AuthorizableSetCollection extends Collection
     {
         parent::__construct($items);
 
-        $authorizableSetType = config('asseco-authorization.authorizable_set_type_model');
-        $this->authorizableSetType = new $authorizableSetType;
-
-        $authorizationRule = config('asseco-authorization.authorization_rule_model');
-        $this->authorizationRule = new $authorizationRule;
+        $this->authorizableSetType = app(AuthorizableSetType::class);
+        $this->authorizationRule = app(AuthorizationRule::class);
     }
 
     /**

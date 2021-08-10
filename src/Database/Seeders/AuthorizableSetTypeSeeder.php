@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace Asseco\JsonAuthorization\Database\Seeders;
 
 use Asseco\JsonAuthorization\App\Collections\AuthorizableSetCollection;
-use Asseco\JsonAuthorization\App\Models\AuthorizableSetType;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizableSetType;
 use Illuminate\Database\Seeder;
 
 class AuthorizableSetTypeSeeder extends Seeder
 {
     public function run(): void
     {
+        /** @var AuthorizableSetType $authorizableSetType */
+        $authorizableSetType = app(AuthorizableSetType::class);
+
         $basicTypes = [
             [
                 'name'        => AuthorizableSetCollection::VIRTUAL_SET_TYPE,
@@ -31,6 +34,6 @@ class AuthorizableSetTypeSeeder extends Seeder
             ],
         ];
 
-        AuthorizableSetType::query()->upsert($basicTypes, 'name');
+        $authorizableSetType::query()->upsert($basicTypes, 'name');
     }
 }

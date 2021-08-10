@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization\Authorization;
 
-use Asseco\JsonAuthorization\App\Models\AuthorizableModel;
-use Asseco\JsonAuthorization\App\Models\AuthorizationRule;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizableModel;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizationRule;
 use Asseco\JsonAuthorization\App\Traits\Authorizable;
 use Asseco\JsonAuthorization\Exceptions\AuthorizationException;
 use Exception;
@@ -45,7 +45,7 @@ class RuleParser
     public function getRules(string $modelClass, string $right = self::READ_RIGHT): array
     {
         /** @var AuthorizableModel $authorizableModel */
-        $authorizableModel = config('asseco-authorization.authorizable_model');
+        $authorizableModel = app(AuthorizableModel::class);
 
         if (!$authorizableModel::isAuthorizable($modelClass)) {
             Log::info("[Authorization] Model '$modelClass' does not implement " . Authorizable::class . 'trait (or you forgot to flush the cache). Skipping authorization...');
@@ -54,7 +54,7 @@ class RuleParser
         }
 
         /** @var AuthorizationRule $authorizationRule */
-        $authorizationRule = config('asseco-authorization.authorization_rule_model');
+        $authorizationRule = app(AuthorizationRule::class);
 
         $authorizationRules = $authorizationRule::resolveRulesFor($modelClass);
 

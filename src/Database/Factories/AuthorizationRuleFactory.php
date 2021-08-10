@@ -9,12 +9,10 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class AuthorizationRuleFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = AuthorizationRule::class;
+    public function modelName()
+    {
+        return config('asseco-authorization.models.authorization_rule');
+    }
 
     /**
      * Define the model's default state.

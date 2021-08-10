@@ -4,22 +4,27 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization\Database\Seeders;
 
-use Asseco\JsonAuthorization\App\Models\AuthorizableModel;
-use Asseco\JsonAuthorization\App\Models\AuthorizationRule;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizableModel;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizationRule;
 use Illuminate\Database\Seeder;
 
 class AuthorizationRuleSeeder extends Seeder
 {
     public function run(): void
     {
+        /** @var AuthorizableModel $authorizableModelClass */
+        $authorizableModelClass = app(AuthorizableModel::class);
+        /** @var AuthorizationRule $authorizationRule */
+        $authorizationRule = app(AuthorizationRule::class);
+
         $role = config('asseco-authorization.virtual_role');
 
-        $authorizableModels = AuthorizableModel::all();
+        $authorizableModels = $authorizableModelClass::all();
 
         foreach ($authorizableModels as $authorizableModel) {
             $rules = $this->generateRules();
 
-            AuthorizationRule::query()->create([
+            $authorizationRule::query()->create([
                 'authorizable_set_type_id' => 1,
                 'authorizable_set_value'   => $role,
                 'authorizable_model_id'    => $authorizableModel->id,

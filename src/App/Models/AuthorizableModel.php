@@ -13,8 +13,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Throwable;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizationRule;
 
-class AuthorizableModel extends Model
+class AuthorizableModel extends Model implements \Asseco\JsonAuthorization\App\Contracts\AuthorizableModel
 {
     use FindsTraits, Cacheable, HasFactory;
 
@@ -27,7 +28,7 @@ class AuthorizableModel extends Model
 
     public function rules(): HasMany
     {
-        return $this->hasMany(config('asseco-authorization.authorization_rule_model'));
+        return $this->hasMany(get_class(app(AuthorizationRule::class)));
     }
 
     protected static function cacheKey(): string
@@ -74,10 +75,7 @@ class AuthorizableModel extends Model
     protected static function deleteModelsWithoutTrait(array $deleteDiff): void
     {
         if ($deleteDiff) {
-            /** @var AuthorizableModel $model */
-            $model = config('asseco-authorization.authorizable_model');
-
-            $model::query()->whereIn('name', $deleteDiff)->delete();
+            self::query()->whereIn('name', $deleteDiff)->delete();
         }
     }
 
@@ -88,10 +86,7 @@ class AuthorizableModel extends Model
         }, $insertDiff);
 
         if ($insertData) {
-            /** @var AuthorizableModel $model */
-            $model = config('asseco-authorization.authorizable_model');
-
-            $model::query()->insert(array_values($insertData));
+            self::query()->insert(array_values($insertData));
         }
     }
 

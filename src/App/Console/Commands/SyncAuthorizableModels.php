@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization\App\Console\Commands;
 
-use Asseco\JsonAuthorization\App\Models\AuthorizableModel;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizableModel;
 use Illuminate\Console\Command;
 
 class SyncAuthorizableModels extends Command
@@ -30,7 +30,10 @@ class SyncAuthorizableModels extends Command
      */
     public function handle(): void
     {
-        AuthorizableModel::reCache();
+        /** @var AuthorizableModel $authorizableModel */
+        $authorizableModel = app(AuthorizableModel::class);
+
+        $authorizableModel::reCache();
 
         $this->info('Sync completed.');
     }

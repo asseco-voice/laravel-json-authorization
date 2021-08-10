@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization\Authorization;
 
-use Asseco\JsonAuthorization\App\Models\AuthorizableSetType;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizableSetType;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 
@@ -17,7 +17,7 @@ class AbsoluteRights
         foreach ($absoluteRights as $authorizableSetType => $authorizableSetValues) {
 
             /** @var AuthorizableSetType $authorizableSetTypeModel */
-            $authorizableSetTypeModel = config('asseco-authorization.authorizable_set_type_model');
+            $authorizableSetTypeModel = app(AuthorizableSetType::class);
 
             $resolvedSetType = $authorizableSetTypeModel::cached()->where('name', $authorizableSetType)->first();
             $setTypeId = Arr::get($resolvedSetType, 'id');
