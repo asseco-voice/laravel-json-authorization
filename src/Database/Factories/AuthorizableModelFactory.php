@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization\Database\Factories;
 
-use Asseco\JsonAuthorization\App\Models\AuthorizableModel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class AuthorizableModelFactory extends Factory

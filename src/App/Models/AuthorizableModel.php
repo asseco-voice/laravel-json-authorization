@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization\App\Models;
 
+use Asseco\JsonAuthorization\App\Contracts\AuthorizationRule;
 use Asseco\JsonAuthorization\App\Traits\Cacheable;
 use Asseco\JsonAuthorization\App\Traits\FindsTraits;
 use Asseco\JsonAuthorization\Database\Factories\AuthorizableModelFactory;
@@ -13,7 +14,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Throwable;
-use Asseco\JsonAuthorization\App\Contracts\AuthorizationRule;
 
 class AuthorizableModel extends Model implements \Asseco\JsonAuthorization\App\Contracts\AuthorizableModel
 {
