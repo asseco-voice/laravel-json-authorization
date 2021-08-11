@@ -306,12 +306,12 @@ which will in start limit the possible output to 1, 2, 3, 4 and 5 effectively sa
 update IDs 1, 3, 4, and 5. Others are forbidden through an imposed read right.
 - since delete option is omitted, you have no right for deleting any contact
 
-## Additional
+# Extending the package & other
+
+Publishing the configuration will enable you to change package models as
+well as controlling how migrations behave. If extending the model, make sure
+you're extending the original model in your implementation.
 
 For dev purposes, you can disable authorization completely by adding this to your ``.env`` file:
 
     OVERRIDE_AUTHORIZATION=true
-
-Publish and override the configuration for the package:
-
-    php artisan vendor:publish --provider="Asseco\JsonAuthorization\JsonAuthorizationServiceProvider"
