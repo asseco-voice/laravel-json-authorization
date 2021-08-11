@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization\App\Http\Controllers;
 
-use Asseco\JsonAuthorization\App\Models\AuthorizableSetType;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizableSetType;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,11 +13,9 @@ class AuthorizableSetTypeController extends Controller
 {
     public AuthorizableSetType $authorizableSetType;
 
-    public function __construct()
+    public function __construct(AuthorizableSetType $authorizableSetType)
     {
-        $model = config('asseco-authorization.authorizable_set_type_model');
-
-        $this->authorizableSetType = new $model;
+        $this->authorizableSetType = $authorizableSetType;
     }
 
     /**

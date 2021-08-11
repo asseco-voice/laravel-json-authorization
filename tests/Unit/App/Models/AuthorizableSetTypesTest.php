@@ -2,18 +2,29 @@
 
 namespace Asseco\JsonAuthorization\Tests\Unit\Authorization;
 
-use Asseco\JsonAuthorization\App\Models\AuthorizableSetType;
-use Asseco\JsonAuthorization\App\Models\AuthorizationRule;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizableSetType;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizationRule;
 use Asseco\JsonAuthorization\Tests\TestCase;
 
 class AuthorizableSetTypesTest extends TestCase
 {
+    protected AuthorizableSetType $authorizableSetType;
+    protected AuthorizationRule $authorizationRule;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->authorizableSetType = app(AuthorizableSetType::class);
+        $this->authorizationRule = app(AuthorizationRule::class);
+    }
+
     /** @test */
     public function has_rules()
     {
-        $setType = AuthorizableSetType::factory()->create();
+        $setType = $this->authorizableSetType::factory()->create();
 
-        AuthorizationRule::factory()->count(5)->create([
+        $this->authorizationRule::factory()->count(5)->create([
             'authorizable_set_type_id' => $setType->id,
         ]);
 

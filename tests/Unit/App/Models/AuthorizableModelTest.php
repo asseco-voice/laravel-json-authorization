@@ -2,14 +2,17 @@
 
 namespace Asseco\JsonAuthorization\Tests\Unit\Authorization;
 
-use Asseco\JsonAuthorization\App\Models\AuthorizableModel;
-use Asseco\JsonAuthorization\App\Models\AuthorizationRule;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizableModel;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizationRule;
 use Asseco\JsonAuthorization\Tests\TestCase;
 use Asseco\JsonAuthorization\Tests\TestUser;
 use Exception;
 
 class AuthorizableModelTest extends TestCase
 {
+    protected AuthorizableModel $authorizableModel;
+    protected AuthorizationRule $authorizationRule;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -17,6 +20,9 @@ class AuthorizableModelTest extends TestCase
         config(['asseco-authorization.models_path' => [
             __DIR__ . '/../../../' => 'Asseco\\JsonAuthorization\\Tests\\',
         ]]);
+
+        $this->authorizableModel = app(AuthorizableModel::class);
+        $this->authorizationRule = app(AuthorizationRule::class);
     }
 
     /** @test */
@@ -28,11 +34,11 @@ class AuthorizableModelTest extends TestCase
         // always re-scan models and write to DB only models which actually do have
         // the trait, ignoring others.
 
-        AuthorizableModel::factory()->create();
-        AuthorizableModel::factory()->create(['name' => 'SomeOther::class']);
-        AuthorizableModel::factory()->count(5)->create();
+        $this->authorizableModel::factory()->create();
+        $this->authorizableModel::factory()->create(['name' => 'SomeOther::class']);
+        $this->authorizableModel::factory()->count(5)->create();
 
-        $this->assertCount(1, AuthorizableModel::all());
+        $this->assertCount(1, $this->authorizableModel::all());
     }
 
     /** @test */
@@ -40,19 +46,19 @@ class AuthorizableModelTest extends TestCase
     {
         config(['asseco-authorization.models_path' => []]);
 
-        AuthorizableModel::factory()->create([
+        $this->authorizableModel::factory()->create([
             'name' => TestUser::class,
         ]);
 
-        $this->assertCount(0, AuthorizableModel::all());
+        $this->assertCount(0, $this->authorizableModel::all());
     }
 
     /** @test */
     public function has_rules()
     {
-        $model = AuthorizableModel::factory()->create();
+        $model = $this->authorizableModel::factory()->create();
 
-        AuthorizationRule::factory()->count(5)->create([
+        $this->authorizationRule::factory()->count(5)->create([
             'authorizable_model_id' => $model->id,
         ]);
 
@@ -62,14 +68,14 @@ class AuthorizableModelTest extends TestCase
     /** @test */
     public function checks_if_model_is_authorizable()
     {
-        $this->assertTrue(AuthorizableModel::isAuthorizable(TestUser::class));
-        $this->assertFalse(AuthorizableModel::isAuthorizable('SomeOther::class'));
+        $this->assertTrue($this->authorizableModel::isAuthorizable(TestUser::class));
+        $this->assertFalse($this->authorizableModel::isAuthorizable('SomeOther::class'));
     }
 
     /** @test */
     public function returns_id_of_authorizable_models()
     {
-        $this->assertEquals(1, AuthorizableModel::getIdFor(TestUser::class));
+        $this->assertEquals(1, $this->authorizableModel::getIdFor(TestUser::class));
     }
 
     /** @test */
@@ -77,6 +83,6 @@ class AuthorizableModelTest extends TestCase
     {
         $this->expectException(Exception::class);
 
-        AuthorizableModel::getIdFor('SomeOther::class');
+        $this->authorizableModel::getIdFor('SomeOther::class');
     }
 }

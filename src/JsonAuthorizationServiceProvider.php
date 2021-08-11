@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Asseco\JsonAuthorization;
 
 use Asseco\JsonAuthorization\App\Console\Commands\SyncAuthorizableModels;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizableModel;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizableSetType;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizationRule;
 use Asseco\JsonAuthorization\Authorization\AbsoluteRights;
 use Asseco\JsonAuthorization\Authorization\EloquentEvents;
 use Asseco\JsonAuthorization\Authorization\RuleParser;
@@ -20,11 +23,9 @@ class JsonAuthorizationServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/../config/asseco-authorization.php', 'asseco-authorization');
         $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
 
-        if (config('asseco-authorization.runs_migrations')) {
+        if (config('asseco-authorization.migrations.run')) {
             $this->loadMigrationsFrom(__DIR__ . '/../migrations');
         }
-
-        $this->registerAuthorizationClasses();
     }
 
     /**
@@ -39,6 +40,12 @@ class JsonAuthorizationServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../config/asseco-authorization.php' => config_path('asseco-authorization.php'),
         ], 'asseco-authorization');
+
+        $this->app->bind(AuthorizableModel::class, config('asseco-authorization.models.authorizable_model'));
+        $this->app->bind(AuthorizableSetType::class, config('asseco-authorization.models.authorizable_set_type'));
+        $this->app->bind(AuthorizationRule::class, config('asseco-authorization.models.authorization_rule'));
+
+        $this->registerAuthorizationClasses();
 
         $override = config('asseco-authorization.override_authorization');
 
@@ -57,8 +64,8 @@ class JsonAuthorizationServiceProvider extends ServiceProvider
 
     protected function registerAuthorizationClasses(): void
     {
-        app()->singleton(AbsoluteRights::class);
-        app()->singleton(RuleParser::class);
-        app()->singleton(EloquentEvents::class);
+        $this->app->singleton(AbsoluteRights::class);
+        $this->app->singleton(RuleParser::class);
+        $this->app->singleton(EloquentEvents::class);
     }
 }

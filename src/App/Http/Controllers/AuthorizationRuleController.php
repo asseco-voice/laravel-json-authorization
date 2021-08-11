@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization\App\Http\Controllers;
 
-use Asseco\JsonAuthorization\App\Models\AuthorizationRule;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizationRule;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,11 +13,9 @@ class AuthorizationRuleController extends Controller
 {
     public AuthorizationRule $authorizationRule;
 
-    public function __construct()
+    public function __construct(AuthorizationRule $authorizationRule)
     {
-        $model = config('asseco-authorization.authorization_rule_model');
-
-        $this->authorizationRule = new $model;
+        $this->authorizationRule = $authorizationRule;
     }
 
     /**

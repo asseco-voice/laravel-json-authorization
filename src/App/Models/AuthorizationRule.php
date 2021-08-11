@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization\App\Models;
 
+use Asseco\JsonAuthorization\App\Contracts\AuthorizableModel;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizableSetType;
 use Asseco\JsonAuthorization\App\Traits\Cacheable;
 use Asseco\JsonAuthorization\Authorization\UserAuthorizableSet;
 use Asseco\JsonAuthorization\Database\Factories\AuthorizationRuleFactory;
@@ -15,7 +17,7 @@ use Illuminate\Support\Arr;
 use JsonException;
 use Throwable;
 
-class AuthorizationRule extends Model
+class AuthorizationRule extends Model implements \Asseco\JsonAuthorization\App\Contracts\AuthorizationRule
 {
     use Cacheable, HasFactory;
 
@@ -38,12 +40,12 @@ class AuthorizationRule extends Model
      */
     public function authorizableModel(): BelongsTo
     {
-        return $this->belongsTo(config('asseco-authorization.authorizable_model'));
+        return $this->belongsTo(get_class(app(AuthorizableModel::class)));
     }
 
     public function authorizableSetType(): BelongsTo
     {
-        return $this->belongsTo(config('asseco-authorization.authorizable_set_type_model'));
+        return $this->belongsTo(get_class(app(AuthorizableSetType::class)));
     }
 
     protected static function cacheKey(): string
@@ -71,7 +73,7 @@ class AuthorizationRule extends Model
         $formattedSets = UserAuthorizableSet::prepare();
 
         /** @var AuthorizableModel $authorizableModel */
-        $authorizableModel = config('asseco-authorization.authorizable_model');
+        $authorizableModel = app(AuthorizableModel::class);
 
         $modelId = $authorizableModel::getIdFor($modelClass);
 
@@ -116,10 +118,7 @@ class AuthorizationRule extends Model
 
     protected static function getRulesForGivenModel(int $modelId, Collection $authorizableSets)
     {
-        /** @var AuthorizationRule $model */
-        $model = config('asseco-authorization.authorization_rule_model');
-
-        return $model::query()
+        return self::query()
             ->where(self::MODEL_ID, $modelId)
             ->where(function ($builder) use ($authorizableSets) {
                 foreach ($authorizableSets as $authorizableSet) {

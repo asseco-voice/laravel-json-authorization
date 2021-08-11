@@ -2,15 +2,19 @@
 
 namespace Asseco\JsonAuthorization\Tests\Unit\Authorization;
 
-use Asseco\JsonAuthorization\App\Models\AuthorizableModel;
-use Asseco\JsonAuthorization\App\Models\AuthorizableSetType;
-use Asseco\JsonAuthorization\App\Models\AuthorizationRule;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizableModel;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizableSetType;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizationRule;
 use Asseco\JsonAuthorization\Authorization\AbsoluteRights;
 use Asseco\JsonAuthorization\Tests\TestCase;
 use Asseco\JsonAuthorization\Tests\TestUser;
 
 class AbsoluteRightsTest extends TestCase
 {
+    protected AuthorizableModel $authorizableModel;
+    protected AuthorizableSetType $authorizableSetType;
+    protected AuthorizationRule $authorizationRule;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -18,6 +22,10 @@ class AbsoluteRightsTest extends TestCase
         config(['asseco-authorization.models_path' => [
             __DIR__ . '/../../' => 'Asseco\\JsonAuthorization\\Tests\\',
         ]]);
+
+        $this->authorizableModel = app(AuthorizableModel::class);
+        $this->authorizableSetType = app(AuthorizableSetType::class);
+        $this->authorizationRule = app(AuthorizationRule::class);
     }
 
     /** @test */
@@ -25,10 +33,10 @@ class AbsoluteRightsTest extends TestCase
     {
         $this->actingAs(new TestUser());
 
-        AuthorizableModel::factory()->create();
-        AuthorizableSetType::factory()->create(['name' => 'roles']);
+        $this->authorizableModel::factory()->create();
+        $this->authorizableSetType::factory()->create(['name' => 'roles']);
 
-        $authorizationRules = AuthorizationRule::resolveRulesFor(TestUser::class);
+        $authorizationRules = $this->authorizationRule::resolveRulesFor(TestUser::class);
 
         $this->assertFalse(AbsoluteRights::hasRole($authorizationRules));
     }
@@ -46,10 +54,10 @@ class AbsoluteRightsTest extends TestCase
 
         $this->actingAs(new TestUser());
 
-        AuthorizableModel::factory()->create();
-        AuthorizableSetType::factory()->create(['name' => 'roles']);
+        $this->authorizableModel::factory()->create();
+        $this->authorizableSetType::factory()->create(['name' => 'roles']);
 
-        $authorizationRules = AuthorizationRule::resolveRulesFor(TestUser::class);
+        $authorizationRules = $this->authorizationRule::resolveRulesFor(TestUser::class);
 
         $this->assertTrue(AbsoluteRights::hasRole($authorizationRules));
     }

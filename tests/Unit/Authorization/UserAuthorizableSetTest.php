@@ -2,7 +2,7 @@
 
 namespace Asseco\JsonAuthorization\Tests\Unit\Authorization;
 
-use Asseco\JsonAuthorization\App\Models\AuthorizableSetType;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizableSetType;
 use Asseco\JsonAuthorization\Authorization\UserAuthorizableSet;
 use Asseco\JsonAuthorization\Tests\TestCase;
 use Asseco\JsonAuthorization\Tests\TestUser;
@@ -11,6 +11,15 @@ use Illuminate\Foundation\Auth\User;
 
 class UserAuthorizableSetTest extends TestCase
 {
+    protected AuthorizableSetType $authorizableSetType;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->authorizableSetType = app(AuthorizableSetType::class);
+    }
+
     /** @test */
     public function returns_empty_set_if_not_logged_in()
     {
@@ -34,8 +43,8 @@ class UserAuthorizableSetTest extends TestCase
     {
         $this->actingAs(new TestUser());
 
-        $roleType = AuthorizableSetType::factory()->create(['name' => 'roles']);
-        $groupType = AuthorizableSetType::factory()->create(['name' => 'groups']);
+        $roleType = $this->authorizableSetType::factory()->create(['name' => 'roles']);
+        $groupType = $this->authorizableSetType::factory()->create(['name' => 'groups']);
 
         $expected = [
             [

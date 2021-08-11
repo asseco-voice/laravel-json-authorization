@@ -4,17 +4,14 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization\Database\Factories;
 
-use Asseco\JsonAuthorization\App\Models\AuthorizableSetType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class AuthorizableSetTypeFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = AuthorizableSetType::class;
+    public function modelName()
+    {
+        return config('asseco-authorization.models.authorizable_set_type');
+    }
 
     /**
      * Define the model's default state.

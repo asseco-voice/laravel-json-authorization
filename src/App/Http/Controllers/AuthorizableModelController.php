@@ -4,18 +4,16 @@ declare(strict_types=1);
 
 namespace Asseco\JsonAuthorization\App\Http\Controllers;
 
-use Asseco\JsonAuthorization\App\Models\AuthorizableModel;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizableModel;
 use Illuminate\Http\JsonResponse;
 
 class AuthorizableModelController extends Controller
 {
     public AuthorizableModel $authorizableModel;
 
-    public function __construct()
+    public function __construct(AuthorizableModel $authorizableModel)
     {
-        $model = config('asseco-authorization.authorizable_model');
-
-        $this->authorizableModel = new $model;
+        $this->authorizableModel = $authorizableModel;
     }
 
     /**

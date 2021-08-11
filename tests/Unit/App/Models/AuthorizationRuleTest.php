@@ -2,9 +2,9 @@
 
 namespace Asseco\JsonAuthorization\Tests\Unit\Authorization;
 
-use Asseco\JsonAuthorization\App\Models\AuthorizableModel;
-use Asseco\JsonAuthorization\App\Models\AuthorizableSetType;
-use Asseco\JsonAuthorization\App\Models\AuthorizationRule;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizableModel;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizableSetType;
+use Asseco\JsonAuthorization\App\Contracts\AuthorizationRule;
 use Asseco\JsonAuthorization\Tests\TestCase;
 use Asseco\JsonAuthorization\Tests\TestUser;
 use Exception;
@@ -12,6 +12,10 @@ use Illuminate\Support\Arr;
 
 class AuthorizationRuleTest extends TestCase
 {
+    protected AuthorizableModel $authorizableModel;
+    protected AuthorizableSetType $authorizableSetType;
+    protected AuthorizationRule $authorizationRule;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -19,14 +23,18 @@ class AuthorizationRuleTest extends TestCase
         config(['asseco-authorization.models_path' => [
             __DIR__ . '/../../../' => 'Asseco\\JsonAuthorization\\Tests\\',
         ]]);
+
+        $this->authorizableModel = app(AuthorizableModel::class);
+        $this->authorizableSetType = app(AuthorizableSetType::class);
+        $this->authorizationRule = app(AuthorizationRule::class);
     }
 
     /** @test */
     public function has_authorizable_set_type_relation()
     {
-        $setType = AuthorizableSetType::factory()->create();
+        $setType = $this->authorizableSetType::factory()->create();
 
-        $rule = AuthorizationRule::factory()->create([
+        $rule = $this->authorizationRule::factory()->create([
             'authorizable_set_type_id' => $setType->id,
         ]);
 
@@ -36,11 +44,11 @@ class AuthorizationRuleTest extends TestCase
     /** @test */
     public function has_authorizable_model_relation()
     {
-        $model = AuthorizableModel::factory()->create([
+        $model = $this->authorizableModel::factory()->create([
             'name' => TestUser::class,
         ]);
 
-        $rule = AuthorizationRule::factory()->create([
+        $rule = $this->authorizationRule::factory()->create([
             'authorizable_model_id' => $model->id,
         ]);
 
@@ -52,7 +60,7 @@ class AuthorizationRuleTest extends TestCase
     {
         $this->expectException(Exception::class);
 
-        AuthorizationRule::resolveRulesFor('SomeOther::class');
+        $this->authorizationRule::resolveRulesFor('SomeOther::class');
     }
 
     /** @test */
@@ -60,11 +68,11 @@ class AuthorizationRuleTest extends TestCase
     {
         $this->actingAs(new TestUser());
 
-        $roleType = AuthorizableSetType::factory()->create(['name' => 'roles']);
+        $roleType = $this->authorizableSetType::factory()->create(['name' => 'roles']);
 
-        $model = AuthorizableModel::factory()->create(['name' => TestUser::class]);
+        $model = $this->authorizableModel::factory()->create(['name' => TestUser::class]);
 
-        AuthorizationRule::factory()->create([
+        $this->authorizationRule::factory()->create([
             'authorizable_set_type_id' => $roleType->id,
             'authorizable_set_value'   => 'role1',
             'authorizable_model_id'    => $model->id,
@@ -73,7 +81,7 @@ class AuthorizationRuleTest extends TestCase
             ]),
         ]);
 
-        $resolvedRules = AuthorizationRule::resolveRulesFor(TestUser::class);
+        $resolvedRules = $this->authorizationRule::resolveRulesFor(TestUser::class);
 
         $role1Rules = $resolvedRules->where('authorizable_set_value', 'role1')->first();
         $role2Rules = $resolvedRules->where('authorizable_set_value', 'role2')->first();
@@ -87,11 +95,11 @@ class AuthorizationRuleTest extends TestCase
     {
         $this->actingAs(new TestUser());
 
-        $roleType = AuthorizableSetType::factory()->create(['name' => 'roles']);
+        $roleType = $this->authorizableSetType::factory()->create(['name' => 'roles']);
 
-        $model = AuthorizableModel::factory()->create(['name' => TestUser::class]);
+        $model = $this->authorizableModel::factory()->create(['name' => TestUser::class]);
 
-        AuthorizationRule::factory()->create([
+        $this->authorizationRule::factory()->create([
             'authorizable_set_type_id' => $roleType->id,
             'authorizable_set_value'   => 'role1',
             'authorizable_model_id'    => $model->id,
@@ -100,7 +108,7 @@ class AuthorizationRuleTest extends TestCase
             ]),
         ]);
 
-        AuthorizationRule::factory()->create([
+        $this->authorizationRule::factory()->create([
             'authorizable_set_type_id' => $roleType->id,
             'authorizable_set_value'   => 'role2',
             'authorizable_model_id'    => $model->id,
@@ -109,7 +117,7 @@ class AuthorizationRuleTest extends TestCase
             ]),
         ]);
 
-        $resolvedRules = AuthorizationRule::resolveRulesFor(TestUser::class);
+        $resolvedRules = $this->authorizationRule::resolveRulesFor(TestUser::class);
 
         $role1Rules = $resolvedRules->where('authorizable_set_value', 'role1')->first();
         $role2Rules = $resolvedRules->where('authorizable_set_value', 'role2')->first();
@@ -129,7 +137,7 @@ class AuthorizationRuleTest extends TestCase
             ],
         ];
 
-        $actual = AuthorizationRule::format(1, 'role1', ['test' => 'test']);
+        $actual = $this->authorizationRule::format(1, 'role1', ['test' => 'test']);
 
         $this->assertEquals($expected, $actual);
     }
