@@ -7,6 +7,7 @@ namespace Asseco\JsonAuthorization\Database\Seeders;
 use Asseco\JsonAuthorization\App\Collections\AuthorizableSetCollection;
 use Asseco\JsonAuthorization\App\Contracts\AuthorizableSetType;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class AuthorizableSetTypeSeeder extends Seeder
 {
@@ -33,6 +34,12 @@ class AuthorizableSetTypeSeeder extends Seeder
                 'description' => 'Authentication service ID',
             ],
         ];
+
+        if(config('asseco-authorization.migrations.uuid')){
+            foreach ($basicTypes as &$basicType) {
+                $basicType['id'] = Str::uuid();
+            }
+        }
 
         $authorizableSetType::query()->upsert($basicTypes, 'name');
     }
