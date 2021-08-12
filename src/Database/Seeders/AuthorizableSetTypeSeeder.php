@@ -35,7 +35,7 @@ class AuthorizableSetTypeSeeder extends Seeder
             ],
         ];
 
-        if(config('asseco-authorization.migrations.uuid')){
+        if (config('asseco-authorization.migrations.uuid')) {
             foreach ($basicTypes as &$basicType) {
                 $basicType['id'] = Str::uuid();
             }
