@@ -26,7 +26,7 @@ class AuthorizableModelSeeder extends Seeder
             $models[] = ['name' => $model['name']];
         }
 
-        if(config('asseco-authorization.migrations.uuid')){
+        if (config('asseco-authorization.migrations.uuid')) {
             foreach ($models as &$model) {
                 $model['id'] = Str::uuid();
             }
