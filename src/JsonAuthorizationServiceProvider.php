@@ -11,6 +11,7 @@ use Asseco\JsonAuthorization\App\Contracts\AuthorizationRule;
 use Asseco\JsonAuthorization\Authorization\AbsoluteRights;
 use Asseco\JsonAuthorization\Authorization\EloquentEvents;
 use Asseco\JsonAuthorization\Authorization\RuleParser;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class JsonAuthorizationServiceProvider extends ServiceProvider
@@ -41,9 +42,8 @@ class JsonAuthorizationServiceProvider extends ServiceProvider
             __DIR__ . '/../config/asseco-authorization.php' => config_path('asseco-authorization.php'),
         ], 'asseco-authorization');
 
-        $this->app->bind(AuthorizableModel::class, config('asseco-authorization.models.authorizable_model'));
-        $this->app->bind(AuthorizableSetType::class, config('asseco-authorization.models.authorizable_set_type'));
-        $this->app->bind(AuthorizationRule::class, config('asseco-authorization.models.authorization_rule'));
+        $this->bindClasses();
+        $this->routeModelBinding();
 
         $this->registerAuthorizationClasses();
 
@@ -67,5 +67,19 @@ class JsonAuthorizationServiceProvider extends ServiceProvider
         $this->app->singleton(AbsoluteRights::class);
         $this->app->singleton(RuleParser::class);
         $this->app->singleton(EloquentEvents::class);
+    }
+
+    protected function bindClasses()
+    {
+        $this->app->bind(AuthorizableModel::class, config('asseco-authorization.models.authorizable_model'));
+        $this->app->bind(AuthorizableSetType::class, config('asseco-authorization.models.authorizable_set_type'));
+        $this->app->bind(AuthorizationRule::class, config('asseco-authorization.models.authorization_rule'));
+    }
+
+    protected function routeModelBinding()
+    {
+        Route::model('authorizable_model', get_class(app(AuthorizableModel::class)));
+        Route::model('authorizable_set_type', get_class(app(AuthorizableSetType::class)));
+        Route::model('authorization_rule', get_class(app(AuthorizationRule::class)));
     }
 }

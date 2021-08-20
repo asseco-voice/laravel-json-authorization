@@ -6,6 +6,7 @@ namespace Asseco\JsonAuthorization\Database\Seeders;
 
 use Asseco\JsonAuthorization\App\Contracts\AuthorizableModel;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class AuthorizableModelSeeder extends Seeder
 {
@@ -23,6 +24,12 @@ class AuthorizableModelSeeder extends Seeder
         $models = [];
         foreach ($modelsWithTrait as $model) {
             $models[] = ['name' => $model['name']];
+        }
+
+        if(config('asseco-authorization.migrations.uuid')){
+            foreach ($models as &$model) {
+                $model['id'] = Str::uuid();
+            }
         }
 
         $authorizableModel::query()->upsert($models, 'name');
