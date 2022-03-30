@@ -36,9 +36,10 @@ class RuleParser
     ];
 
     /**
-     * @param string $modelClass
-     * @param string $right
+     * @param  string  $modelClass
+     * @param  string  $right
      * @return array|string[]
+     *
      * @throws Exception
      * @throws Throwable
      */
@@ -66,9 +67,9 @@ class RuleParser
     }
 
     /**
-     * @param Collection $authorizationRules
-     * @param string $modelClass
-     * @param string $right
+     * @param  Collection  $authorizationRules
+     * @param  string  $modelClass
+     * @param  string  $right
      * @return array
      */
     protected function getMergedRules(Collection $authorizationRules, string $modelClass, string $right): array
@@ -102,7 +103,8 @@ class RuleParser
      * Events mapped within this class should reflect events registered within EloquentEvents class
      * (without the wildcard character).
      *
-     * @param string $eventName
+     * @param  string  $eventName
+     *
      * @throws AuthorizationException
      */
     public function checkEventMapping(string $eventName): void
@@ -120,15 +122,15 @@ class RuleParser
             return $mergedRules;
         }
 
-        $mergedRules = $this->initMergedRulesArrayKeys(self::SEARCH, $mergedRules, self:: OR);
-        $mergedRules[self::SEARCH][self:: OR][] = $rules[self::SEARCH];
+        $mergedRules = $this->initMergedRulesArrayKeys(self::SEARCH, $mergedRules, self::OR);
+        $mergedRules[self::SEARCH][self::OR][] = $rules[self::SEARCH];
 
         return $mergedRules;
     }
 
     /**
-     * @param string $search
-     * @param array $rules
+     * @param  string  $search
+     * @param  array  $rules
      * @return bool
      */
     protected function rulesMalformed(string $search, array $rules): bool
@@ -137,9 +139,9 @@ class RuleParser
     }
 
     /**
-     * @param string $search
-     * @param array $mergedRules
-     * @param string $or
+     * @param  string  $search
+     * @param  array  $mergedRules
+     * @param  string  $or
      * @return array
      */
     protected function initMergedRulesArrayKeys(string $search, array $mergedRules, string $or): array

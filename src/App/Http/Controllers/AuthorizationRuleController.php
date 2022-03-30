@@ -31,7 +31,7 @@ class AuthorizationRuleController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return JsonResponse
      */
     public function store(Request $request): JsonResponse
@@ -44,7 +44,7 @@ class AuthorizationRuleController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param AuthorizationRule $authorizationRule
+     * @param  AuthorizationRule  $authorizationRule
      * @return JsonResponse
      */
     public function show(AuthorizationRule $authorizationRule): JsonResponse
@@ -55,8 +55,8 @@ class AuthorizationRuleController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
-     * @param AuthorizationRule $authorizationRule
+     * @param  Request  $request
+     * @param  AuthorizationRule  $authorizationRule
      * @return JsonResponse
      */
     public function update(Request $request, AuthorizationRule $authorizationRule): JsonResponse
@@ -69,8 +69,9 @@ class AuthorizationRuleController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param AuthorizationRule $authorizationRule
+     * @param  AuthorizationRule  $authorizationRule
      * @return JsonResponse
+     *
      * @throws Exception
      */
     public function destroy(AuthorizationRule $authorizationRule): JsonResponse

@@ -31,7 +31,7 @@ class AuthorizableSetTypeController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return JsonResponse
      */
     public function store(Request $request): JsonResponse
@@ -44,7 +44,7 @@ class AuthorizableSetTypeController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param AuthorizableSetType $authorizableSetType
+     * @param  AuthorizableSetType  $authorizableSetType
      * @return JsonResponse
      */
     public function show(AuthorizableSetType $authorizableSetType): JsonResponse
@@ -55,8 +55,8 @@ class AuthorizableSetTypeController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
-     * @param AuthorizableSetType $authorizableSetType
+     * @param  Request  $request
+     * @param  AuthorizableSetType  $authorizableSetType
      * @return JsonResponse
      */
     public function update(Request $request, AuthorizableSetType $authorizableSetType): JsonResponse
@@ -69,8 +69,9 @@ class AuthorizableSetTypeController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param AuthorizableSetType $authorizableSetType
+     * @param  AuthorizableSetType  $authorizableSetType
      * @return JsonResponse
+     *
      * @throws Exception
      */
     public function destroy(AuthorizableSetType $authorizableSetType): JsonResponse

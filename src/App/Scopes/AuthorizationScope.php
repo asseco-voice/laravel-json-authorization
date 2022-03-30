@@ -19,9 +19,10 @@ class AuthorizationScope implements Scope
     /**
      * Apply the scope to a given Eloquent query builder.
      *
-     * @param Builder $builder
-     * @param Model $model
+     * @param  Builder  $builder
+     * @param  Model  $model
      * @return void
+     *
      * @throws JsonQueryBuilderException
      * @throws Exception
      * @throws Throwable

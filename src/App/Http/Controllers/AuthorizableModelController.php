@@ -29,7 +29,7 @@ class AuthorizableModelController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param AuthorizableModel $authorizableModel
+     * @param  AuthorizableModel  $authorizableModel
      * @return JsonResponse
      */
     public function show(AuthorizableModel $authorizableModel): JsonResponse
