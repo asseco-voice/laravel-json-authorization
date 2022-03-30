@@ -46,6 +46,7 @@ class AuthorizableModel extends Model implements \Asseco\JsonAuthorization\App\C
 
     /**
      * Find models which implement Authorizable trait.
+     *
      * @return Collection
      */
     protected static function withTrait(): Collection
@@ -57,8 +58,9 @@ class AuthorizableModel extends Model implements \Asseco\JsonAuthorization\App\C
 
     /**
      * Remove models from DB which no longer implement the trait and add those which implement it but don't yet exist in DB.
-     * @param Collection $modelsInDb
-     * @param Collection $modelsWithTrait
+     *
+     * @param  Collection  $modelsInDb
+     * @param  Collection  $modelsWithTrait
      * @return Collection
      */
     protected static function sync(Collection $modelsInDb, Collection $modelsWithTrait): Collection
@@ -96,8 +98,9 @@ class AuthorizableModel extends Model implements \Asseco\JsonAuthorization\App\C
     }
 
     /**
-     * @param string $model
+     * @param  string  $model
      * @return int
+     *
      * @throws Throwable
      */
     public static function getIdFor(string $model): int

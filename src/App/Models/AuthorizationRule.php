@@ -36,6 +36,7 @@ class AuthorizationRule extends Model implements \Asseco\JsonAuthorization\App\C
 
     /**
      * Don't ever rename this to just 'model', it will conflict with Laravel.
+     *
      * @return BelongsTo
      */
     public function authorizableModel(): BelongsTo
@@ -64,8 +65,9 @@ class AuthorizationRule extends Model implements \Asseco\JsonAuthorization\App\C
      * Cache and return everything asked for (independently of whether search was a hit or not)
      * to prevent additional trips to the DB.
      *
-     * @param string $modelClass
+     * @param  string  $modelClass
      * @return Collection
+     *
      * @throws Throwable
      */
     public static function resolveRulesFor(string $modelClass): Collection
@@ -98,9 +100,10 @@ class AuthorizationRule extends Model implements \Asseco\JsonAuthorization\App\C
     }
 
     /**
-     * @param Collection $authorizableSets
-     * @param int $modelId
+     * @param  Collection  $authorizableSets
+     * @param  int  $modelId
      * @return array
+     *
      * @throws JsonException
      */
     protected static function getStored(Collection $authorizableSets, int $modelId): array
@@ -136,8 +139,10 @@ class AuthorizationRule extends Model implements \Asseco\JsonAuthorization\App\C
 
     /**
      * Decode to array to prepare for cache insertion. We don't want to decode every time the rule is returned.
-     * @param array $rules
+     *
+     * @param  array  $rules
      * @return array
+     *
      * @throws JsonException
      */
     protected static function decodeRules(array $rules): array
@@ -151,8 +156,9 @@ class AuthorizationRule extends Model implements \Asseco\JsonAuthorization\App\C
 
     /**
      * Remove records which were found to prevent searching for same record at more than one place.
-     * @param Collection $authorizableSets
-     * @param Collection $collection
+     *
+     * @param  Collection  $authorizableSets
+     * @param  Collection  $collection
      */
     protected static function cleanup(Collection $authorizableSets, Collection $collection): void
     {
@@ -169,8 +175,9 @@ class AuthorizationRule extends Model implements \Asseco\JsonAuthorization\App\C
 
     /**
      * Check if the collection contains a given authorizable set.
-     * @param array $authorizableSet
-     * @param Collection $collection
+     *
+     * @param  array  $authorizableSet
+     * @param  Collection  $collection
      * @return bool
      */
     protected static function existsInTheCollection(array $authorizableSet, Collection $collection): bool
@@ -182,9 +189,9 @@ class AuthorizationRule extends Model implements \Asseco\JsonAuthorization\App\C
     /**
      * Format input for pushing to collection which will ultimately end up in the cache in this format.
      *
-     * @param mixed $authorizableSetTypeId
-     * @param string $authorizableSetValue
-     * @param array $rules
+     * @param  mixed  $authorizableSetTypeId
+     * @param  string  $authorizableSetValue
+     * @param  array  $rules
      * @return array
      */
     public static function format($authorizableSetTypeId, string $authorizableSetValue, array $rules = []): array

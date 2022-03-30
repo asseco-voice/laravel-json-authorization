@@ -56,6 +56,7 @@ class EloquentEvents
     /**
      * @param $model
      * @return Model
+     *
      * @throws AuthorizationException
      */
     protected function getModel(array $model): Model
@@ -69,8 +70,9 @@ class EloquentEvents
 
     /**
      * @param $event
-     * @param RuleParser $ruleParser
+     * @param  RuleParser  $ruleParser
      * @return mixed|string
+     *
      * @throws AuthorizationException
      * @throws \Exception
      */
@@ -91,10 +93,11 @@ class EloquentEvents
     }
 
     /**
-     * @param string $modelClass
-     * @param array $input
-     * @param Model $eloquentModel
+     * @param  string  $modelClass
+     * @param  array  $input
+     * @param  Model  $eloquentModel
      * @return mixed
+     *
      * @throws JsonQueryBuilderException
      */
     protected function executeQuery(string $modelClass, array $input, Model $eloquentModel): array

@@ -87,6 +87,7 @@ class AuthorizableSetCollection extends Collection
      * Transform output to resemble authorization rules since at this point user authorizable sets are still unresolved
      * but we need a way to store it in the cache in the same format like authorization rules even if it is not found
      * in the DB (to prevent going to DB unnecessarily next time the same set value arrives).
+     *
      * @return AuthorizableSetCollection
      */
     public function toAuthorizationRuleFormat(): AuthorizableSetCollection

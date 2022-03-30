@@ -19,6 +19,7 @@ class UserAuthorizableSet
      * actually exist. This is preparing data for assembling a query down the line.
      *
      * @return AuthorizableSetCollection
+     *
      * @throws AuthorizationException
      */
     public static function prepare(): AuthorizableSetCollection
