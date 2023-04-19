@@ -15,7 +15,6 @@ class AbsoluteRights
         $absoluteRights = config('asseco-authorization.absolute_rights');
 
         foreach ($absoluteRights as $authorizableSetType => $authorizableSetValues) {
-
             /** @var AuthorizableSetType $authorizableSetTypeModel */
             $authorizableSetTypeModel = app(AuthorizableSetType::class);
 
