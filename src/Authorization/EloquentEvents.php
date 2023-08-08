@@ -54,7 +54,7 @@ class EloquentEvents
     }
 
     /**
-     * @param $model
+     * @param  $model
      * @return Model
      *
      * @throws AuthorizationException
@@ -69,7 +69,7 @@ class EloquentEvents
     }
 
     /**
-     * @param $event
+     * @param  $event
      * @param  RuleParser  $ruleParser
      * @return mixed|string
      *
