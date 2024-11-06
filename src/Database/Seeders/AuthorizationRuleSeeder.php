@@ -26,9 +26,9 @@ class AuthorizationRuleSeeder extends Seeder
 
             $authorizationRule::query()->create([
                 'authorizable_set_type_id' => 1,
-                'authorizable_set_value'   => $role,
-                'authorizable_model_id'    => $authorizableModel->id,
-                'rules'                    => json_encode($rules, JSON_THROW_ON_ERROR),
+                'authorizable_set_value' => $role,
+                'authorizable_model_id' => $authorizableModel->id,
+                'rules' => json_encode($rules, JSON_THROW_ON_ERROR),
             ]);
         }
     }

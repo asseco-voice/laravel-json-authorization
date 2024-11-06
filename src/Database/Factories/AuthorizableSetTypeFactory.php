@@ -21,10 +21,10 @@ class AuthorizableSetTypeFactory extends Factory
     public function definition()
     {
         return [
-            'name'        => $this->faker->word,
+            'name' => $this->faker->word,
             'description' => $this->faker->sentence,
-            'created_at'  => now(),
-            'updated_at'  => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 }
