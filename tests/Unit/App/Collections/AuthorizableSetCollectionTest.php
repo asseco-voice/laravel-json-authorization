@@ -97,23 +97,23 @@ class AuthorizableSetCollectionTest extends TestCase
         $expected = [
             [
                 'authorizable_set_type_id' => $roleType->id,
-                'authorizable_set_value'   => 'role1',
-                'rules'                    => [],
+                'authorizable_set_value' => 'role1',
+                'rules' => [],
             ],
             [
                 'authorizable_set_type_id' => $roleType->id,
-                'authorizable_set_value'   => 'role2',
-                'rules'                    => [],
+                'authorizable_set_value' => 'role2',
+                'rules' => [],
             ],
             [
                 'authorizable_set_type_id' => $groupType->id,
-                'authorizable_set_value'   => 'group1',
-                'rules'                    => [],
+                'authorizable_set_value' => 'group1',
+                'rules' => [],
             ],
             [
                 'authorizable_set_type_id' => $groupType->id,
-                'authorizable_set_value'   => 'group2',
-                'rules'                    => [],
+                'authorizable_set_value' => 'group2',
+                'rules' => [],
             ],
         ];
 
