@@ -22,11 +22,11 @@ class AuthorizationRuleFactory extends Factory
     {
         return [
             'authorizable_set_type_id' => $this->faker->randomNumber(),
-            'authorizable_set_value'   => $this->faker->word,
-            'authorizable_model_id'    => $this->faker->randomNumber(),
-            'rules'                    => json_encode($this->faker->words(10)),
-            'created_at'               => now(),
-            'updated_at'               => now(),
+            'authorizable_set_value' => $this->faker->word,
+            'authorizable_model_id' => $this->faker->randomNumber(),
+            'rules' => json_encode($this->faker->words(10)),
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 }

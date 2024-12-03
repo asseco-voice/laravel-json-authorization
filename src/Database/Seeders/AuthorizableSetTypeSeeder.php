@@ -18,19 +18,19 @@ class AuthorizableSetTypeSeeder extends Seeder
 
         $basicTypes = [
             [
-                'name'        => AuthorizableSetCollection::VIRTUAL_SET_TYPE,
+                'name' => AuthorizableSetCollection::VIRTUAL_SET_TYPE,
                 'description' => 'Virtual set type attached automatically to every user.',
             ],
             [
-                'name'        => 'roles',
+                'name' => 'roles',
                 'description' => 'Authentication service roles',
             ],
             [
-                'name'        => 'groups',
+                'name' => 'groups',
                 'description' => 'Authentication service groups',
             ],
             [
-                'name'        => 'id',
+                'name' => 'id',
                 'description' => 'Authentication service ID',
             ],
         ];

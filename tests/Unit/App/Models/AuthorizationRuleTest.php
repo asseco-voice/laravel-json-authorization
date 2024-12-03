@@ -74,9 +74,9 @@ class AuthorizationRuleTest extends TestCase
 
         $this->authorizationRule::factory()->create([
             'authorizable_set_type_id' => $roleType->id,
-            'authorizable_set_value'   => 'role1',
-            'authorizable_model_id'    => $model->id,
-            'rules'                    => json_encode([
+            'authorizable_set_value' => 'role1',
+            'authorizable_model_id' => $model->id,
+            'rules' => json_encode([
                 'read' => '*',
             ]),
         ]);
@@ -101,18 +101,18 @@ class AuthorizationRuleTest extends TestCase
 
         $this->authorizationRule::factory()->create([
             'authorizable_set_type_id' => $roleType->id,
-            'authorizable_set_value'   => 'role1',
-            'authorizable_model_id'    => $model->id,
-            'rules'                    => json_encode([
+            'authorizable_set_value' => 'role1',
+            'authorizable_model_id' => $model->id,
+            'rules' => json_encode([
                 'read' => '*',
             ]),
         ]);
 
         $this->authorizationRule::factory()->create([
             'authorizable_set_type_id' => $roleType->id,
-            'authorizable_set_value'   => 'role2',
-            'authorizable_model_id'    => $model->id,
-            'rules'                    => json_encode([
+            'authorizable_set_value' => 'role2',
+            'authorizable_model_id' => $model->id,
+            'rules' => json_encode([
                 'write' => '*',
             ]),
         ]);
@@ -131,8 +131,8 @@ class AuthorizationRuleTest extends TestCase
     {
         $expected = [
             'authorizable_set_type_id' => 1,
-            'authorizable_set_value'   => 'role1',
-            'rules'                    => [
+            'authorizable_set_value' => 'role1',
+            'rules' => [
                 'test' => 'test',
             ],
         ];
