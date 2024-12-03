@@ -13,7 +13,7 @@ class TestUser extends Authenticatable implements AuthorizationInterface
     public function getAuthorizableSets(): array
     {
         return [
-            'roles'  => [
+            'roles' => [
                 'role1',
                 'role2',
             ],

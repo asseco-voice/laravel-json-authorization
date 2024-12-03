@@ -198,8 +198,8 @@ class AuthorizationRule extends Model implements \Asseco\JsonAuthorization\App\C
     {
         return [
             self::SET_TYPE_ID => $authorizableSetTypeId,
-            self::SET_VALUE   => $authorizableSetValue,
-            self::RULES       => $rules,
+            self::SET_VALUE => $authorizableSetValue,
+            self::RULES => $rules,
         ];
     }
 }
