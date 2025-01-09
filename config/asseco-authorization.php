@@ -12,17 +12,17 @@ return [
      * Model bindings.
      */
     'models' => [
-        'authorizable_model'    => AuthorizableModel::class,
+        'authorizable_model' => AuthorizableModel::class,
         'authorizable_set_type' => AuthorizableSetType::class,
-        'authorization_rule'    => AuthorizationRule::class,
+        'authorization_rule' => AuthorizationRule::class,
     ],
 
-    'migrations'             => [
+    'migrations' => [
 
         /**
          * UUIDs as primary keys.
          */
-        'uuid'       => false,
+        'uuid' => false,
 
         /**
          * Timestamp types.
@@ -35,7 +35,7 @@ return [
          * Should the package run the migrations. Set to false if you're publishing
          * and changing default migrations.
          */
-        'run'        => true,
+        'run' => true,
     ],
 
     /**
@@ -44,20 +44,20 @@ return [
      * This does not recurse in folders, so you need to specify
      * an array of paths if non-standard models are to be used
      */
-    'models_path'            => [
+    'models_path' => [
         app_path('Models') => 'App\\Models\\',
     ],
 
     /**
      * Namespace to Authorizable trait.
      */
-    'trait_path'             => Authorizable::class,
+    'trait_path' => Authorizable::class,
 
     /**
      * List of roles/groups/etc which have absolute admin/root rights.
      * Key must resemble names from authorization_manage_types table.
      */
-    'absolute_rights'        => [
+    'absolute_rights' => [
         // 'roles' => [
         //      'asseco-voice-admin'
         // ],
@@ -76,5 +76,5 @@ return [
      * your auth service (or whoever is responsible for providing user roles). Check readme
      * for more details.
      */
-    'virtual_role'           => env('VIRTUAL_ROLE', 'voice-all-mighty'),
+    'virtual_role' => env('VIRTUAL_ROLE', 'voice-all-mighty'),
 ];
